@@ -18,6 +18,7 @@ public abstract class PacketClient {
 
 	public PacketClient() {
 	}
+
 	/**
 	 * handle the packet
 	 * 

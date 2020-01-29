@@ -9,10 +9,12 @@ import io.netty.channel.socket.SocketChannel;
 import ssixprojet.server.packet.PacketServer;
 
 public class Player {
+	public static final int MAX_KEEP_ALIVE = 5;
 	private static AtomicInteger lastId = new AtomicInteger(1);
 	private final int id;
 	private boolean connected = false;
 	private SocketChannel channel;
+	private int keepAliveCount = MAX_KEEP_ALIVE;
 
 	public Player(SocketChannel channel) {
 		this.id = lastId.getAndIncrement();
@@ -33,6 +35,17 @@ public class Player {
 
 	public boolean isConnected() {
 		return connected;
+	}
+
+	public synchronized int getKeepAliveCount() {
+		return keepAliveCount;
+	}
+
+	public synchronized void resetKeepAliveCount() {
+		keepAliveCount = MAX_KEEP_ALIVE;
+	}
+	public synchronized void decrementKeepAliveCount() {
+		keepAliveCount--;
 	}
 
 	public void sendPacket(PacketServer packet) {
