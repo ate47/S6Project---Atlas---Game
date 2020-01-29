@@ -1,52 +1,22 @@
 package ssixprojet.server;
 
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-
-public class Server extends ChannelInboundHandlerAdapter {
-	private WebServer webServer;
-	private GameServer gameServer;
-	private Thread gameThread, webThread;
-
-	public Server(int gameServerPort, int webServerPort, boolean bufferiseFile) {
-		this.gameServer = new GameServer(gameServerPort);
-		this.webServer = new WebServer(gameServerPort, bufferiseFile);
-	}
+public abstract class Server extends Thread {
 
 	@Override
-	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		cause.printStackTrace();
-		ctx.close();
-	}
-
-	public GameServer getGameServer() {
-		return gameServer;
-	}
-
-	public WebServer getWebServer() {
-		return webServer;
+	public void run() {
+		try {
+			startServer();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		super.run();
 	}
 
 	/**
-	 * launch the server
+	 * start the server
+	 * 
+	 * @throws Exception
+	 *             all exception the server can return
 	 */
-	public void startServers() {
-		webThread = new Thread(() -> {
-			try {
-				webServer.startServer();
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			}
-		});
-		gameThread = new Thread(() -> {
-			try {
-				gameServer.startServer();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		});
-		webThread.start();
-		gameThread.start();
-	}
-
+	protected abstract void startServer() throws Exception;
 }

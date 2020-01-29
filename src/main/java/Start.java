@@ -1,7 +1,7 @@
-import ssixprojet.server.Server;
+import ssixprojet.server.ServerManager;
 
 public class Start {
 	public static void main(String[] args) throws InterruptedException {
-		new Server(2206, 2080, false).startServers();
+		new ServerManager(2206, 2080, false).startServers();
 	}
 }

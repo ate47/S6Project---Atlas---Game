@@ -12,17 +12,19 @@ import ssixprojet.common.Player;
 import ssixprojet.server.packet.PacketPlayerParser;
 import ssixprojet.server.packet.PacketUnparserHandler;
 
-public class GameServer {
+public class GameServer extends Server {
 	private final int port;
 
 	public GameServer(int port) {
 		this.port = port;
 	}
 
-	public void startServer() throws Exception {
+	
+	protected void startServer() throws Exception {
 		EventLoopGroup bossGroup = new NioEventLoopGroup();
 		EventLoopGroup workerGroup = new NioEventLoopGroup();
 		try {
+			// start server
 			System.out.println("Starting server...");
 			ServerBootstrap b = new ServerBootstrap();
 			b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
@@ -34,7 +36,7 @@ public class GameServer {
 						}
 					})
 
-					.option(ChannelOption.SO_BACKLOG, 128).childOption(ChannelOption.SO_KEEPALIVE, true);
+					.option(ChannelOption.SO_BACKLOG, 1024).childOption(ChannelOption.SO_KEEPALIVE, true);
 
 			System.out.println("Binding connections...");
 			// Bind and start to accept incoming connections.

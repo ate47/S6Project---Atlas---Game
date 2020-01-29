@@ -20,7 +20,7 @@ import ssixprojet.server.web.WebBuffer;
 import ssixprojet.server.web.WebByteBuffer;
 import ssixprojet.server.web.WebFileBuffer;
 
-public class WebServer {
+public class WebServer extends Server {
 
 	private Map<String, WebBuffer> context = new HashMap<>();
 	private WebBuffer defaultBuffer = new WebByteBuffer("", "text/plain", "Bad URI".getBytes());
@@ -42,14 +42,14 @@ public class WebServer {
 		context.put(buffer.getUri().toLowerCase(), buffer);
 	}
 
-	public void startServer() throws Exception {
+	protected void startServer() throws Exception {
 
 		// Configure the server.
 		EventLoopGroup bossGroup = new NioEventLoopGroup(1);
 		EventLoopGroup workerGroup = new NioEventLoopGroup();
-
 		try {
 			ServerBootstrap b = new ServerBootstrap();
+			// max request connections
 			b.option(ChannelOption.SO_BACKLOG, 1024);
 			b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
 					.handler(new LoggingHandler(LogLevel.INFO)).childHandler(new ChannelInitializer<SocketChannel>() {
@@ -60,10 +60,11 @@ public class WebServer {
 						}
 					});
 
+			// binding channel
 			Channel ch = b.bind(webServerPort).sync().channel();
 
 			System.out.println("Webserver: http://127.0.0.1:" + webServerPort + '/');
-
+			// wait the end
 			ch.closeFuture().sync();
 		} finally {
 			bossGroup.shutdownGracefully();
