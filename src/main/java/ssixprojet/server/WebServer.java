@@ -30,10 +30,17 @@ public class WebServer extends Server {
 	public WebServer(int port, boolean bufferiseFile) {
 		this.webServerPort = port;
 		this.bufferiseFile = bufferiseFile;
-
 		// Register web context
+		registerWebContext(new WebFileBuffer("/", "text/html", "web/index.html"));
 		registerWebContext(new WebFileBuffer("/telephone", "text/html", "web/telephone.html"));
+
+		// libs
+		registerWebContext(new WebFileBuffer("/libs/p5.js", "text/javascript", "web/libs/p5.min.js"));
+		registerWebContext(new WebFileBuffer("/libs/p5.sound.js", "text/javascript", "web/libs/p5.sound.min.js"));
+
+		// scripts
 		registerWebContext(new WebFileBuffer("/script.js", "text/javascript", "web/script.js"));
+		// styles
 		registerWebContext(new WebFileBuffer("/style.css", "text/css", "web/style.css"));
 	}
 
