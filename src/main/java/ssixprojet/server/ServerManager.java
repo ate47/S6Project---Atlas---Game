@@ -6,7 +6,7 @@ public class ServerManager {
 
 	public ServerManager(int gameServerPort, int webServerPort, boolean bufferiseFile) {
 		this.gameServer = new GameServer(gameServerPort);
-		this.webServer = new WebServer(gameServerPort, bufferiseFile);
+		this.webServer = new WebServer(webServerPort, bufferiseFile);
 	}
 
 	public GameServer getGameServer() {
