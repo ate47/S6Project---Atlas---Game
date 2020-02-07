@@ -1,5 +1,6 @@
 package ssixprojet.server;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -16,6 +17,7 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import ssixprojet.server.web.HttpServerHandler;
+import ssixprojet.server.web.MimeTypeProvider;
 import ssixprojet.server.web.WebBuffer;
 import ssixprojet.server.web.WebByteBuffer;
 import ssixprojet.server.web.WebFileBuffer;
@@ -31,17 +33,17 @@ public class WebServer extends Server {
 		this.webServerPort = port;
 		this.bufferiseFile = bufferiseFile;
 		// Register web context
-		registerWebContext(new WebFileBuffer("/", "text/html", "web/index.html"));
-		registerWebContext(new WebFileBuffer("/telephone", "text/html", "web/telephone.html"));
+		registerDirectory("/", new File("web"));
+	}
 
-		// libs
-		registerWebContext(new WebFileBuffer("/libs/p5.js", "text/javascript", "web/libs/p5.min.js"));
-		registerWebContext(new WebFileBuffer("/libs/p5.sound.js", "text/javascript", "web/libs/p5.sound.min.js"));
-
-		// scripts
-		registerWebContext(new WebFileBuffer("/script.js", "text/javascript", "web/script.js"));
-		// styles
-		registerWebContext(new WebFileBuffer("/style.css", "text/css", "web/style.css"));
+	public void registerDirectory(String context, File d) {
+		if (!d.isDirectory())
+			return;
+		for (File f : d.listFiles())
+			if (f.isDirectory())
+				registerDirectory(context + f.getName() + "/", f);
+			else
+				registerWebContext(new WebFileBuffer(context + f.getName(), MimeTypeProvider.getMime(f.getName()), f));
 	}
 
 	public void registerWebContext(WebBuffer buffer) {
