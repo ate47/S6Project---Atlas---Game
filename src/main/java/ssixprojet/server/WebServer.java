@@ -34,6 +34,7 @@ public class WebServer extends Server {
 		this.bufferiseFile = bufferiseFile;
 		// Register web context
 		registerDirectory("/", new File("web"));
+		registerWebContext(new WebFileBuffer("/", MimeTypeProvider.getMime("index.html"), "web/index.html"));
 	}
 
 	public void registerDirectory(String context, File d) {
