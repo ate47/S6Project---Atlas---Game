@@ -1,7 +1,9 @@
 package ssixprojet.server;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -20,6 +22,7 @@ import ssixprojet.server.web.HttpServerHandler;
 import ssixprojet.server.web.MimeTypeProvider;
 import ssixprojet.server.web.WebBuffer;
 import ssixprojet.server.web.WebByteBuffer;
+import ssixprojet.server.web.WebDirectoryBuffer;
 import ssixprojet.server.web.WebFileBuffer;
 
 public class WebServer extends Server {
@@ -34,24 +37,58 @@ public class WebServer extends Server {
 		this.bufferiseFile = bufferiseFile;
 		// Register web context
 		registerDirectory("/", new File("web"));
-		registerWebContext(new WebFileBuffer("/", MimeTypeProvider.getMime("index.html"), "web/index.html"));
 	}
 
-	public void registerDirectory(String context, File d) {
-		if (!d.isDirectory())
+	/**
+	 * register all sub files of a directory
+	 * 
+	 * @param context the context to enter to this directory
+	 * @param dir     the directory
+	 */
+	public void registerDirectory(String context, File dir) {
+		// pass if not a directory
+		if (!dir.isDirectory())
 			return;
-		for (File f : d.listFiles())
-			if (f.isDirectory())
+		boolean indexFound = false;
+		List<String> directory = new ArrayList<>();
+		for (File f : dir.listFiles())
+			// register sub directory
+			if (f.isDirectory()) {
+				if (!indexFound)
+					directory.add(f.getName() + "/");
 				registerDirectory(context + f.getName() + "/", f);
-			else
-				registerWebContext(new WebFileBuffer(context + f.getName(), MimeTypeProvider.getMime(f.getName()), f));
+			} else {
+				// search the file name and the extension
+				String fileName = f.getName();
+				int point = fileName.lastIndexOf(".");
+				String mime = MimeTypeProvider.getMime(fileName.substring(point + 1));
+				// register this file as an index
+				if (point != -1 && fileName.substring(0, point).equalsIgnoreCase("index")) {
+					registerWebContext(new WebFileBuffer(context, mime, f));
+					indexFound = true;
+				}
+				
+				if (!indexFound)
+					directory.add(f.getName());
+				// register the file
+				registerWebContext(new WebFileBuffer(context + f.getName(), mime, f));
+			}
+		// register an index if no index exists
+		if (!indexFound)
+			registerWebContext(new WebDirectoryBuffer(context, directory));
 	}
 
+	/**
+	 * register a buffer
+	 * 
+	 * @param buffer the buffer
+	 */
 	public void registerWebContext(WebBuffer buffer) {
 		Objects.requireNonNull(buffer, "File buffer can't be null");
 		context.put(buffer.getUri().toLowerCase(), buffer);
 	}
 
+	@Override
 	protected void startServer() throws Exception {
 
 		// Configure the server.

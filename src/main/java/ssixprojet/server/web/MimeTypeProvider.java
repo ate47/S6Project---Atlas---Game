@@ -5,25 +5,29 @@ import java.util.Map;
 
 public class MimeTypeProvider {
 	private static final Map<String, String> MIMES = new HashMap<>();
-	private static final String MIME_DEFAULT = "text/plain";
-	static {
-		MIMES.put("html", "text/html");
-		MIMES.put("htm", "text/html");
-		MIMES.put("js", "text/javascript");
-		MIMES.put("css", "text/css");
+	public static final String TEXT_PLAIN = "text/plain";
+	public static final String TEXT_HTML = "text/html";
+	public static final String TEXT_JAVASCRIPT = "text/javascript";
+	public static final String TEXT_CSS = "text/css";
 
-		MIMES.put("png", "image/png");
-		MIMES.put("gif", "image/gif");
-		MIMES.put("jpg", "image/jpeg");
-		MIMES.put("jpeg", "image/jpeg");
-		MIMES.put("svg", "image/svg+xml");
+	public static final String IMAGE_PNG = "image/png";
+	public static final String IMAGE_GIF = "image/gif";
+	public static final String IMAGE_JPEG = "image/jpeg";
+	public static final String IMAGE_SVG = "image/svg+xml";
+	static {
+		MIMES.put("html", TEXT_HTML);
+		MIMES.put("htm", TEXT_HTML);
+		MIMES.put("js", TEXT_JAVASCRIPT);
+		MIMES.put("css", TEXT_CSS);
+
+		MIMES.put("png", IMAGE_PNG);
+		MIMES.put("gif", IMAGE_GIF);
+		MIMES.put("jpg", IMAGE_JPEG);
+		MIMES.put("jpeg", IMAGE_JPEG);
+		MIMES.put("svg", IMAGE_SVG);
 	}
 
-	public static String getMime(String file) {
-		int point = file.lastIndexOf(".");
-		System.out.println(file + " / " + point);
-		if (point == -1)
-			return MIME_DEFAULT;
-		return MIMES.getOrDefault(file.substring(point + 1), MIME_DEFAULT);
+	public static String getMime(String endOfName) {
+		return MIMES.getOrDefault(endOfName, TEXT_PLAIN);
 	}
 }
