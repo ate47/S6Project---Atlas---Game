@@ -6,6 +6,9 @@ let IMAGE_CONTROLER_RIGHT;
 let left;
 let right;
 
+let plrx = 0, plry = 0;
+let shots = [];
+
 class PressPoint {
 	/**
 	 * build a press point
@@ -18,14 +21,14 @@ class PressPoint {
 	constructor(x, y, idf, radius, img) {
 		this.x = x;
 		this.y = y;
+		this.d2 = 0;
 		this.idf = idf;
 		this.vectorX = 0;
 		this.vectorY = 0;
 		this.radius = radius;
 		this.img = img;
-		this.color = 255
-		this.drawControler = true;
-		this.color = color(255, 100, 100, 100);
+		this.drawControler = false;
+		this.color = color(100, 100, 255, 50);
 	}
 
 	/**
@@ -38,15 +41,24 @@ class PressPoint {
 		this.vectorY = inputY - this.y;
 		
 		// maximize the move vector
-		let d2 = this.vectorX * this.vectorX + this.vectorY * this.vectorY;
+		this.d2 = this.vectorX * this.vectorX + this.vectorY * this.vectorY;
 		let radius2 = this.radius * this.radius / 4;
-		if (d2 > radius2) {
-			let d = Math.sqrt(d2);	
+		if (this.d2 > radius2) {
+			let d = Math.sqrt(this.d2);	
 			this.vectorX = this.radius / 2 * this.vectorX / d;
 			this.vectorY = this.radius / 2 * this.vectorY / d;
 		}
 	}
-
+	/**
+	 * update the identifier of this controller
+	 * @param {number} idf 
+	 */
+	updateIDF(idf) {
+		this.idf = idf;
+		this.vectorX = 0;
+		this.vectorY = 0;
+		this.drawControler = true;
+	}
 	/**
 	 * set a new location for the controller
 	 * @param {number} x the new x location
@@ -55,11 +67,15 @@ class PressPoint {
 	updateLocation(x, y, idf, radius) {
 		this.x = x;
 		this.y = y;
-		this.idf = idf;
-		this.vectorX = 0;
-		this.vectorY = 0;
 		this.radius = radius;
-		this.drawControler = true;
+		updateIDF(idf);
+	}
+
+	getMoveX() {
+		return this.vectorX / this.radius;
+	}
+	getMoveY() {
+		return this.vectorY / this.radius;
 	}
 
 	/**
@@ -69,6 +85,7 @@ class PressPoint {
 		this.vectorX = 0;
 		this.vectorY = 0;
 		this.idf = -1;
+		this.d2 = 0;
 		this.drawControler = false;
 	}
 
@@ -76,8 +93,15 @@ class PressPoint {
 	 * draw the press point
 	 */
 	draw() {
-		if (!this.drawControler)
-			return;
+		if (!this.drawControler) {
+			if (this.color._getAlpha() > 50)
+				this.color.setAlpha(this.color._getAlpha() - 10);
+			else if (this.color._getAlpha() < 50)
+				this.color.setAlpha(50);
+		} else if (this.color._getAlpha() < 100) {
+			this.color.setAlpha(this.color._getAlpha() + 10);
+		} else if (this.color._getAlpha() > 100)
+			this.color.setAlpha(100);
 		// draw the controller
 		fill(this.color);
 		circle(this.x, this.y, this.radius * 3 / 2);
@@ -96,19 +120,30 @@ function setup() {
 	IMAGE_CONTROLER_LEFT = loadImage("images/controler_view.png");
 	IMAGE_CONTROLER_RIGHT = loadImage("images/controler_weapon.png");
 
-	left = new PressPoint(windowWidth / 4, windowHeight * 3 / 4, -1, windowWidth / 8, IMAGE_CONTROLER_LEFT);
-	right = new PressPoint(windowWidth * 3 / 4, windowHeight * 3 / 4, -1, windowWidth / 8, IMAGE_CONTROLER_RIGHT);
+	left = new PressPoint(windowWidth / 6, windowHeight * 3 / 5, -1, windowWidth / 8, IMAGE_CONTROLER_LEFT);
+	right = new PressPoint(windowWidth * 5 / 6, windowHeight * 3 / 5, -1, windowWidth / 8, IMAGE_CONTROLER_RIGHT);
 
 	frameRate(60);
 	setInterval(tick, 20);
 }
 
 function tick() {
-	
+	plrx += left.getMoveX() * 5;
+	plry += left.getMoveY() * 5;
+
+	let r2 = right.radius * right.radius;
+	if (right.d2 > r2 / 4) {
+		shots.push({'x': plrx + 10, 'y': plry + 10, 'vx': right.getMoveX() * 5, 'vy' : right.getMoveY() * 5});
+	}
+
+	shots.forEach(obj => {
+		obj.x += obj.vx;
+		obj.y += obj.vy;
+	});
 }
 
 function draw() {
-	fill(color(255, 255, 255));
+	fill(color(220, 220, 220));
 	rect(0, 0, windowWidth, windowHeight);
 	noStroke();
 	
@@ -118,6 +153,15 @@ function draw() {
 
 	left.draw();
 	right.draw();
+
+	fill(color(255, 0, 0));
+
+	rect(plrx + windowWidth / 2, plry + windowHeight / 2, 20, 20);
+	
+	fill(color(0, 0, 255));
+	shots.forEach(obj => {
+		rect(obj.x + windowWidth / 2, obj.y + windowHeight / 2, 3, 3);
+	});
 }
 
 function touchStarted(ev) {
@@ -127,9 +171,9 @@ function touchStarted(ev) {
 		for (let i = 0; i < list.length; i++) {
 			touch = list[i];
 			if (touch.clientX < windowWidth / 2) { // left
-				left.updateLocation(touch.clientX, touch.clientY, touch.identifier, windowWidth / 8);
+				left.updateIDF(touch.identifier);
 			} else { // right
-				right.updateLocation(touch.clientX, touch.clientY, touch.identifier, windowWidth / 8);
+				right.updateIDF(touch.identifier);
 			}
 		}
 	}
@@ -171,6 +215,6 @@ function windowResized() {
 	log("Resize canvas("+windowWidth+", "+windowHeight+")");
 	resizeCanvas(windowWidth, windowHeight);
 
-	left.updateLocation(windowWidth / 4, windowHeight * 3 / 4, -1, windowWidth / 8);
-	right.updateLocation(windowWidth * 3 / 4, windowHeight * 3 / 4, -1, windowWidth / 8);
+	left.updateLocation(windowWidth / 6, windowHeight * 3 / 5, -1, windowWidth / 8);
+	right.updateLocation(windowWidth * 5 / 6, windowHeight * 3 / 5, -1, windowWidth / 8);
 }
