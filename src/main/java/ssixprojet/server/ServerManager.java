@@ -2,15 +2,9 @@ package ssixprojet.server;
 
 public class ServerManager {
 	private WebServer webServer;
-	private GameServer gameServer;
 
-	public ServerManager(int gameServerPort, int webServerPort, boolean bufferiseFile) {
-		this.gameServer = new GameServer(gameServerPort);
+	public ServerManager(int webServerPort, boolean bufferiseFile) {
 		this.webServer = new WebServer(webServerPort, bufferiseFile);
-	}
-
-	public GameServer getGameServer() {
-		return gameServer;
 	}
 
 	public WebServer getWebServer() {
@@ -22,7 +16,6 @@ public class ServerManager {
 	 */
 	public void startServers() {
 		webServer.start();
-		gameServer.start();
 	}
 
 }

@@ -1,6 +1,7 @@
 package ssixprojet.common;
 
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.netty.buffer.ByteBuf;
@@ -9,15 +10,17 @@ import io.netty.channel.socket.SocketChannel;
 import ssixprojet.server.packet.PacketServer;
 
 public class Player {
-	public static final int MAX_KEEP_ALIVE = 5;
+	public static final int MAX_KEEP_ALIVE = 20;
 	private static AtomicInteger lastId = new AtomicInteger(1);
 	private final int id;
+	private final UUID internalId;
 	private boolean connected = false;
 	private SocketChannel channel;
 	private int keepAliveCount = MAX_KEEP_ALIVE;
 
 	public Player(SocketChannel channel) {
 		this.id = lastId.getAndIncrement();
+		this.internalId = UUID.randomUUID();
 		this.channel = Objects.requireNonNull(channel);
 	}
 
@@ -33,6 +36,10 @@ public class Player {
 		return id;
 	}
 
+	public UUID getInternalId() {
+		return internalId;
+	}
+	
 	public boolean isConnected() {
 		return connected;
 	}

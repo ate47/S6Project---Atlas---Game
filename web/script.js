@@ -6,8 +6,18 @@ let IMAGE_CONTROLER_RIGHT;
 let left;
 let right;
 
-let plrx = 0, plry = 0;
-let shots = [];
+// Create WebSocket connection.
+const socket = new WebSocket('ws://' + window.location.host + '/game/phone');
+
+// Connection opened
+socket.addEventListener('open', function (event) {
+	socket.send('Hello Server!');
+});
+
+// Listen for messages
+socket.addEventListener('message', function (event) {
+	log('Message from server ', event.data);
+});
 
 class PressPoint {
 	/**
@@ -128,18 +138,14 @@ function setup() {
 }
 
 function tick() {
-	plrx += left.getMoveX() * 5;
-	plry += left.getMoveY() * 5;
+	// left.getMoveX() * 5;
+	// left.getMoveY() * 5;
+	// move
 
 	let r2 = right.radius * right.radius;
 	if (right.d2 > r2 / 4) {
-		shots.push({'x': plrx + 10, 'y': plry + 10, 'vx': right.getMoveX() * 5, 'vy' : right.getMoveY() * 5});
+		// shot
 	}
-
-	shots.forEach(obj => {
-		obj.x += obj.vx;
-		obj.y += obj.vy;
-	});
 }
 
 function draw() {
@@ -153,15 +159,6 @@ function draw() {
 
 	left.draw();
 	right.draw();
-
-	fill(color(255, 0, 0));
-
-	rect(plrx + windowWidth / 2, plry + windowHeight / 2, 20, 20);
-	
-	fill(color(0, 0, 255));
-	shots.forEach(obj => {
-		rect(obj.x + windowWidth / 2, obj.y + windowHeight / 2, 3, 3);
-	});
 }
 
 function touchStarted(ev) {

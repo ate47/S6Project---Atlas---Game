@@ -11,6 +11,7 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -18,6 +19,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import ssixprojet.server.packet.PacketManager;
 import ssixprojet.server.web.HttpServerHandler;
 import ssixprojet.server.web.MimeTypeProvider;
 import ssixprojet.server.web.WebBuffer;
@@ -27,6 +29,7 @@ import ssixprojet.server.web.WebFileBuffer;
 
 public class WebServer extends Server {
 
+	private PacketManager manager = new PacketManager();
 	private Map<String, WebBuffer> context = new HashMap<>();
 	private WebBuffer defaultBuffer = new WebByteBuffer("", "text/plain", "Bad URI".getBytes());
 	private final int webServerPort;
@@ -67,7 +70,7 @@ public class WebServer extends Server {
 					registerWebContext(new WebFileBuffer(context, mime, f));
 					indexFound = true;
 				}
-				
+
 				if (!indexFound)
 					directory.add(f.getName());
 				// register the file
@@ -102,8 +105,11 @@ public class WebServer extends Server {
 					.handler(new LoggingHandler(LogLevel.INFO)).childHandler(new ChannelInitializer<SocketChannel>() {
 						@Override
 						protected void initChannel(SocketChannel ch) throws Exception {
-							ch.pipeline().addLast(new HttpServerCodec())
-									.addLast(new HttpServerHandler(bufferiseFile, context, defaultBuffer));
+							ChannelPipeline pipeline = ch.pipeline();
+
+							pipeline.addLast("httpCodec", new HttpServerCodec());
+							pipeline.addLast("httpHandler",
+									new HttpServerHandler(bufferiseFile, context, defaultBuffer, manager));
 						}
 					});
 
