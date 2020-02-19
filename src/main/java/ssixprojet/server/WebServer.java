@@ -19,6 +19,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import ssixprojet.common.GameMap;
 import ssixprojet.server.packet.PacketManager;
 import ssixprojet.server.web.HttpServerHandler;
 import ssixprojet.server.web.MimeTypeProvider;
@@ -34,12 +35,22 @@ public class WebServer extends Server {
 	private WebBuffer defaultBuffer = new WebByteBuffer("", "text/plain", "Bad URI".getBytes());
 	private final int webServerPort;
 	private boolean bufferiseFile;
+	private GameMap gameMap;
 
 	public WebServer(int port, boolean bufferiseFile) {
 		this.webServerPort = port;
 		this.bufferiseFile = bufferiseFile;
 		// Register web context
 		registerDirectory("/", new File("web"));
+		if ((gameMap = GameMap.readMap(new File(new File("config"), "map.json"))) == null)
+			throw new RuntimeException("Can't load the game map");
+	}
+
+	/**
+	 * @return the game map
+	 */
+	public GameMap getGameMap() {
+		return gameMap;
 	}
 
 	/**
