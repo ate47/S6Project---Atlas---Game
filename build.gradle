@@ -30,6 +30,9 @@ dependencies {
     // networks
     implementation 'io.netty:netty-all:4.0.56.Final'
     implementation 'commons-io:commons-io:2.4'
+
+	// reader
+  	implementation 'com.google.code.gson:gson:2.8.6'
     
     // annotation
 	compileOnly 'org.projectlombok:lombok:1.18.8'
