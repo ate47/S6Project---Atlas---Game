@@ -3,7 +3,7 @@ package JEU;
 public class Zombie extends Perso{
 
 	private int numZombie;
-	private int nb_zombie = 0;
+	private static int NB_ZOMBIE = 0;
 	protected IPerso tz;
 	
 	public Zombie() {
@@ -11,6 +11,7 @@ public class Zombie extends Perso{
 		super(TYPEZ, x, y, v);
 		IPerso zombie = IPerso.ZOMBIE;
 		tz = zombie;
+		this.numZombie = ++NB_ZOMBIE;
 	}
 	
 	public IPerso getTZ() {
@@ -18,7 +19,7 @@ public class Zombie extends Perso{
 	}
 	
 	public int getNB() {
-		return this.nb_zombie;
+		return Zombie.NB_ZOMBIE;
 	}
 	
 	public String toString() {

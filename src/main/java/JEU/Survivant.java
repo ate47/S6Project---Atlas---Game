@@ -3,7 +3,7 @@ package JEU;
 public class Survivant extends Perso{
 
 	private int numSurvivant;
-	private int nb_survivant = 0;
+	private static int NB_SURVIVANT = 0;
 	protected IPerso ts;
 	
 	public Survivant() {
@@ -11,6 +11,7 @@ public class Survivant extends Perso{
 		// TODO Auto-generated constructor stub
 		IPerso survivant = IPerso.SURVIVANT;
 		this.ts = survivant;
+		numSurvivant = ++NB_SURVIVANT;
 	}
 	
 	public IPerso getTS() {
@@ -18,7 +19,7 @@ public class Survivant extends Perso{
 	}
 	
 	public int getNB() {
-		return this.nb_survivant;
+		return Survivant.NB_SURVIVANT;
 	}
 	
 	public String toString() {
