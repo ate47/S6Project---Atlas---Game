@@ -42,8 +42,8 @@ public class WebServer extends Server {
 		this.bufferiseFile = bufferiseFile;
 		// Register web context
 		registerDirectory("/", new File("web"));
-		if ((gameMap = GameMap.readMap(new File(new File("config"), "map.json"))) == null)
-			throw new RuntimeException("Can't load the game map");
+//		if ((gameMap = GameMap.readMap(new File(new File("config"), "map.json"))) == null)
+//			throw new RuntimeException("Can't load the game map");
 	}
 
 	/**
