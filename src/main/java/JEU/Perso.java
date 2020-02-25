@@ -7,9 +7,11 @@ public class Perso implements IConfig{
 	protected static int v; //tir ou pv
 	protected static double x;
 	protected static double y;
+	private int num_perso; //id perso
 	
 	public Perso(int type, double x, double y, int v) {
 		super();
+		this.num_perso++;
 		this.type = type;
 		this.statut = true;
 		Perso.x = x;
@@ -56,6 +58,11 @@ public class Perso implements IConfig{
 	public void setV(int v) {
 		Perso.v = v;
 	}
+	
+	public int getID() {
+		return this.num_perso;
+	}
+	
 	
 	//Survivant To Zombie
 	public Perso SurvivantToZombie() {
