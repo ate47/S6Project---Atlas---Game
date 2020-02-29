@@ -1,15 +1,17 @@
 package JEU;
 
-public class Perso implements IConfig{
+import ssixprojet.common.PlayerType;
 
-	private int type;
+public class Perso {
+
+	private PlayerType type;
 	private boolean  statut; //mort ou vivant
 	protected static int v; //tir ou pv
 	protected static double x;
 	protected static double y;
 	private int num_perso; //id perso
 	
-	public Perso(int type, double x, double y, int v) {
+	public Perso(PlayerType type, double x, double y, int v) {
 		super();
 		this.num_perso++;
 		this.type = type;
@@ -26,7 +28,7 @@ public class Perso implements IConfig{
 		return Perso.y;
 	}
 	
-	public int getTYPE() {
+	public PlayerType getType() {
 		return this.type;
 	}
 	
@@ -38,8 +40,8 @@ public class Perso implements IConfig{
 		Perso.y = y;
 	}
 	
-	public void setTYPE(int tnew) {
-		this.type = tnew;
+	public void setType(PlayerType type) {
+		this.type = type;
 	}
 	
 	
