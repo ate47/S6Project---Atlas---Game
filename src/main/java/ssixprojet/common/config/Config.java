@@ -7,6 +7,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Config {
 	/**
+	 * save the files at first load
+	 */
+	private boolean bufferiseFile = false;
+	/**
 	 * percentage of initial infected
 	 */
 	private int initialInfectionPercentage = 10;
@@ -38,6 +42,7 @@ public class Config {
 	 * time before the end of the game in tick
 	 */
 	private int timeInTickBeforeEnd = tickRate * 60 * 4; // 4min
+
 	/**
 	 * time before the end of the game in tick
 	 */
