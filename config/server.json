@@ -1,0 +1,12 @@
+{
+  "bufferiseFile": false,
+  "initialInfectionPercentage": 10,
+  "passwordMaster": "ATAKE",
+  "port": 2080,
+  "tickRate": 20,
+  "spawnCrateLuck": 0.01,
+  "speedAccelerationPercentage": 110,
+  "startAmmo": 90,
+  "timeInTickBeforeEnd": 4800,
+  "timeInTickBeforeInfection": 600
+}
