@@ -7,6 +7,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.socket.SocketChannel;
+import lombok.Getter;
+import lombok.Setter;
 import ssixprojet.server.packet.PacketServer;
 
 public class Player {
@@ -14,9 +16,16 @@ public class Player {
 	private static AtomicInteger lastId = new AtomicInteger(1);
 	private final int id;
 	private final UUID internalId;
+	@Getter
+	@Setter
+	private PlayerType type = PlayerType.SURVIVOR;
 	private boolean connected = false;
 	private SocketChannel channel;
 	private int keepAliveCount = MAX_KEEP_ALIVE;
+	@Getter
+	private double x, y;
+	@Getter
+	private int health = 100, ammos = 90; // TODO Set config
 
 	public Player(SocketChannel channel) {
 		this.id = lastId.getAndIncrement();
