@@ -23,9 +23,13 @@ public class Config {
 	 */
 	private int port = 2080;
 	/**
+	 * tick rate of the server (Hz)
+	 */
+	private int tickRate = 20;
+	/**
 	 * luck of the spawn of a crate
 	 */
-	private double spawnCrateLuck = 1.0 / (5 * getTickRate()); // every 5 second
+	private double spawnCrateLuck = 1.0 / (5 * tickRate); // every 5 second
 	/**
 	 * speed added to the infected
 	 */
@@ -34,10 +38,6 @@ public class Config {
 	 * start ammo for each players
 	 */
 	private int startAmmo = 90;
-	/**
-	 * tick rate of the server (Hz)
-	 */
-	private int tickRate = 20;
 	/**
 	 * time before the end of the game in tick
 	 */
