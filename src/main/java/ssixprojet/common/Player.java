@@ -26,7 +26,7 @@ public class Player {
 	@Getter
 	private double x, y;
 	@Getter
-	private int health = 100, ammos = ServerManager.getConfig().getStartAmmo(); // TODO Set config
+	private int health = 100, ammos = ServerManager.getConfig().getStartAmmo();
 
 	public Player(SocketChannel channel) {
 		this.id = lastId.getAndIncrement();
