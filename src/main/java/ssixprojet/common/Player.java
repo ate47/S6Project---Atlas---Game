@@ -9,6 +9,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.socket.SocketChannel;
 import lombok.Getter;
 import lombok.Setter;
+import ssixprojet.server.ServerManager;
 import ssixprojet.server.packet.PacketServer;
 
 public class Player {
@@ -25,7 +26,7 @@ public class Player {
 	@Getter
 	private double x, y;
 	@Getter
-	private int health = 100, ammos = 90; // TODO Set config
+	private int health = 100, ammos = ServerManager.getConfig().getStartAmmo(); // TODO Set config
 
 	public Player(SocketChannel channel) {
 		this.id = lastId.getAndIncrement();
