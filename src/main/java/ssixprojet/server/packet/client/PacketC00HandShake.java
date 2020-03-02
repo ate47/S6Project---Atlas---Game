@@ -12,7 +12,7 @@ public class PacketC00HandShake extends PacketPlayer {
 	}
 
 	@Override
-	public void handle(Player player) throws Exception {
+	public void handle0(Player player) throws Exception {
 		player.connect(name);
 	}
 

@@ -9,7 +9,7 @@ public class PacketS02Death extends PacketServer {
 	private byte[] data;
 	public PacketS02Death(String msg) {
 		super(0x02, 4 + msg.length() * 3);
-		msg.getBytes(Charsets.UTF_8);
+		data = msg.getBytes(Charsets.UTF_8);
 	}
 	
 	@Override

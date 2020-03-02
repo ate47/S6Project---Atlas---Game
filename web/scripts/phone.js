@@ -7,7 +7,7 @@ let left;
 let right;
 
 // Create WebSocket connection.
-const packetHandler = new PacketHandler('ws://' + window.location.host + '/game/screen');
+const packetHandler = new PacketHandler('ws://' + window.location.host + '/game/phone');
 
 class PressPoint {
 	/**

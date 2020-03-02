@@ -2,7 +2,7 @@ package ssixprojet.server.packet;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import ssixprojet.common.PacketSource;
 
@@ -15,7 +15,7 @@ public class WebSocketHandler extends ChannelInboundHandlerAdapter {
 		this.src = source;
 	}
 
-	protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame frame) {
+	protected void channelRead0(ChannelHandlerContext ctx, BinaryWebSocketFrame frame) {
 		PacketClient packet = manager.buildPacket(frame);
 		if (packet == null) {
 			src.kick("Bad packet format");
@@ -23,7 +23,7 @@ public class WebSocketHandler extends ChannelInboundHandlerAdapter {
 		}
 
 		try {
-			packet.handle(src);
+			packet.handle((PacketSource) src);
 		} catch (Exception e) {
 			e.printStackTrace();
 			src.kick("Error while handling the packet");
@@ -32,13 +32,12 @@ public class WebSocketHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) {
-
 		if (msg instanceof WebSocketFrame) {
-			if (msg instanceof TextWebSocketFrame) {
-				channelRead0(ctx, (TextWebSocketFrame) msg);
+			if (msg instanceof BinaryWebSocketFrame) {
+				channelRead0(ctx, (BinaryWebSocketFrame) msg);
 			} else {
 				ctx.close();
-				System.out.println("Unsupported WebSocketFrame");
+				System.out.println("Unsupported WebSocketFrame: " + msg.getClass().getCanonicalName());
 			}
 		}
 	}

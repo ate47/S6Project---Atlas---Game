@@ -3,6 +3,7 @@ package ssixprojet.server.packet;
 import org.apache.commons.io.Charsets;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import ssixprojet.server.packet.Packet.PacketBuilder;
 import ssixprojet.server.packet.client.PacketC00HandShake;
@@ -53,7 +54,7 @@ public class PacketManager {
 	 *            the frame
 	 * @return the packet or null if an error occurred
 	 */
-	public PacketClient buildPacket(TextWebSocketFrame frame) {
+	public PacketClient buildPacket(BinaryWebSocketFrame frame) {
 		ByteBuf buffer = frame.content();
 		try {
 			int type = (int) buffer.readUnsignedInt(); // read u32

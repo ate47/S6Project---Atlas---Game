@@ -8,9 +8,9 @@ public abstract class PacketPlayer extends PacketClient {
 	@Override
 	public void handle(PacketSource src) throws Exception {
 		if (src instanceof Player) {
-			handle((Player) src);
+			handle0((Player) src);
 		} else
 			src.kick("Bad packet type");
 	}
-	public abstract void handle(Player player) throws Exception;
+	public abstract void handle0(Player player) throws Exception;
 }

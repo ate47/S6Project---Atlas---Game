@@ -9,7 +9,7 @@ public class PacketC01KeepAlive extends PacketPlayer {
 	}
 	
 	@Override
-	public void handle(Player player) throws Exception {
+	public void handle0(Player player) throws Exception {
 		player.resetKeepAliveCount();
 	}
 

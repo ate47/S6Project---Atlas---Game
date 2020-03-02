@@ -40,6 +40,8 @@ public class Player implements PacketSource {
 	public void connect(String name) {
 		connected = true;
 		this.username = name;
+		System.out.println(name + " connected!");
+		kick("sorry, not now");
 	}
 
 	public synchronized void decrementKeepAliveCount() {
@@ -68,6 +70,7 @@ public class Player implements PacketSource {
 
 	@Override
 	public void kick(String msg) {
+		System.out.println("Kick " + username + ": " + msg);
 		sendPacket(new PacketS02Death(msg));
 		channel.close();
 	}
@@ -81,7 +84,6 @@ public class Player implements PacketSource {
 		ByteBuf buffer = Unpooled.buffer(packet.getInitialSize() + 4);
 		buffer.writeInt(packet.getPacketId());
 		packet.write(buffer);
-		channel.write(buffer);
-		channel.flush();
+		channel.writeAndFlush(buffer);
 	}
 }
