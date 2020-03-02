@@ -14,9 +14,10 @@ import io.netty.handler.codec.http.HttpHeaders.Values;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
+import ssixprojet.common.Player;
+import ssixprojet.common.Screen;
 import ssixprojet.server.packet.PacketManager;
-import ssixprojet.server.packet.PhoneWebSocketHandler;
-import ssixprojet.server.packet.ScreenWebSocketHandler;
+import ssixprojet.server.packet.WebSocketHandler;
 
 public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 	private static final WebBuffer BAD_WEBSOCKET_RESPONSE = new WebByteBuffer("", MimeTypeProvider.TEXT_PLAIN,
@@ -56,9 +57,9 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 
 				// create a WebSocketHandler for the good actor
 				if (req.getUri().equals("/game/phone")) {
-					handler = new PhoneWebSocketHandler(manager);
+					handler = new WebSocketHandler(manager, new Player(ctx.channel()));
 				} else if (req.getUri().equals("/game/screen")) {
-					handler = new ScreenWebSocketHandler(manager);
+					handler = new WebSocketHandler(manager, new Screen(ctx.channel()));
 				} else {
 					System.out.println("Bad WS actor: " + req.getUri());
 					ctx.write(BAD_WEBSOCKET_RESPONSE.buildResponse(false));

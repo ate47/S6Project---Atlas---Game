@@ -4,15 +4,31 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
+import ssixprojet.common.PacketSource;
 
-public abstract class WebSocketHandler extends ChannelInboundHandlerAdapter {
+public class WebSocketHandler extends ChannelInboundHandlerAdapter {
 	protected final PacketManager manager;
+	private final PacketSource src;
 
-	public WebSocketHandler(PacketManager manager) {
+	public WebSocketHandler(PacketManager manager, PacketSource source) {
 		this.manager = manager;
+		this.src = source;
 	}
 
-	protected abstract void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame frame);
+	protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame frame) {
+		PacketClient packet = manager.buildPacket(frame);
+		if (packet == null) {
+			src.kick("Bad packet format");
+			return;
+		}
+
+		try {
+			packet.handle(src);
+		} catch (Exception e) {
+			e.printStackTrace();
+			src.kick("Error while handling the packet");
+		}
+	}
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) {
