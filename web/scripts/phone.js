@@ -7,17 +7,7 @@ let left;
 let right;
 
 // Create WebSocket connection.
-const socket = new WebSocket('ws://' + window.location.host + '/game/phone');
-
-// Connection opened
-socket.addEventListener('open', function (event) {
-	socket.send('Hello Server!');
-});
-
-// Listen for messages
-socket.addEventListener('message', function (event) {
-	log('Message from server ', event.data);
-});
+const packetHandler = new PacketHandler('ws://' + window.location.host + '/game/screen');
 
 class PressPoint {
 	/**

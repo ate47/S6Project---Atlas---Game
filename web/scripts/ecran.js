@@ -1,31 +1,6 @@
 let log = console.log;
 let canvas;
-// Create WebSocket connection.
-const socket = new WebSocket('ws://' + window.location.host + '/game/screen');
-
-// Connection opened
-socket.addEventListener('open', function (event) {
-	socket.send('Hello Server!');
-});
-
-// Listen for messages
-socket.addEventListener('message', function (event) {
-	log('Message from server ', event.data);
-});
-
-function onSocketOpen(event) {
-	log("Connection etablished");
-}
-
-function onSocketMessage(event) {
-	log(event.message);
-}
-function onSocketError(msg) {
-	log(msg);
-}
-function onSocketClose(event) {
-	log(event);
-}
+const packetHandler = new PacketHandler('ws://' + window.location.host + '/game/screen');
 
 function setup() {
 	log("Create canvas("+windowWidth+", "+windowHeight+")");
