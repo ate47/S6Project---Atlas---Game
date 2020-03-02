@@ -6,8 +6,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import javax.annotation.Nonnull;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -21,7 +19,7 @@ public class ConfigManager {
 	private final File configFile;
 	private Config config;
 
-	public @Nonnull Config getConfig() {
+	public Config getConfig() {
 		if (config == null)
 			sync();
 		return config;
