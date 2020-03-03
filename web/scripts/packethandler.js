@@ -50,19 +50,19 @@ class PacketHandler {
     constructor(url) {
         // Create WebSocket connection.
         this.socket = new WebSocket(url);
-        this.socket.binaryType = "arraybuffer";
 
         // Connection opened
-        this.socket.addEventListener('open', this.webSocketOpen.bind(this));
+        this.socket.onopen = this.webSocketOpen.bind(this);
+        // Listen for messages
+        this.socket.onmessage = this.webSocketMessage.bind(this);
+        // Listen for messages
+        this.socket.onclose = this.webSocketClose.bind(this);
+        // Listen for messages
+        this.socket.onerror = this.webSocketError.bind(this);
         
-        // Listen for messages
-        this.socket.addEventListener('message', this.webSocketMessage.bind(this));
-        // Listen for messages
-        this.socket.addEventListener('close', this.webSocketClose.bind(this));
-        // Listen for messages
-        this.socket.addEventListener('error', this.webSocketError.bind(this));
+        this.socket.binaryType = "arraybuffer";
     }
-    
+
     sendPacket(packet) {
         // create the buffer and set the packet ID
         const buffer = new ArrayBuffer(4 + packet.size);
