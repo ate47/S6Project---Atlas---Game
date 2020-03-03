@@ -42,6 +42,12 @@ class PacketC00HandShake extends ClientPacket {
     }
 }
 
+class PacketC01KeepAlive extends ClientPacket {
+    constructor() {
+        super(0x01, 0);
+    }
+}
+
 class PacketHandler {
     /**
      * 
@@ -80,11 +86,10 @@ class PacketHandler {
         this.sendPacket(new PacketC00HandShake("xXPro_player_mlgXx"));
     }
     webSocketMessage(ev) {
-        console.log("receive");
         console.log(event.data);
     }
     webSocketClose(ev) {
-        console.log(ev);
+        alert("Vous avez été exclu: " + ev.reason);
     }
     webSocketError(msg) {
         console.log(msg);
