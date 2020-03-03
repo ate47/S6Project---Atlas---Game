@@ -4,6 +4,12 @@ const textEncoder = new TextEncoder();
 class ServerPacket {
     constructor() {}
 
+    /**
+     * get a UTF8 string from a DataView
+     * @param {DataView} dataView the dataview to read
+     * @param {number} offset the offset
+     * @returns string
+     */
     getUTF8String(dataView, offset) {
         let l = dataView.getUint32(offset);
         let array = new Uint8Array(l);
@@ -11,6 +17,10 @@ class ServerPacket {
             array[i] = dataView.getUint8(offset + 4 + i);
         return textDecoder.decode(array);
     }
+    /**
+     * read packet data from a DataView
+     * @param {DataView} dataView the dataview
+     */
     read(dataView) {}
 }
 
@@ -19,16 +29,31 @@ class ClientPacket {
         this.id = id;
         this.size = size;
     }
+    /**
+     * prepare a UTF8 string to be send
+     * @param {string} str the string
+     * @returns Uint8Array
+     */
     prepareUTF8String(str) {
         let encodedString = textEncoder.encode(str);
         this.size += encodedString.length + 4;
         return encodedString;
     }
+    /**
+     * set a prepared UTF8 string at an offset
+     * @param {DataView} dataView the dataview to set
+     * @param {number} offset the offset to put the prepared string
+     * @param {Uint8Array} preparedString the prepared string
+     */
     setUTF8String(dataView, offset, preparedString) {
         dataView.setUint32(offset, preparedString.length);
         for (let i = 0; i < preparedString.length; i++) 
             dataView.setUint8(offset + 4 + i, preparedString[i]);
     }
+    /**
+     * write packet data to the DataView
+     * @param {DataView} dataView 
+     */
     write(dataView){}
 }
 
@@ -85,6 +110,10 @@ class PacketHandler {
         this.socket.binaryType = "arraybuffer";
     }
 
+    /**
+     * send a packet to the server
+     * @param {ClientPacket} packet the packet to send
+     */
     sendPacket(packet) {
         // create the buffer and set the packet ID
         const buffer = new ArrayBuffer(4 + packet.size);
