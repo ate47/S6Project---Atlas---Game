@@ -50,8 +50,11 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 
 			System.out.println("[" + req.getProtocolVersion() + "] " + req.getUri());
 
+			// check if this connection is a websocket
 			if ("Upgrade".equalsIgnoreCase(headers.get(Names.CONNECTION))
 					&& "WebSocket".equalsIgnoreCase(headers.get(Names.UPGRADE))) {
+
+				// Websocket request
 
 				ChannelHandler handler;
 
@@ -72,6 +75,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 				// Do the Handshake to upgrade connection from HTTP to WebSocket protocol
 				handleHandshake(ctx, req);
 			} else {
+				// simple HTTP request
 				WebBuffer file = context.getOrDefault(req.getUri().toLowerCase(), defaultContext);
 
 				boolean keepAlive = HttpHeaders.isKeepAlive(req);

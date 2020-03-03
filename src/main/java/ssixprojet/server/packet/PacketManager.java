@@ -67,6 +67,14 @@ public class PacketManager {
 		}
 	}
 
+	/**
+	 * register a {@link PacketBuilder} for client packets
+	 * 
+	 * @param packetId
+	 *            the packet id
+	 * @param builder
+	 *            the builder
+	 */
 	public void registerPacket(int packetId, PacketBuilder<? extends PacketClient> builder) {
 		if (packets.length <= packetId || packetId < 0)
 			throw new IllegalArgumentException("Bad packet id");

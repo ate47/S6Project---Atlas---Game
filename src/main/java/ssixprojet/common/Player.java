@@ -34,17 +34,23 @@ public class Player extends Entity implements PacketSource {
 	private int health = 100, ammos = ServerManager.getConfig().getStartAmmo();
 
 	public Player(Channel channel) {
-		super(10 , 10);
+		super(10, 10);
 		this.id = lastId.getAndIncrement();
 		this.internalId = UUID.randomUUID();
 		this.channel = Objects.requireNonNull(channel);
 	}
 
+	/**
+	 * mark this player as connected
+	 * 
+	 * @param name
+	 *            the username to take in game
+	 */
 	public void connect(String name) {
 		connected = true;
 		this.username = name;
 		System.out.println(name + " connected!");
-		kick("sorry, not now");
+		// TODO show connected
 	}
 
 	public synchronized void decrementKeepAliveCount() {
@@ -92,6 +98,12 @@ public class Player extends Entity implements PacketSource {
 		channel.writeAndFlush(frame);
 	}
 
+	/**
+	 * parse a {@link PacketC04Move} packet on this player
+	 * 
+	 * @param movePacket
+	 *            the move packet
+	 */
 	public void updateMove(PacketC04Move movePacket) {
 		lookX = movePacket.getLookX();
 		lookY = movePacket.getLookY();

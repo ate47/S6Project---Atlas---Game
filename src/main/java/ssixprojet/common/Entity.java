@@ -17,28 +17,58 @@ public class Entity {
 
 	private World world;
 
+	/**
+	 * respawn this entity in the same world, does nothing if the entity isn't in a
+	 * world
+	 * 
+	 * @param x
+	 *            the new x location
+	 * @param y
+	 *            the new y location
+	 */
 	public void respawn(double x, double y) {
 		if (!exist && world != null) {
-			world.getEntities().add(this);
+			world.spawnEntity(this);
 			this.exist = true;
 		}
 		this.x = x;
 		this.y = y;
 	}
 
+	/**
+	 * spawn an entity in a world
+	 * 
+	 * @param w
+	 *            the world to spawn
+	 * @param x
+	 *            the new x location
+	 * @param y
+	 *            the new y location
+	 */
 	public void spawn(World w, double x, double y) {
 		this.world = w;
-		w.getEntities().add(this);
+		world.spawnEntity(this);
 		this.x = x;
 		this.y = y;
 		this.exist = true;
 	}
 
+	/**
+	 * kill this entity
+	 */
 	public void kill() {
-		getWorld().getEntities().remove(this);
+		getWorld().killEntity(this);
 		this.exist = false;
 	}
 
+	/**
+	 * move the entity
+	 * 
+	 * @param dx
+	 *            the x delta
+	 * @param dy
+	 *            the y delta
+	 */
 	public void move(double dx, double dy) {
 		// TODO move algorithm
 	}
