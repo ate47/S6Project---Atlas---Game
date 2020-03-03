@@ -15,7 +15,7 @@ import ssixprojet.server.ServerManager;
 import ssixprojet.server.packet.PacketServer;
 import ssixprojet.server.packet.client.PacketC04Move;
 
-public class Player implements PacketSource {
+public class Player extends Entity implements PacketSource {
 	public static final int MAX_KEEP_ALIVE = 20;
 	private static AtomicInteger lastId = new AtomicInteger(1);
 	@Getter
@@ -37,6 +37,7 @@ public class Player implements PacketSource {
 	private int health = 100, ammos = ServerManager.getConfig().getStartAmmo();
 
 	public Player(Channel channel) {
+		super(10 , 10);
 		this.id = lastId.getAndIncrement();
 		this.internalId = UUID.randomUUID();
 		this.channel = Objects.requireNonNull(channel);
@@ -94,13 +95,9 @@ public class Player implements PacketSource {
 		channel.writeAndFlush(frame);
 	}
 
-	private void tryMove(double dX, double dY) {
-		// TODO move algorithm
-	}
-
 	public void updateMove(PacketC04Move movePacket) {
 		lookX = movePacket.getLookX();
 		lookY = movePacket.getLookY();
-		tryMove(movePacket.getDeltaX(), movePacket.getDeltaY());
+		move(movePacket.getDeltaX(), movePacket.getDeltaY());
 	}
 }
