@@ -18,9 +18,6 @@ import ssixprojet.server.packet.client.PacketC04Move;
 public class Player extends Entity implements PacketSource {
 	public static final int MAX_KEEP_ALIVE = 20;
 	private static AtomicInteger lastId = new AtomicInteger(1);
-	@Getter
-	@Setter
-	private World world;
 	private final int id;
 	private final UUID internalId;
 	@Getter

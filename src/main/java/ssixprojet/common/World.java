@@ -16,7 +16,7 @@ public class World {
 
 	public void spawn(Entity entity, double x, double y) {
 		this.entities.add(entity);
-		entity.spawn(x, y);
+		entity.spawn(this, x, y);
 	}
 	
 	public void tick() {

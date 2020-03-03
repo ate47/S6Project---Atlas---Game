@@ -14,8 +14,10 @@ public class Entity {
 		this.width = w;
 		this.height = h;
 	}
-	
-	public void spawn(double x, double y) {
+
+	private World world;
+	public void spawn(World w, double x, double y) {
+		this.world = w;
 		this.x = x;
 		this.y = y;
 		this.exist = true;
