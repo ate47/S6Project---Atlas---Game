@@ -48,6 +48,22 @@ class PacketC01KeepAlive extends ClientPacket {
     }
 }
 
+class PacketC04Move extends ClientPacket {
+    constructor(deltaX, deltaY, lx, ly) {
+        super(0x01, 32); // dx, dy, lx, ly
+        this.deltaX = deltaX;
+        this.deltaY = deltaY;
+        this.lx = lx;
+        this.ly = ly;
+    }
+    write(dataView) {
+        dataView.setFloat64(0, this.deltaX);
+        dataView.setFloat64(8, this.deltaY);
+        dataView.setFloat64(16, this.lx);
+        dataView.setFloat64(24, this.ly);
+    }
+}
+
 class PacketHandler {
     /**
      * 

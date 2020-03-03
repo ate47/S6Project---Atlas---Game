@@ -13,10 +13,14 @@ import lombok.Getter;
 import lombok.Setter;
 import ssixprojet.server.ServerManager;
 import ssixprojet.server.packet.PacketServer;
+import ssixprojet.server.packet.client.PacketC04Move;
 
 public class Player implements PacketSource {
 	public static final int MAX_KEEP_ALIVE = 20;
 	private static AtomicInteger lastId = new AtomicInteger(1);
+	@Getter
+	@Setter
+	private World world;
 	private final int id;
 	private final UUID internalId;
 	@Getter
@@ -28,7 +32,7 @@ public class Player implements PacketSource {
 	private Channel channel;
 	private int keepAliveCount = MAX_KEEP_ALIVE;
 	@Getter
-	private double x, y;
+	private double x, y, lookX, lookY;
 	@Getter
 	private int health = 100, ammos = ServerManager.getConfig().getStartAmmo();
 
@@ -88,5 +92,15 @@ public class Player implements PacketSource {
 		packet.write(buffer);
 		BinaryWebSocketFrame frame = new BinaryWebSocketFrame(buffer);
 		channel.writeAndFlush(frame);
+	}
+
+	private void tryMove(double dX, double dY) {
+		// TODO move algorithm
+	}
+
+	public void updateMove(PacketC04Move movePacket) {
+		lookX = movePacket.getLookX();
+		lookY = movePacket.getLookY();
+		tryMove(movePacket.getDeltaX(), movePacket.getDeltaY());
 	}
 }
