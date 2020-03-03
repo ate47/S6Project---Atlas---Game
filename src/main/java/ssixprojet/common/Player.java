@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
+import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import lombok.Getter;
 import lombok.Setter;
 import ssixprojet.server.ServerManager;
@@ -84,6 +85,7 @@ public class Player implements PacketSource {
 		ByteBuf buffer = Unpooled.buffer(packet.getInitialSize() + 4);
 		buffer.writeInt(packet.getPacketId());
 		packet.write(buffer);
-		channel.writeAndFlush(buffer);
+		BinaryWebSocketFrame frame = new BinaryWebSocketFrame(buffer);
+		channel.writeAndFlush(frame);
 	}
 }
