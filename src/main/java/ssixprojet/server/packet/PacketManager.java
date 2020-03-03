@@ -8,6 +8,7 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import ssixprojet.server.packet.Packet.PacketBuilder;
 import ssixprojet.server.packet.client.PacketC00HandShake;
 import ssixprojet.server.packet.client.PacketC01KeepAlive;
+import ssixprojet.server.packet.client.PacketC04Move;
 
 public class PacketManager {
 	/**
@@ -31,6 +32,7 @@ public class PacketManager {
 	public PacketManager() {
 		registerPacket(0x00, PacketC00HandShake::new);
 		registerPacket(0x01, b -> new PacketC01KeepAlive());
+		registerPacket(0x04, PacketC04Move::new);
 	}
 
 	public PacketClient buildPacket(int type, ByteBuf buffer) {
