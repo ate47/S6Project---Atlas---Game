@@ -13,11 +13,6 @@ public class World {
 	public World(GameMap map) {
 		this.map = map;
 	}
-
-	public void spawn(Entity entity, double x, double y) {
-		this.entities.add(entity);
-		entity.spawn(this, x, y);
-	}
 	
 	public void tick() {
 		// TODO link tick method
