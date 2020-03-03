@@ -8,11 +8,11 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import lombok.Getter;
 import lombok.Setter;
 import ssixprojet.server.ServerManager;
 import ssixprojet.server.packet.PacketServer;
-import ssixprojet.server.packet.server.PacketS02Death;
 
 public class Player implements PacketSource {
 	public static final int MAX_KEEP_ALIVE = 20;
@@ -72,7 +72,8 @@ public class Player implements PacketSource {
 	@Override
 	public void kick(String msg) {
 		System.out.println("Kick " + username + ": " + msg);
-		sendPacket(new PacketS02Death(msg));
+		CloseWebSocketFrame frame = new CloseWebSocketFrame(1000, msg);
+		channel.writeAndFlush(frame);
 		channel.close();
 	}
 
