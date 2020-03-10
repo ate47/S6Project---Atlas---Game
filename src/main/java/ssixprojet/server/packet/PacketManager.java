@@ -14,14 +14,18 @@ public class PacketManager {
 	/**
 	 * read an UTF8 string from a buffer
 	 * 
-	 * @param buf
-	 *            the buffer
-	 * @return the string
+	 * @param buf the buffer
+	 * @return the string or null if can't read enought bytes
 	 */
 	public static String readUTF8String(ByteBuf buf) {
+		if (!buf.isReadable(4))
+			return null;
+
 		int size = buf.readInt();
 		byte[] bytes = new byte[size];
 
+		if (!buf.isReadable(size))
+			return null;
 		buf.readBytes(bytes);
 		return new String(bytes, Charsets.UTF_8);
 	}
@@ -30,9 +34,9 @@ public class PacketManager {
 	private PacketBuilder<? extends PacketClient>[] packets = new PacketBuilder[256];
 
 	public PacketManager() {
-		registerPacket(0x00, PacketC00HandShake::new);
+		registerPacket(0x00, PacketC00HandShake::create);
 		registerPacket(0x01, b -> new PacketC01KeepAlive());
-		registerPacket(0x04, PacketC04Move::new);
+		registerPacket(0x04, PacketC04Move::create);
 	}
 
 	public PacketClient buildPacket(int type, ByteBuf buffer) {
@@ -52,13 +56,14 @@ public class PacketManager {
 	/**
 	 * build a packet from a {@link TextWebSocketFrame}
 	 * 
-	 * @param frame
-	 *            the frame
+	 * @param frame the frame
 	 * @return the packet or null if an error occurred
 	 */
 	public PacketClient buildPacket(BinaryWebSocketFrame frame) {
 		ByteBuf buffer = frame.content();
 		try {
+			if (!buffer.isReadable(4))
+				return null;
 			int type = (int) buffer.readUnsignedInt(); // read u32
 
 			return buildPacket(type, buffer);
@@ -70,10 +75,8 @@ public class PacketManager {
 	/**
 	 * register a {@link PacketBuilder} for client packets
 	 * 
-	 * @param packetId
-	 *            the packet id
-	 * @param builder
-	 *            the builder
+	 * @param packetId the packet id
+	 * @param builder  the builder
 	 */
 	public void registerPacket(int packetId, PacketBuilder<? extends PacketClient> builder) {
 		if (packets.length <= packetId || packetId < 0)

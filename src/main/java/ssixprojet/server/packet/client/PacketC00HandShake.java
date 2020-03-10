@@ -6,9 +6,15 @@ import ssixprojet.server.packet.PacketPlayer;
 import ssixprojet.server.packet.PacketManager;
 
 public class PacketC00HandShake extends PacketPlayer {
+	public static PacketC00HandShake create(ByteBuf buf) {
+		String name = PacketManager.readUTF8String(buf);
+		return name == null ? null : new PacketC00HandShake(name);
+	}
+
 	private String name;
-	public PacketC00HandShake(ByteBuf buf) {
-		name = PacketManager.readUTF8String(buf);
+
+	private PacketC00HandShake(String name) {
+		this.name = name;
 	}
 
 	@Override
