@@ -8,5 +8,6 @@
   "speedAccelerationPercentage": 110,
   "startAmmo": 90,
   "timeInTickBeforeEnd": 4800,
-  "timeInTickBeforeInfection": 600
+  "timeInTickBeforeInfection": 600,
+  "chunkSplit": 20
 }
