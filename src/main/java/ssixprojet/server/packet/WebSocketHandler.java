@@ -3,6 +3,7 @@ package ssixprojet.server.packet;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import ssixprojet.common.PacketSource;
 
@@ -35,6 +36,8 @@ public class WebSocketHandler extends ChannelInboundHandlerAdapter {
 		if (msg instanceof WebSocketFrame) {
 			if (msg instanceof BinaryWebSocketFrame) {
 				channelRead0(ctx, (BinaryWebSocketFrame) msg);
+			} else if (msg instanceof CloseWebSocketFrame) {
+				ctx.close();
 			} else {
 				ctx.close();
 				System.out.println("Unsupported WebSocketFrame: " + msg.getClass().getCanonicalName());
