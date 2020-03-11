@@ -96,7 +96,12 @@ class PacketHandler {
      */
     constructor(url) {
         // Create WebSocket connection.
-        this.socket = new WebSocket(url);
+        this.url = url;
+        this.openWebSocket();
+    }
+
+    openWebSocket() {
+        this.socket = new WebSocket(this.url);
 
         // Connection opened
         this.socket.onopen = this.webSocketOpen.bind(this);
@@ -108,6 +113,7 @@ class PacketHandler {
         this.socket.onerror = this.webSocketError.bind(this);
         
         this.socket.binaryType = "arraybuffer";
+        this.open = false;
     }
 
     /**
@@ -127,6 +133,7 @@ class PacketHandler {
     }
 
     webSocketOpen(ev) {
+        this.open = true;
         console.log("WebSocket open");
         this.sendPacket(new PacketC00HandShake("xXPro_player_mlgXx"));
     }
@@ -134,7 +141,8 @@ class PacketHandler {
         console.log(event.data);
     }
     webSocketClose(ev) {
-        alert("Vous avez été exclu: " + ev.reason);
+        this.open = false;
+        this.openWebSocket();
     }
     webSocketError(msg) {
         console.log(msg);
