@@ -22,6 +22,7 @@ public class GameMap {
 	private List<MapEdge> edges = new ArrayList<>();
 	private List<SpawnLocation> spawnLocations = new ArrayList<>();
 	private int width, height;
+	private int playerSize;
 
 	/**
 	 * read the map from a Json file
