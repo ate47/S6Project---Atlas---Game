@@ -34,11 +34,15 @@ public class Player extends Entity implements PacketSource {
 	@Getter
 	private int health = 100, ammos = AtlasGame.getConfig().getStartAmmo();
 
-	public Player(Channel channel) {
-		super(10, 10);
+	private Player(Channel channel, double size) {
+		super(size, size);
 		this.id = lastId.getAndIncrement();
 		this.internalId = UUID.randomUUID();
 		this.channel = Objects.requireNonNull(channel);
+	}
+
+	public Player(Channel channel) {
+		this(channel, AtlasGame.getAtlas().getPlayerSize());
 	}
 
 	/**

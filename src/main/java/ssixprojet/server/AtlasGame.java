@@ -18,33 +18,39 @@ public class AtlasGame {
 	public static Config getConfig() {
 		return configManager.getConfig();
 	}
+	@Getter
+	private static AtlasGame atlas;
 
 	private GameMap gameMap;
 	private WebServer webServer;
 	private World mainWorld;
+	private double mapFactorX, mapFactorY, playerSize;
 
 	public AtlasGame() {
+		atlas = this;
 		Config cfg = getConfig();
 		this.webServer = new WebServer(cfg.getPort(), cfg.isBufferiseFile());
 		if ((gameMap = GameMap.readMap(new File(new File("config"), "map.json"))) == null)
 			throw new RuntimeException("Can't load the game map");
 		
 		this.mainWorld = new World();
-		double factorX = 1. / gameMap.getWidth();
-		double factorY = 1. / gameMap.getHeight();
+		mapFactorX = 1. / gameMap.getWidth();
+		mapFactorY = 1. / gameMap.getHeight();
+		
+		playerSize = mapFactorX * gameMap.getPlayerSize();
 		
 		// add world edges
-		new Wall(factorX, 1).spawn(mainWorld, 0, 0);
-		new Wall(1, factorY).spawn(mainWorld, 0, 0);
-		new Wall(factorX, 1).spawn(mainWorld, 0, 1);
-		new Wall(1, factorY).spawn(mainWorld, 1, 0);
+		new Wall(mapFactorX, 1).spawn(mainWorld, 0, 0);
+		new Wall(1, mapFactorY).spawn(mainWorld, 0, 0);
+		new Wall(mapFactorX, 1).spawn(mainWorld, 0, 1);
+		new Wall(1, mapFactorY).spawn(mainWorld, 1, 0);
 		
 		// add world walls
 		for (MapEdge edge : gameMap.getEdges()) {
 			if (edge.getOrientation() == Orientation.BOTTOM) {
-				new Wall(factorX, factorY * edge.getLength()).spawn(mainWorld, factorX * edge.getX(), factorY * edge.getY());
+				new Wall(mapFactorX, mapFactorY * edge.getLength()).spawn(mainWorld, mapFactorX * edge.getX(), mapFactorY * edge.getY());
 			} else {
-				new Wall(factorX * edge.getLength(), factorY).spawn(mainWorld, factorX * edge.getX(), factorY * edge.getY());
+				new Wall(mapFactorX * edge.getLength(), mapFactorY).spawn(mainWorld, mapFactorX * edge.getX(), mapFactorY * edge.getY());
 			}
 		}
 
