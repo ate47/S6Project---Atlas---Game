@@ -4,8 +4,11 @@ import java.io.File;
 
 import lombok.Getter;
 import ssixprojet.common.GameMap;
+import ssixprojet.common.MapEdge;
+import ssixprojet.common.MapEdge.Orientation;
 import ssixprojet.common.config.Config;
 import ssixprojet.common.config.ConfigManager;
+import ssixprojet.common.entity.Wall;
 import ssixprojet.common.world.World;
 
 @Getter
@@ -27,6 +30,24 @@ public class AtlasGame {
 			throw new RuntimeException("Can't load the game map");
 		
 		this.mainWorld = new World();
+		double factorX = 1. / gameMap.getWidth();
+		double factorY = 1. / gameMap.getHeight();
+		
+		// add world edge
+		new Wall(factorX, 1).spawn(mainWorld, 0, 0);
+		new Wall(1, factorY).spawn(mainWorld, 0, 0);
+		new Wall(factorX, 1).spawn(mainWorld, 0, 1);
+		new Wall(1, factorY).spawn(mainWorld, 1, 0);
+		
+		// add world walls
+		for (MapEdge edge : gameMap.getEdges()) {
+			if (edge.getOrientation() == Orientation.BOTTOM) {
+				new Wall(factorX, factorY * edge.getLength()).spawn(mainWorld, factorX * edge.getX(), factorY * edge.getY());
+			} else {
+				new Wall(factorX * edge.getLength(), factorY).spawn(mainWorld, factorX * edge.getX(), factorY * edge.getY());
+			}
+		}
+
 		// TODO: build world
 		
 	}
