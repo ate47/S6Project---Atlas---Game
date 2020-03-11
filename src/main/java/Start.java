@@ -1,7 +1,7 @@
-import ssixprojet.server.ServerManager;
+import ssixprojet.server.AtlasGame;
 
 public class Start {
 	public static void main(String[] args) throws InterruptedException {
-		new ServerManager().startServers();
+		new AtlasGame().startServer();
 	}
 }

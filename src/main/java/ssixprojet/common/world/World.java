@@ -5,12 +5,12 @@ import java.util.List;
 
 import lombok.Data;
 import ssixprojet.common.entity.Entity;
-import ssixprojet.server.ServerManager;
+import ssixprojet.server.AtlasGame;
 
 @Data
 public class World {
 	private List<Entity> entities = new ArrayList<>();
-	private Chunk[][] chunks = new Chunk[ServerManager.getConfig().getChunkSplit()][ServerManager.getConfig()
+	private Chunk[][] chunks = new Chunk[AtlasGame.getConfig().getChunkSplit()][AtlasGame.getConfig()
 			.getChunkSplit()];
 
 	public World() {

@@ -9,7 +9,7 @@ import ssixprojet.common.config.ConfigManager;
 import ssixprojet.common.world.World;
 
 @Getter
-public class ServerManager {
+public class AtlasGame {
 	private static ConfigManager configManager = new ConfigManager(new File(new File("config"), "server.json"));
 
 	public static Config getConfig() {
@@ -20,7 +20,7 @@ public class ServerManager {
 	private WebServer webServer;
 	private World mainWorld;
 
-	public ServerManager() {
+	public AtlasGame() {
 		Config cfg = getConfig();
 		this.webServer = new WebServer(cfg.getPort(), cfg.isBufferiseFile());
 		if ((gameMap = GameMap.readMap(new File(new File("config"), "map.json"))) == null)
@@ -38,7 +38,7 @@ public class ServerManager {
 	/**
 	 * launch the server
 	 */
-	public void startServers() {
+	public void startServer() {
 		webServer.start();
 	}
 

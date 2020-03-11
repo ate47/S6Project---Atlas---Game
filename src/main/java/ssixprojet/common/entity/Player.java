@@ -12,7 +12,7 @@ import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import lombok.Getter;
 import lombok.Setter;
 import ssixprojet.common.PacketSource;
-import ssixprojet.server.ServerManager;
+import ssixprojet.server.AtlasGame;
 import ssixprojet.server.packet.PacketServer;
 import ssixprojet.server.packet.client.PacketC04Move;
 
@@ -32,7 +32,7 @@ public class Player extends Entity implements PacketSource {
 	@Getter
 	private double x, y, lookX, lookY;
 	@Getter
-	private int health = 100, ammos = ServerManager.getConfig().getStartAmmo();
+	private int health = 100, ammos = AtlasGame.getConfig().getStartAmmo();
 
 	public Player(Channel channel) {
 		super(10, 10);
