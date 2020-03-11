@@ -9,8 +9,9 @@ import ssixprojet.server.AtlasGame;
 
 @Data
 public class World {
-	private List<Entity> entities = new ArrayList<>();
-	private Chunk[][] chunks = new Chunk[AtlasGame.getConfig().getChunkSplit()][AtlasGame.getConfig()
+	private final List<Entity> entities = new ArrayList<>();
+	private final List<Spawn> spawns = new ArrayList<>();
+	private final Chunk[][] chunks = new Chunk[AtlasGame.getConfig().getChunkSplit()][AtlasGame.getConfig()
 			.getChunkSplit()];
 
 	public World() {
@@ -25,6 +26,15 @@ public class World {
 	 */
 	public void tick() {
 		// TODO link tick method
+	}
+
+	/**
+	 * add a spawn location
+	 * 
+	 * @param spawn a spawn location
+	 */
+	public void addSpawnLocation(Spawn spawn) {
+		this.spawns.add(spawn);
 	}
 
 	/**
