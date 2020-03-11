@@ -43,8 +43,7 @@ public class Player extends Entity implements PacketSource {
 	/**
 	 * mark this player as connected
 	 * 
-	 * @param name
-	 *            the username to take in game
+	 * @param name the username to take in game
 	 */
 	public void connect(String name) {
 		connected = true;
@@ -101,12 +100,25 @@ public class Player extends Entity implements PacketSource {
 	/**
 	 * parse a {@link PacketC04Move} packet on this player
 	 * 
-	 * @param movePacket
-	 *            the move packet
+	 * @param movePacket the move packet
 	 */
 	public void updateMove(PacketC04Move movePacket) {
-		lookX = movePacket.getLookX();
-		lookY = movePacket.getLookY();
-		move(movePacket.getDeltaX(), movePacket.getDeltaY());
+		double preLookX = movePacket.getLookX();
+		double preLookY = movePacket.getLookY();
+		double preDeltaX = movePacket.getDeltaX();
+		double preDeltaY = movePacket.getDeltaY();
+
+		if (preLookX * preLookX + preLookY * preLookY > 1.05D) {
+			kick("Bad look vector");
+			return;
+		}
+		if (preDeltaX * preDeltaX + preDeltaY * preDeltaY > 1.05D) {
+			kick("Bad move vector");
+			return;
+		}
+
+		lookX = preLookX;
+		lookY = preLookY;
+		move(preDeltaX, preDeltaY);
 	}
 }
