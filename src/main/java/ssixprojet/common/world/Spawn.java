@@ -16,7 +16,7 @@ public class Spawn {
 		return RANDOM.nextDouble() * width + x;
 	}
 
-	public double getRandomYY() {
+	public double getRandomY() {
 		return RANDOM.nextDouble() * height + y;
 	}
 }
