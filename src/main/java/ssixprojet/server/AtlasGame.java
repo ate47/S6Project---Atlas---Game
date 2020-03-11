@@ -24,7 +24,7 @@ public class AtlasGame {
 	private GameMap gameMap;
 	private WebServer webServer;
 	private World mainWorld;
-	private double mapFactorX, mapFactorY, playerSize;
+	private double mapFactorX, mapFactorY, playerSizeX, playerSizeY;
 
 	public AtlasGame() {
 		atlas = this;
@@ -36,8 +36,9 @@ public class AtlasGame {
 		this.mainWorld = new World();
 		mapFactorX = 1. / gameMap.getWidth();
 		mapFactorY = 1. / gameMap.getHeight();
-		
-		playerSize = mapFactorX * gameMap.getPlayerSize();
+
+		playerSizeX = mapFactorX * gameMap.getPlayerSize();
+		playerSizeY = mapFactorY * gameMap.getPlayerSize();
 		
 		// add world edges
 		new Wall(mapFactorX, 1).spawn(mainWorld, 0, 0);
