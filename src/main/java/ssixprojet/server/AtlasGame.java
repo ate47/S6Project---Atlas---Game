@@ -33,7 +33,7 @@ public class AtlasGame {
 		double factorX = 1. / gameMap.getWidth();
 		double factorY = 1. / gameMap.getHeight();
 		
-		// add world edge
+		// add world edges
 		new Wall(factorX, 1).spawn(mainWorld, 0, 0);
 		new Wall(1, factorY).spawn(mainWorld, 0, 0);
 		new Wall(factorX, 1).spawn(mainWorld, 0, 1);
@@ -50,10 +50,6 @@ public class AtlasGame {
 
 		// TODO: build world
 		
-	}
-
-	public WebServer getWebServer() {
-		return webServer;
 	}
 
 	/**
