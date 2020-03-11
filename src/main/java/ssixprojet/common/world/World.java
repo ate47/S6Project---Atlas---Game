@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Data;
-import ssixprojet.common.GameMap;
 import ssixprojet.common.entity.Entity;
 import ssixprojet.server.ServerManager;
 
@@ -13,10 +12,8 @@ public class World {
 	private List<Entity> entities = new ArrayList<>();
 	private Chunk[][] chunks = new Chunk[ServerManager.getConfig().getChunkSplit()][ServerManager.getConfig()
 			.getChunkSplit()];
-	private GameMap map;
 
-	public World(GameMap map) {
-		this.map = map;
+	public World() {
 		int i, j;
 		for (i = 0; i < chunks.length; i++)
 			for (j = 0; j < chunks[i].length; i++)
@@ -50,8 +47,8 @@ public class World {
 		entities.remove(e);
 		// TODO send spawn packet to screen
 	}
-	
+
 	public void moveEntityChunk(Entity e) {
-		
+
 	}
 }
