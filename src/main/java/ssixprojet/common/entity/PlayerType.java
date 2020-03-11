@@ -1,4 +1,4 @@
-package ssixprojet.common;
+package ssixprojet.common.entity;
 
 /**
  * mark the current state of the player

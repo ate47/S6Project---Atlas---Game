@@ -1,17 +1,26 @@
-package ssixprojet.common;
+package ssixprojet.common.world;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Data;
+import ssixprojet.common.GameMap;
+import ssixprojet.common.entity.Entity;
+import ssixprojet.server.ServerManager;
 
 @Data
 public class World {
 	private List<Entity> entities = new ArrayList<>();
+	private Chunk[][] chunks = new Chunk[ServerManager.getConfig().getChunkSplit()][ServerManager.getConfig()
+			.getChunkSplit()];
 	private GameMap map;
 
 	public World(GameMap map) {
 		this.map = map;
+		int i, j;
+		for (i = 0; i < chunks.length; i++)
+			for (j = 0; j < chunks[i].length; i++)
+				chunks[i][j] = new Chunk();
 	}
 
 	/**
@@ -24,8 +33,7 @@ public class World {
 	/**
 	 * add an entity to this world entities
 	 * 
-	 * @param e
-	 *            the entity
+	 * @param e the entity
 	 */
 	public void spawnEntity(Entity e) {
 		if (e.getWorld() != this || !e.isExist())
@@ -36,11 +44,14 @@ public class World {
 	/**
 	 * remove an entity from this world entities
 	 * 
-	 * @param e
-	 *            the entity
+	 * @param e the entity
 	 */
 	public void killEntity(Entity e) {
 		entities.remove(e);
 		// TODO send spawn packet to screen
+	}
+	
+	public void moveEntityChunk(Entity e) {
+		
 	}
 }

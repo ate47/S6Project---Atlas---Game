@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import ssixprojet.common.Player;
+import ssixprojet.common.entity.Player;
 import ssixprojet.server.packet.PacketPlayer;
 
 @Getter

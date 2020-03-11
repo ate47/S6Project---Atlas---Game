@@ -47,5 +47,10 @@ public class Config {
 	 * time before the end of the game in tick
 	 */
 	private int timeInTickBeforeInfection = tickRate * 30; // 30s
+	/**
+	 * number of chunk inside a row (number total of chunks is chunkSplit *
+	 * chunkSplit)
+	 */
+	private int chunkSplit = 20;
 
 }

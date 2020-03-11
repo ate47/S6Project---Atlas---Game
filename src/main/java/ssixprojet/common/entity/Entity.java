@@ -1,7 +1,8 @@
-package ssixprojet.common;
+package ssixprojet.common.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import ssixprojet.common.world.World;
 
 @Getter
 public class Entity {
@@ -21,10 +22,8 @@ public class Entity {
 	 * respawn this entity in the same world, does nothing if the entity isn't in a
 	 * world
 	 * 
-	 * @param x
-	 *            the new x location
-	 * @param y
-	 *            the new y location
+	 * @param x the new x location
+	 * @param y the new y location
 	 */
 	public void respawn(double x, double y) {
 		if (!exist && world != null) {
@@ -38,12 +37,9 @@ public class Entity {
 	/**
 	 * spawn an entity in a world
 	 * 
-	 * @param w
-	 *            the world to spawn
-	 * @param x
-	 *            the new x location
-	 * @param y
-	 *            the new y location
+	 * @param w the world to spawn
+	 * @param x the new x location
+	 * @param y the new y location
 	 */
 	public void spawn(World w, double x, double y) {
 		this.world = w;
@@ -64,12 +60,11 @@ public class Entity {
 	/**
 	 * move the entity
 	 * 
-	 * @param dx
-	 *            the x delta
-	 * @param dy
-	 *            the y delta
+	 * @param dx the x delta
+	 * @param dy the y delta
 	 */
 	public void move(double dx, double dy) {
 		// TODO move algorithm
 	}
+
 }

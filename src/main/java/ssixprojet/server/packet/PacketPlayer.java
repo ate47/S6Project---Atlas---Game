@@ -1,7 +1,7 @@
 package ssixprojet.server.packet;
 
 import ssixprojet.common.PacketSource;
-import ssixprojet.common.Player;
+import ssixprojet.common.entity.Player;
 
 public abstract class PacketPlayer extends PacketClient {
 	

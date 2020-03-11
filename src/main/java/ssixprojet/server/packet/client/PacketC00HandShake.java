@@ -1,8 +1,8 @@
 package ssixprojet.server.packet.client;
 
 import io.netty.buffer.ByteBuf;
-import ssixprojet.common.Player;
 import ssixprojet.server.packet.PacketPlayer;
+import ssixprojet.common.entity.Player;
 import ssixprojet.server.packet.PacketManager;
 
 public class PacketC00HandShake extends PacketPlayer {

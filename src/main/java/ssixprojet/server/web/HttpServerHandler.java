@@ -14,8 +14,8 @@ import io.netty.handler.codec.http.HttpHeaders.Values;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
-import ssixprojet.common.Player;
 import ssixprojet.common.Screen;
+import ssixprojet.common.entity.Player;
 import ssixprojet.server.packet.PacketManager;
 import ssixprojet.server.packet.WebSocketHandler;
 

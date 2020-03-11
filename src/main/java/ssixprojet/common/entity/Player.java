@@ -1,4 +1,4 @@
-package ssixprojet.common;
+package ssixprojet.common.entity;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -11,6 +11,7 @@ import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import lombok.Getter;
 import lombok.Setter;
+import ssixprojet.common.PacketSource;
 import ssixprojet.server.ServerManager;
 import ssixprojet.server.packet.PacketServer;
 import ssixprojet.server.packet.client.PacketC04Move;

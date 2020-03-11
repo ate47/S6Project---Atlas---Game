@@ -1,6 +1,6 @@
 package ssixprojet.server.packet.client;
 
-import ssixprojet.common.Player;
+import ssixprojet.common.entity.Player;
 import ssixprojet.server.packet.PacketPlayer;
 
 public class PacketC01KeepAlive extends PacketPlayer {
