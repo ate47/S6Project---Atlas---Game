@@ -7,6 +7,7 @@ import java.util.Random;
 import lombok.Getter;
 import ssixprojet.common.entity.Entity;
 import ssixprojet.common.entity.Player;
+import ssixprojet.common.entity.PlayerType;
 
 @Getter
 public class Chunk {
@@ -17,7 +18,8 @@ public class Chunk {
 	private List<Spawn> spawns = new ArrayList<>();
 
 	public int getPlayerCount() {
-		return (int) entityList.stream().filter(e -> e instanceof Player).count();
+		return (int) entityList.stream()
+				.filter(e -> e instanceof Player && ((Player) e).getType() == PlayerType.SURVIVOR).count();
 	}
 
 	public Chunk(double unit, double x, double y) {
