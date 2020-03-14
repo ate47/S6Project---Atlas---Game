@@ -3,6 +3,7 @@ package ssixprojet.common.world;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import lombok.Data;
@@ -11,6 +12,7 @@ import ssixprojet.server.AtlasGame;
 
 @Data
 public class World {
+	private static final Random RANDOM = new Random();
 	private final List<Entity> entities = new ArrayList<>();
 	private final List<Spawn> spawns = new ArrayList<>();
 	private final int split = AtlasGame.getConfig().getChunkSplit();
@@ -64,6 +66,13 @@ public class World {
 	 */
 	public int getChunk(double location) {
 		return (int) (location * split);
+	}
+
+	/**
+	 * @return a random chunk of the map
+	 */
+	public Chunk getRandomChunk() {
+		return chunks[RANDOM.nextInt(chunks.length)];
 	}
 
 	/**
@@ -135,13 +144,17 @@ public class World {
 
 	}
 
+	/**
+	 * spawn an entity where there is a minimum survivor, this method call the
+	 * {@link Entity#spawn(World, double, double)} method.
+	 * 
+	 * @param e
+	 *            the entity
+	 */
 	public void spawnEntityAtRandomLocation(Entity e) {
 		// get a random spawn on the chunk with the minimum player count
-		Chunk c = Arrays.stream(chunks).collect(Collectors.minBy((c1, c2) -> c1.getPlayerCount() - c2.getPlayerCount()))
-				.orElse(null);
-		if (c != null) {
-			Spawn s = c.getRandomSpawn();
-			e.spawn(this, s.getRandomX(), s.getRandomY());
-		}
+		Spawn s = Arrays.stream(chunks).collect(Collectors.minBy((c1, c2) -> c1.getPlayerCount() - c2.getPlayerCount()))
+				.orElseGet(this::getRandomChunk).getRandomSpawn();
+		e.spawn(this, s.getRandomX(), s.getRandomY());
 	}
 }
