@@ -56,18 +56,63 @@ public class World {
 	}
 
 	/**
+	 * get the chunk that represend this location
+	 * 
+	 * @param location
+	 *            the x or y location
+	 * @return the index of the chunk
+	 */
+	public int getChunk(double location) {
+		return (int) (location * split);
+	}
+
+	/**
 	 * add a spawn location
 	 * 
-	 * @param spawn a spawn location
+	 * @param spawn
+	 *            a spawn location
 	 */
-	public void addSpawnLocation(Spawn spawn) {
-		this.spawns.add(spawn);
+	public void addSpawnLocation(double x, double y, double width, double height, boolean outside) {
+		int left = getChunk(x);
+		int right = getChunk(x + width);
+		int top = getChunk(y);
+		int bottom = getChunk(y + height);
+
+		for (int i = left; i <= right; i++)
+			for (int j = top; j <= bottom; j++) {
+				Chunk c = getChunk(i, j);
+
+				double sLeft, sRight, sTop, sBottom;
+
+				if (i != left)
+					sLeft = c.getX();
+				else
+					sLeft = x;
+
+				if (i != right)
+					sRight = c.getX() + c.getUnit();
+				else
+					sRight = x + width;
+
+				if (j != top)
+					sTop = c.getY();
+				else
+					sTop = y;
+
+				if (j != bottom)
+					sBottom = c.getY() + c.getUnit();
+				else
+					sBottom = y + height;
+
+				spawns.add(new Spawn(sLeft, sTop, sRight - sLeft, sBottom - sTop, outside));
+			}
 	}
 
 	/**
 	 * add an entity to this world entities
 	 * 
-	 * @param e the entity
+	 * @param e
+	 *            the entity
 	 */
 	public void spawnEntity(Entity e) {
 		if (e.getWorld() != this || !e.isExist())
@@ -78,7 +123,8 @@ public class World {
 	/**
 	 * remove an entity from this world entities
 	 * 
-	 * @param e the entity
+	 * @param e
+	 *            the entity
 	 */
 	public void killEntity(Entity e) {
 		entities.remove(e);

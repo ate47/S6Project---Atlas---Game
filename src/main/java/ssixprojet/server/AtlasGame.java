@@ -5,12 +5,11 @@ import java.io.File;
 import lombok.Getter;
 import ssixprojet.common.GameMap;
 import ssixprojet.common.MapEdge;
-import ssixprojet.common.SpawnLocation;
 import ssixprojet.common.MapEdge.Orientation;
+import ssixprojet.common.SpawnLocation;
 import ssixprojet.common.config.Config;
 import ssixprojet.common.config.ConfigManager;
 import ssixprojet.common.entity.Wall;
-import ssixprojet.common.world.Spawn;
 import ssixprojet.common.world.World;
 
 @Getter
@@ -69,9 +68,9 @@ public class AtlasGame {
 		for (SpawnLocation location : gameMap.getSpawnLocations())
 			// try if a player can fit, if not it's a useless location
 			if (location.getWidth() > size && location.getHeight() > size)
-				mainWorld.addSpawnLocation(new Spawn((location.getX() + dsize) * mapFactorX,
+				mainWorld.addSpawnLocation((location.getX() + dsize) * mapFactorX,
 						(location.getY() + dsize) * mapFactorY, (location.getWidth() - size) * mapFactorX,
-						(location.getHeight() - size) * mapFactorX, location.isOutside()));
+						(location.getHeight() - size) * mapFactorX, location.isOutside());
 			else
 				System.err.println("Can't add the spawn location : " + location);
 	}
