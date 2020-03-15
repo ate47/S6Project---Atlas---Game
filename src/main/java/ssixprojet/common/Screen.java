@@ -6,15 +6,23 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import lombok.AllArgsConstructor;
+import ssixprojet.server.connection.Connection;
+import ssixprojet.server.connection.ConnectionClient;
 import ssixprojet.server.packet.PacketServer;
 
 @AllArgsConstructor
-public class Screen implements PacketSource {
+public class Screen implements ConnectionClient {
 
-	private Channel channel;
-	
+	private Connection connection;
+
+	@Override
+	public Connection getConnection() {
+		return connection;
+	}
+
 	@Override
 	public void kick(String msg) {
+		Channel channel = connection.getChannel();
 		CloseWebSocketFrame frame = new CloseWebSocketFrame(1000, msg);
 		channel.writeAndFlush(frame);
 		channel.close();
@@ -26,7 +34,11 @@ public class Screen implements PacketSource {
 		buffer.writeInt(packet.getPacketId());
 		packet.write(buffer);
 		BinaryWebSocketFrame frame = new BinaryWebSocketFrame(buffer);
-		channel.writeAndFlush(frame);
+		connection.getChannel().writeAndFlush(frame);
+	}
+
+	public void disconnect() {
+		connection = null;
 	}
 
 }

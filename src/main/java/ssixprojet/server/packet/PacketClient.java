@@ -1,6 +1,6 @@
 package ssixprojet.server.packet;
 
-import ssixprojet.common.PacketSource;
+import ssixprojet.server.connection.ConnectionClient;
 
 public abstract class PacketClient implements Packet {
 
@@ -12,5 +12,5 @@ public abstract class PacketClient implements Packet {
 	 * @throws Exception
 	 *             if the packet throw an exception
 	 */
-	public abstract void handle(PacketSource src) throws Exception;
+	public abstract void handle(ConnectionClient src) throws Exception;
 }

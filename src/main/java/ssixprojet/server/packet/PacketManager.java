@@ -1,12 +1,14 @@
 package ssixprojet.server.packet;
 
+import java.util.UUID;
+
 import org.apache.commons.io.Charsets;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import ssixprojet.server.packet.Packet.PacketBuilder;
-import ssixprojet.server.packet.client.PacketC00HandShake;
+import ssixprojet.server.packet.client.PacketC00ConnectPlayer;
 import ssixprojet.server.packet.client.PacketC01KeepAlive;
 import ssixprojet.server.packet.client.PacketC04Move;
 
@@ -15,7 +17,7 @@ public class PacketManager {
 	 * read an UTF8 string from a buffer
 	 * 
 	 * @param buf the buffer
-	 * @return the string or null if can't read enought bytes
+	 * @return the string or null if can't read enough bytes
 	 */
 	public static String readUTF8String(ByteBuf buf) {
 		if (!buf.isReadable(4))
@@ -29,12 +31,25 @@ public class PacketManager {
 		buf.readBytes(bytes);
 		return new String(bytes, Charsets.UTF_8);
 	}
+	
+	/**
+	 * read a UUID from a buffer
+	 * @param buf the buffer
+	 * @return the uuid or null if can't read enough bytes
+	 */
+	public static UUID readUUID(ByteBuf buf) {
+		if (!buf.isReadable(16))
+			return null;
+		long mostSigBits = buf.readLong();
+		long leastSigBits = buf.readLong();
+		return new UUID(mostSigBits, leastSigBits);
+	}
 
 	@SuppressWarnings("unchecked")
 	private PacketBuilder<? extends PacketClient>[] packets = new PacketBuilder[256];
 
 	public PacketManager() {
-		registerPacket(0x00, PacketC00HandShake::create);
+		registerPacket(0x00, PacketC00ConnectPlayer::create);
 		registerPacket(0x01, b -> new PacketC01KeepAlive());
 		registerPacket(0x04, PacketC04Move::create);
 	}

@@ -1,8 +1,8 @@
-package ssixprojet.common;
+package ssixprojet.server.connection;
 
 import ssixprojet.server.packet.PacketServer;
 
-public interface PacketSource {
+public interface ConnectionClient {
 	/**
 	 * kick this source from the server ie: close the connection
 	 * 
@@ -18,4 +18,6 @@ public interface PacketSource {
 	 *            the packet to send
 	 */
 	void sendPacket(PacketServer packet);
+	
+	Connection getConnection();
 }

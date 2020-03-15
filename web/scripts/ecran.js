@@ -1,6 +1,6 @@
 let log = console.log;
 let canvas;
-const packetHandler = new PacketHandler('ws://' + window.location.host + '/game/screen');
+const packetHandler = new PacketHandler('ws://' + window.location.host + '/game');
 
 function setup() {
 	log("Create canvas("+windowWidth+", "+windowHeight+")");

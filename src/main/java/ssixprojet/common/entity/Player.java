@@ -11,12 +11,13 @@ import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import lombok.Getter;
 import lombok.Setter;
-import ssixprojet.common.PacketSource;
 import ssixprojet.server.AtlasGame;
+import ssixprojet.server.connection.Connection;
+import ssixprojet.server.connection.ConnectionClient;
 import ssixprojet.server.packet.PacketServer;
 import ssixprojet.server.packet.client.PacketC04Move;
 
-public class Player extends Entity implements PacketSource {
+public class Player extends Entity implements ConnectionClient {
 	public static final int MAX_KEEP_ALIVE = 20;
 	private static AtomicInteger lastId = new AtomicInteger(1);
 	private final int id;
@@ -27,42 +28,47 @@ public class Player extends Entity implements PacketSource {
 	@Setter
 	private PlayerType type = PlayerType.SURVIVOR;
 	private boolean connected = false;
-	private Channel channel;
+	private Connection connection;
 	private int keepAliveCount = MAX_KEEP_ALIVE;
 	@Getter
 	private double x, y, lookX, lookY;
 	@Getter
 	private int health = 100, ammos = AtlasGame.getConfig().getStartAmmo();
 
-	private Player(Channel channel, AtlasGame game) {
+	public Player(Connection connection) {
+		this(connection, AtlasGame.getAtlas());
+	}
+
+	private Player(Connection connection, AtlasGame game) {
 		super(game.getPlayerSizeX(), game.getPlayerSizeY());
 		this.id = lastId.getAndIncrement();
 		this.internalId = UUID.randomUUID();
-		this.channel = Objects.requireNonNull(channel);
-	}
-
-	public Player(Channel channel) {
-		this(channel, AtlasGame.getAtlas());
+		this.connection = Objects.requireNonNull(connection);
 	}
 
 	/**
 	 * mark this player as connected
 	 * 
-	 * @param name the username to take in game
+	 * @param name
+	 *            the username to take in game
 	 */
 	public void connect(String name) {
 		connected = true;
 		this.username = name;
 		System.out.println(name + " connected!");
-		// TODO show connected
 	}
 
 	public synchronized void decrementKeepAliveCount() {
 		keepAliveCount--;
 	}
 
-	public Channel getChannel() {
-		return channel;
+	public void disconnect() {
+		setConnection(null);
+	}
+
+	@Override
+	public Connection getConnection() {
+		return connection;
 	}
 
 	public int getId() {
@@ -83,6 +89,7 @@ public class Player extends Entity implements PacketSource {
 
 	@Override
 	public void kick(String msg) {
+		Channel channel = connection.getChannel();
 		System.out.println("Kick " + username + ": " + msg);
 		CloseWebSocketFrame frame = new CloseWebSocketFrame(1000, msg);
 		channel.writeAndFlush(frame);
@@ -99,13 +106,19 @@ public class Player extends Entity implements PacketSource {
 		buffer.writeInt(packet.getPacketId());
 		packet.write(buffer);
 		BinaryWebSocketFrame frame = new BinaryWebSocketFrame(buffer);
-		channel.writeAndFlush(frame);
+		connection.getChannel().writeAndFlush(frame);
+	}
+
+	public void setConnection(Connection connection) {
+		this.connection = connection;
+		this.connected = this.connection != null;
 	}
 
 	/**
 	 * parse a {@link PacketC04Move} packet on this player
 	 * 
-	 * @param movePacket the move packet
+	 * @param movePacket
+	 *            the move packet
 	 */
 	public void updateMove(PacketC04Move movePacket) {
 		double preLookX = movePacket.getLookX();

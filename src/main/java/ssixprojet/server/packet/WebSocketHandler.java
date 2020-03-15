@@ -1,33 +1,38 @@
 package ssixprojet.server.packet;
 
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
-import ssixprojet.common.PacketSource;
+import ssixprojet.server.connection.Connection;
+import ssixprojet.server.connection.ConnectionClient;
 
-public class WebSocketHandler extends ChannelInboundHandlerAdapter {
+public class WebSocketHandler extends ChannelInboundHandlerAdapter implements ChannelFutureListener {
 	protected final PacketManager manager;
-	private final PacketSource src;
+	private final Connection src;
 
-	public WebSocketHandler(PacketManager manager, PacketSource source) {
+	public WebSocketHandler(PacketManager manager, Connection source) {
 		this.manager = manager;
 		this.src = source;
+		source.getChannel().closeFuture().addListener(this);
 	}
 
 	protected void channelRead0(ChannelHandlerContext ctx, BinaryWebSocketFrame frame) {
 		PacketClient packet = manager.buildPacket(frame);
+		ConnectionClient client = src.getAttachedClient();
 		if (packet == null) {
-			src.kick("Bad packet format");
+			client.kick("Bad packet format");
 			return;
 		}
 
 		try {
-			packet.handle((PacketSource) src);
+			packet.handle(client);
 		} catch (Exception e) {
 			e.printStackTrace();
-			src.kick("Error while handling the packet");
+			client.kick("Error while handling the packet");
 		}
 	}
 
@@ -43,5 +48,11 @@ public class WebSocketHandler extends ChannelInboundHandlerAdapter {
 				System.out.println("Unsupported WebSocketFrame: " + msg.getClass().getCanonicalName());
 			}
 		}
+	}
+
+	@Override
+	public void operationComplete(ChannelFuture future) throws Exception {
+		// close operation
+		src.onClose();
 	}
 }

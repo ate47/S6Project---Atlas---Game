@@ -1,5 +1,25 @@
 const textDecoder = new TextDecoder();
 const textEncoder = new TextEncoder();
+class UUID {
+    constructor() {
+        const buffer = new ArrayBuffer(16);
+        this.view = new DataView(buffer);
+    }
+
+    write(dataView, offset) {
+        dataView.setUint32(offset, this.view.getUint32(0));
+        dataView.setUint32(offset + 4, this.view.getUint32(4));
+        dataView.setUint32(offset + 8, this.view.getUint32(8));
+        dataView.setUint32(offset + 12, this.view.getUint32(12));
+    }
+
+    read(dataView, offset) {
+        this.view.setUint32(0, dataView.getUint32(offset));
+        this.view.setUint32(4, dataView.getUint32(offset + 4));
+        this.view.setUint32(8, dataView.getUint32(offset + 8));
+        this.view.setUint32(12, dataView.getUint32(offset + 12));
+    }
+}
 
 class ServerPacket {
     constructor() {}
@@ -16,6 +36,12 @@ class ServerPacket {
         for (let i = 0; i < l; i++)
             array[i] = dataView.getUint8(offset + 4 + i);
         return textDecoder.decode(array);
+    }
+
+    getUUID(dataView, offset) {
+        let uuid = new UUID();
+        uuid.read(dataView, offset);
+        return uuid;
     }
     /**
      * read packet data from a DataView
@@ -57,7 +83,7 @@ class ClientPacket {
     write(dataView){}
 }
 
-class PacketC00HandShake extends ClientPacket {
+class PacketC00ConnectPlayer extends ClientPacket {
     constructor(username) {
         super(0x00, 0);
         this.username = this.prepareUTF8String(username);
@@ -135,7 +161,7 @@ class PacketHandler {
     webSocketOpen(ev) {
         this.open = true;
         console.log("WebSocket open");
-        this.sendPacket(new PacketC00HandShake("xXPro_player_mlgXx"));
+        this.sendPacket(new PacketC00ConnectPlayer("xXPro_player_mlgXx"));
     }
     webSocketMessage(ev) {
         console.log(event.data);

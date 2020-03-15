@@ -1,7 +1,6 @@
 package ssixprojet.server.web;
 
 import java.io.IOException;
-import java.util.Map;
 
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
@@ -14,26 +13,17 @@ import io.netty.handler.codec.http.HttpHeaders.Values;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
-import ssixprojet.common.Screen;
-import ssixprojet.common.entity.Player;
-import ssixprojet.server.packet.PacketManager;
+import ssixprojet.server.WebServer;
 import ssixprojet.server.packet.WebSocketHandler;
 
 public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 	private static final WebBuffer BAD_WEBSOCKET_RESPONSE = new WebByteBuffer("", MimeTypeProvider.TEXT_PLAIN,
 			"BAD WEBSOCKET URI".getBytes());
-	private boolean reloadFile;
-	private Map<String, WebBuffer> context;
-	private WebBuffer defaultContext;
-	private PacketManager manager;
+	private WebServer server;
 	private WebSocketServerHandshaker handshaker;
 
-	public HttpServerHandler(boolean bufferiseFile, Map<String, WebBuffer> context, WebBuffer defaultContext,
-			PacketManager manager) throws IOException {
-		this.reloadFile = !bufferiseFile;
-		this.context = context;
-		this.defaultContext = defaultContext;
-		this.manager = manager;
+	public HttpServerHandler(WebServer server) throws IOException {
+		this.server = server;
 	}
 
 	@Override
@@ -59,10 +49,9 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 				ChannelHandler handler;
 
 				// create a WebSocketHandler for the good actor
-				if (req.getUri().equals("/game/phone")) {
-					handler = new WebSocketHandler(manager, new Player(ctx.channel()));
-				} else if (req.getUri().equals("/game/screen")) {
-					handler = new WebSocketHandler(manager, new Screen(ctx.channel()));
+				if (req.getUri().equals("/game")) {
+					handler = new WebSocketHandler(server.getPacketManager(),
+							server.getConnectionManager().createConnection(ctx.channel()));
 				} else {
 					System.out.println("Bad WS actor: " + req.getUri());
 					ctx.write(BAD_WEBSOCKET_RESPONSE.buildResponse(false));
@@ -76,10 +65,12 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 				handleHandshake(ctx, req);
 			} else {
 				// simple HTTP request
-				WebBuffer file = context.getOrDefault(req.getUri().toLowerCase(), defaultContext);
+				WebBuffer file = server.getContext().get(req.getUri().toLowerCase());
+				if (file == null)
+					file = server.getDefaultBuffer();
 
 				boolean keepAlive = HttpHeaders.isKeepAlive(req);
-				FullHttpResponse response = file.buildResponse(reloadFile);
+				FullHttpResponse response = file.buildResponse(!server.isBufferiseFile());
 				if (!keepAlive) {
 					ctx.write(response).addListener(ChannelFutureListener.CLOSE);
 				} else {

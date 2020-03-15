@@ -1,12 +1,12 @@
 package ssixprojet.server.packet;
 
-import ssixprojet.common.PacketSource;
 import ssixprojet.common.entity.Player;
+import ssixprojet.server.connection.ConnectionClient;
 
 public abstract class PacketPlayer extends PacketClient {
 	
 	@Override
-	public void handle(PacketSource src) throws Exception {
+	public void handle(ConnectionClient src) throws Exception {
 		if (src instanceof Player) {
 			handle0((Player) src);
 		} else
