@@ -99,6 +99,26 @@ class PacketC01KeepAlive extends ClientPacket {
     }
 }
 
+class PacketC02ConnectScreen extends ClientPacket {
+    constructor() {
+        super(0x02, 0);
+    }
+}
+
+class PacketC03ReconnectPlayer extends ClientPacket {
+    /**
+     * create a reconnect packet
+     * @param {UUID} uuid the player uuid
+     */
+    constructor(uuid) {
+        super(0x03, 16)
+        this.uuid = uuid;
+    }
+    write(dataView) {
+        this.uuid.write(dataView, 0);
+    }
+}
+
 class PacketC04Move extends ClientPacket {
     constructor(deltaX, deltaY, lx, ly) {
         super(0x01, 32); // dx, dy, lx, ly

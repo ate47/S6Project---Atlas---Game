@@ -16,7 +16,8 @@ public class PacketManager {
 	/**
 	 * read an UTF8 string from a buffer
 	 * 
-	 * @param buf the buffer
+	 * @param buf
+	 *            the buffer
 	 * @return the string or null if can't read enough bytes
 	 */
 	public static String readUTF8String(ByteBuf buf) {
@@ -31,18 +32,22 @@ public class PacketManager {
 		buf.readBytes(bytes);
 		return new String(bytes, Charsets.UTF_8);
 	}
-	
+
 	/**
 	 * read a UUID from a buffer
-	 * @param buf the buffer
+	 * 
+	 * @param buf
+	 *            the buffer
 	 * @return the uuid or null if can't read enough bytes
 	 */
 	public static UUID readUUID(ByteBuf buf) {
 		if (!buf.isReadable(16))
 			return null;
-		long mostSigBits = buf.readLong();
-		long leastSigBits = buf.readLong();
-		return new UUID(mostSigBits, leastSigBits);
+		int mostTop = buf.readInt();
+		int mostBottom = buf.readInt();
+		int leastTop = buf.readInt();
+		int leastBottom = buf.readInt();
+		return new UUID(((long) mostTop << 32) | mostBottom, ((long) leastTop << 32) | leastBottom);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -71,7 +76,8 @@ public class PacketManager {
 	/**
 	 * build a packet from a {@link TextWebSocketFrame}
 	 * 
-	 * @param frame the frame
+	 * @param frame
+	 *            the frame
 	 * @return the packet or null if an error occurred
 	 */
 	public PacketClient buildPacket(BinaryWebSocketFrame frame) {
@@ -90,8 +96,10 @@ public class PacketManager {
 	/**
 	 * register a {@link PacketBuilder} for client packets
 	 * 
-	 * @param packetId the packet id
-	 * @param builder  the builder
+	 * @param packetId
+	 *            the packet id
+	 * @param builder
+	 *            the builder
 	 */
 	public void registerPacket(int packetId, PacketBuilder<? extends PacketClient> builder) {
 		if (packets.length <= packetId || packetId < 0)
