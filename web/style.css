@@ -22,3 +22,36 @@ a {
 a:hover {
 	color: rgb(11, 86, 129);
 }
+
+#connect_form {
+	width: 96%;
+	height: 96%;
+	background-color: #3A4600;
+	color: #ffffff;
+	background-image: url("images/logo_biohazard.png");
+	background-repeat: no-repeat;
+    background-position-y: bottom;
+	background-position-x: right;
+	text-align: center;
+	padding: 2%;
+}
+
+#connect_form img{
+	image-rendering: pixelated;
+	height: 50%;
+}
+#connect_form input[type=text] {
+    width: 60%;
+    height: 15%;
+    text-align: center;
+    font-size: 2em;
+}
+#connect_form input[type=submit] {
+    width: 40%;
+	height: 10%;
+	margin-top: 5%;
+    text-align: center;
+	font-size: 2em;
+	background-color: #ffffff;
+	border-width: 0px;
+}
