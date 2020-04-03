@@ -153,8 +153,9 @@ public class World {
 	 */
 	public void spawnEntityAtRandomLocation(Entity e) {
 		// get a random spawn on the chunk with the minimum player count
-		Spawn s = Arrays.stream(chunks).collect(Collectors.minBy((c1, c2) -> c1.getPlayerCount() - c2.getPlayerCount()))
-				.orElseGet(this::getRandomChunk).getRandomSpawn();
+		Spawn s = Arrays.stream(chunks).filter(c -> !c.getSpawns().isEmpty())
+				.collect(Collectors.minBy((c1, c2) -> c1.getPlayerCount() - c2.getPlayerCount()))
+				.get().getRandomSpawn();
 		e.spawn(this, s.getRandomX(), s.getRandomY());
 	}
 }
