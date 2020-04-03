@@ -68,7 +68,7 @@ class PressPoint {
 		this.x = x;
 		this.y = y;
 		this.radius = radius;
-		updateIDF(idf);
+		this.updateIDF(idf);
 	}
 
 	getMoveX() {
