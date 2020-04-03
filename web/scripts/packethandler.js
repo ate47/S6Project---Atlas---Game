@@ -1,5 +1,6 @@
 const textDecoder = new TextDecoder();
 const textEncoder = new TextEncoder();
+
 class UUID {
     constructor() {
         const buffer = new ArrayBuffer(16);
@@ -143,10 +144,9 @@ class PacketHandler {
     constructor(url) {
         // Create WebSocket connection.
         this.url = url;
-        this.openWebSocket();
     }
 
-    openWebSocket() {
+    openWebSocket(callback = false) {
         this.socket = new WebSocket(this.url);
 
         // Connection opened
@@ -160,6 +160,8 @@ class PacketHandler {
         
         this.socket.binaryType = "arraybuffer";
         this.open = false;
+
+        this.callback = callback;
     }
 
     /**
@@ -181,7 +183,8 @@ class PacketHandler {
     webSocketOpen(ev) {
         this.open = true;
         console.log("WebSocket open");
-        this.sendPacket(new PacketC00ConnectPlayer("xXPro_player_mlgXx"));
+        if (this.callback !== false)
+            this.callback();
     }
     webSocketMessage(ev) {
         console.log(event.data);

@@ -6,8 +6,24 @@ let IMAGE_CONTROLER_RIGHT;
 let left;
 let right;
 
+const username = function() {
+    let search = window.location.search;
+	if (search.startsWith("?username=")) {
+		return search.substr("?username=".length);
+	} else {
+		window.location.pathname="/index.html";
+		return false;
+	}
+}();
+
+log("Pseudo: " + username);
+
 // Create WebSocket connection.
 const packetHandler = new PacketHandler('ws://' + window.location.host + '/game');
+
+packetHandler.openWebSocket(function() {
+	packetHandler.sendPacket(new PacketC00ConnectPlayer(username));
+});
 
 class PressPoint {
 	/**
