@@ -38,7 +38,7 @@ public class World {
 			for (j = 1; j < split; j++) {
 				c = getChunk(i, j);
 				c.top = getChunk(i, j - 1);
-				c.left = getChunk(i + 1, j);
+				c.left = getChunk(i - 1, j);
 			}
 	}
 
