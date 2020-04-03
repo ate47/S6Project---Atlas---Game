@@ -2,6 +2,10 @@ let log = console.log;
 let canvas;
 const packetHandler = new PacketHandler('ws://' + window.location.host + '/game');
 
+packetHandler.openWebSocket(function() {
+	packetHandler.sendPacket(new PacketC02ConnectScreen());
+});
+
 function setup() {
 	log("Create canvas("+windowWidth+", "+windowHeight+")");
 	canvas = createCanvas(windowWidth, windowHeight);
