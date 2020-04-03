@@ -10,6 +10,8 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import ssixprojet.server.packet.Packet.PacketBuilder;
 import ssixprojet.server.packet.client.PacketC00ConnectPlayer;
 import ssixprojet.server.packet.client.PacketC01KeepAlive;
+import ssixprojet.server.packet.client.PacketC02ConnectScreen;
+import ssixprojet.server.packet.client.PacketC03ReconnectPlayer;
 import ssixprojet.server.packet.client.PacketC04Move;
 
 public class PacketManager {
@@ -56,6 +58,8 @@ public class PacketManager {
 	public PacketManager() {
 		registerPacket(0x00, PacketC00ConnectPlayer::create);
 		registerPacket(0x01, b -> new PacketC01KeepAlive());
+		registerPacket(0x02, PacketC02ConnectScreen::create);
+		registerPacket(0x03, PacketC03ReconnectPlayer::create);
 		registerPacket(0x04, PacketC04Move::create);
 	}
 
