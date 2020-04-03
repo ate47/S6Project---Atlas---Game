@@ -31,14 +31,21 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 		ctx.flush();
 	}
 
+	private static String getUri(HttpRequest req) {
+		String uri = req.getUri();
+		int index = req.getUri().indexOf('?');
+		return index == -1 ? uri : uri.substring(0, index);
+	}
+
 	@Override
 	public void channelRead0(ChannelHandlerContext ctx, Object msg) throws IOException {
 		if (msg instanceof HttpRequest) {
 			HttpRequest req = (HttpRequest) msg;
 
 			HttpHeaders headers = req.headers();
-
-			System.out.println("[" + req.getProtocolVersion() + "] " + req.getUri());
+			
+			String uri = getUri(req);
+			System.out.println("[" + req.getProtocolVersion() + "] " + uri);
 
 			// check if this connection is a websocket
 			if ("Upgrade".equalsIgnoreCase(headers.get(Names.CONNECTION))
@@ -49,11 +56,11 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 				ChannelHandler handler;
 
 				// create a WebSocketHandler for the good actor
-				if (req.getUri().equals("/game")) {
+				if (uri.equals("/game")) {
 					handler = new WebSocketHandler(server.getPacketManager(),
 							server.getConnectionManager().createConnection(ctx.channel()));
 				} else {
-					System.out.println("Bad WS actor: " + req.getUri());
+					System.out.println("Bad WS actor: " + uri);
 					ctx.write(BAD_WEBSOCKET_RESPONSE.buildResponse(false));
 					ctx.close();
 					return;
@@ -65,7 +72,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 				handleHandshake(ctx, req);
 			} else {
 				// simple HTTP request
-				WebBuffer file = server.getContext().get(req.getUri().toLowerCase());
+				WebBuffer file = server.getContext().get(uri.toLowerCase());
 				if (file == null)
 					file = server.getDefaultBuffer();
 
@@ -95,6 +102,6 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 	}
 
 	protected String getWebSocketURL(HttpRequest req) {
-		return "ws://" + req.headers().get("Host") + req.getUri();
+		return "ws://" + req.headers().get("Host") + getUri(req);
 	}
 }
