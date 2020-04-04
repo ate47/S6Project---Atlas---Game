@@ -11,11 +11,13 @@ import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import lombok.Getter;
 import lombok.Setter;
+import ssixprojet.common.world.World;
 import ssixprojet.server.AtlasGame;
 import ssixprojet.server.connection.Connection;
 import ssixprojet.server.connection.ConnectionClient;
 import ssixprojet.server.packet.PacketServer;
 import ssixprojet.server.packet.client.PacketC04Move;
+import ssixprojet.server.packet.server.PacketS03PlayerSpawn;
 
 public class Player extends Entity implements ConnectionClient {
 	public static final int MAX_KEEP_ALIVE = 20;
@@ -49,8 +51,7 @@ public class Player extends Entity implements ConnectionClient {
 	/**
 	 * mark this player as connected
 	 * 
-	 * @param name
-	 *            the username to take in game
+	 * @param name the username to take in game
 	 */
 	public void connect(String name) {
 		connected = true;
@@ -117,8 +118,7 @@ public class Player extends Entity implements ConnectionClient {
 	/**
 	 * parse a {@link PacketC04Move} packet on this player
 	 * 
-	 * @param movePacket
-	 *            the move packet
+	 * @param movePacket the move packet
 	 */
 	public void updateMove(PacketC04Move movePacket) {
 		double preLookX = movePacket.getLookX();
@@ -138,5 +138,17 @@ public class Player extends Entity implements ConnectionClient {
 		lookX = preLookX;
 		lookY = preLookY;
 		move(preDeltaX, preDeltaY);
+	}
+
+	@Override
+	public void spawn(World w, double x, double y) {
+		super.spawn(w, x, y);
+		sendPacket(new PacketS03PlayerSpawn(id, x, y, lookX, lookY));
+	}
+	
+	@Override
+	public void respawn(double x, double y) {
+		super.respawn(x, y);
+		sendPacket(new PacketS03PlayerSpawn(id, x, y, lookX, lookY));
 	}
 }

@@ -137,11 +137,11 @@ public class World {
 	 */
 	public void killEntity(Entity e) {
 		entities.remove(e);
-		// TODO send spawn packet to screen
+		// TODO send remove packet to screen
 	}
 
 	public void moveEntityChunk(Entity e) {
-
+		// TODO send chunk to screen
 	}
 
 	/**
