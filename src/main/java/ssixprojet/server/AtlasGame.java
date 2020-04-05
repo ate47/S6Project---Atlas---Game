@@ -2,7 +2,6 @@ package ssixprojet.server;
 
 import java.io.File;
 
-import lombok.Getter;
 import ssixprojet.common.GameMap;
 import ssixprojet.common.MapEdge;
 import ssixprojet.common.MapEdge.Orientation;
@@ -12,20 +11,29 @@ import ssixprojet.common.config.ConfigManager;
 import ssixprojet.common.entity.Wall;
 import ssixprojet.common.world.World;
 
-@Getter
 public class AtlasGame {
 	private static ConfigManager configManager = new ConfigManager(new File(new File("config"), "server.json"));
 
+	private static AtlasGame atlas;
+
+	public static AtlasGame getAtlas() {
+		return atlas;
+	}
+	
 	public static Config getConfig() {
 		return configManager.getConfig();
 	}
 
-	@Getter
-	private static AtlasGame atlas;
+	public static ConfigManager getConfigManager() {
+		return configManager;
+	}
 
 	private GameMap gameMap;
+
 	private WebServer webServer;
+
 	private World mainWorld;
+
 	private double mapFactorX, mapFactorY, playerSizeX, playerSizeY;
 
 	private double height;
@@ -73,6 +81,35 @@ public class AtlasGame {
 						(location.getHeight() - size) * mapFactorX, location.isOutside());
 			else
 				System.err.println("Can't add the spawn location : " + location);
+	}
+
+	public GameMap getGameMap() {
+		return gameMap;
+	}
+
+	public double getHeight() {
+		return height;
+	}
+
+	public World getMainWorld() {
+		return mainWorld;
+	}
+	public double getMapFactorX() {
+		return mapFactorX;
+	}
+	public double getMapFactorY() {
+		return mapFactorY;
+	}
+	public double getPlayerSizeX() {
+		return playerSizeX;
+	}
+
+	public double getPlayerSizeY() {
+		return playerSizeY;
+	}
+
+	public WebServer getWebServer() {
+		return webServer;
 	}
 
 	/**

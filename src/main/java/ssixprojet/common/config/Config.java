@@ -1,15 +1,12 @@
 package ssixprojet.common.config;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@NoArgsConstructor
 public class Config {
+
 	/**
 	 * save the files at first load
 	 */
 	private boolean bufferiseFile = false;
+
 	/**
 	 * percentage of initial infected
 	 */
@@ -42,7 +39,6 @@ public class Config {
 	 * time before the end of the game in tick
 	 */
 	private int timeInTickBeforeEnd = tickRate * 60 * 4; // 4min
-
 	/**
 	 * time before the end of the game in tick
 	 */
@@ -52,5 +48,74 @@ public class Config {
 	 * chunkSplit)
 	 */
 	private int chunkSplit = 20;
+	public Config() {}
+	public int getChunkSplit() {
+		return chunkSplit;
+	}
+	public int getInitialInfectionPercentage() {
+		return initialInfectionPercentage;
+	}
+	public String getPasswordMaster() {
+		return passwordMaster;
+	}
+	public int getPort() {
+		return port;
+	}
+	public double getSpawnCrateLuck() {
+		return spawnCrateLuck;
+	}
+	public int getSpeedAccelerationPercentage() {
+		return speedAccelerationPercentage;
+	}
+	public int getStartAmmo() {
+		return startAmmo;
+	}
+	public int getTickRate() {
+		return tickRate;
+	}
+	public int getTimeInTickBeforeEnd() {
+		return timeInTickBeforeEnd;
+	}
+	public int getTimeInTickBeforeInfection() {
+		return timeInTickBeforeInfection;
+	}
+	public boolean isBufferiseFile() {
+		return bufferiseFile;
+	}
+
+	public void setBufferiseFile(boolean bufferiseFile) {
+		this.bufferiseFile = bufferiseFile;
+	}
+	public void setChunkSplit(int chunkSplit) {
+		this.chunkSplit = chunkSplit;
+	}
+	public void setInitialInfectionPercentage(int initialInfectionPercentage) {
+		this.initialInfectionPercentage = initialInfectionPercentage;
+	}
+	public void setPasswordMaster(String passwordMaster) {
+		this.passwordMaster = passwordMaster;
+	}
+	public void setPort(int port) {
+		this.port = port;
+	}
+	public void setSpawnCrateLuck(double spawnCrateLuck) {
+		this.spawnCrateLuck = spawnCrateLuck;
+	}
+	public void setSpeedAccelerationPercentage(int speedAccelerationPercentage) {
+		this.speedAccelerationPercentage = speedAccelerationPercentage;
+	}
+	public void setStartAmmo(int startAmmo) {
+		this.startAmmo = startAmmo;
+	}
+	public void setTickRate(int tickRate) {
+		this.tickRate = tickRate;
+	}
+
+	public void setTimeInTickBeforeEnd(int timeInTickBeforeEnd) {
+		this.timeInTickBeforeEnd = timeInTickBeforeEnd;
+	}
+	public void setTimeInTickBeforeInfection(int timeInTickBeforeInfection) {
+		this.timeInTickBeforeInfection = timeInTickBeforeInfection;
+	}
 
 }

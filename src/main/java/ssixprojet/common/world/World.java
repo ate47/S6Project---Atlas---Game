@@ -6,11 +6,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import lombok.Data;
 import ssixprojet.common.entity.Entity;
 import ssixprojet.server.AtlasGame;
 
-@Data
 public class World {
 	private static final Random RANDOM = new Random();
 	private final List<Entity> entities = new ArrayList<>();
@@ -40,39 +38,6 @@ public class World {
 				c.top = getChunk(i, j - 1);
 				c.left = getChunk(i - 1, j);
 			}
-	}
-
-	public Chunk getChunk(int x, int y) {
-		return chunks[x * split + y];
-	}
-
-	private void setChunk(int x, int y, Chunk chunk) {
-		chunks[x * split + y] = chunk;
-	}
-
-	/**
-	 * run map logic
-	 */
-	public void tick() {
-		// TODO link tick method
-	}
-
-	/**
-	 * get the chunk that represend this location
-	 * 
-	 * @param location
-	 *            the x or y location
-	 * @return the index of the chunk
-	 */
-	public int getChunk(double location) {
-		return (int) (location * split);
-	}
-
-	/**
-	 * @return a random chunk of the map
-	 */
-	public Chunk getRandomChunk() {
-		return chunks[RANDOM.nextInt(chunks.length)];
 	}
 
 	/**
@@ -117,17 +82,79 @@ public class World {
 			}
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		World other = (World) obj;
+		if (!Arrays.equals(chunks, other.chunks))
+			return false;
+		if (entities == null) {
+			if (other.entities != null)
+				return false;
+		} else if (!entities.equals(other.entities))
+			return false;
+		if (spawns == null) {
+			if (other.spawns != null)
+				return false;
+		} else if (!spawns.equals(other.spawns))
+			return false;
+		if (split != other.split)
+			return false;
+		return true;
+	}
+
 	/**
-	 * add an entity to this world entities
+	 * get the chunk that represend this location
 	 * 
-	 * @param e
-	 *            the entity
+	 * @param location
+	 *            the x or y location
+	 * @return the index of the chunk
 	 */
-	public void spawnEntity(Entity e) {
-		if (e.getWorld() != this || !e.isExist())
-			entities.add(e);
-		// TODO set entity on chunks
-		// TODO send spawn packet to screen
+	public int getChunk(double location) {
+		return (int) (location * split);
+	}
+
+	public Chunk getChunk(int x, int y) {
+		return chunks[x * split + y];
+	}
+
+	public Chunk[] getChunks() {
+		return chunks;
+	}
+
+	public List<Entity> getEntities() {
+		return entities;
+	}
+
+	/**
+	 * @return a random chunk of the map
+	 */
+	public Chunk getRandomChunk() {
+		return chunks[RANDOM.nextInt(chunks.length)];
+	}
+
+	public List<Spawn> getSpawns() {
+		return spawns;
+	}
+
+	public int getSplit() {
+		return split;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(chunks);
+		result = prime * result + ((entities == null) ? 0 : entities.hashCode());
+		result = prime * result + ((spawns == null) ? 0 : spawns.hashCode());
+		result = prime * result + split;
+		return result;
 	}
 
 	/**
@@ -145,6 +172,23 @@ public class World {
 		// TODO send chunk to screen
 	}
 
+	private void setChunk(int x, int y, Chunk chunk) {
+		chunks[x * split + y] = chunk;
+	}
+
+	/**
+	 * add an entity to this world entities
+	 * 
+	 * @param e
+	 *            the entity
+	 */
+	public void spawnEntity(Entity e) {
+		if (e.getWorld() != this || !e.isExist())
+			entities.add(e);
+		// TODO set entity on chunks
+		// TODO send spawn packet to screen
+	}
+
 	/**
 	 * spawn an entity where there is a minimum survivor, this method call the
 	 * {@link Entity#spawn(World, double, double)} method.
@@ -155,8 +199,21 @@ public class World {
 	public void spawnEntityAtRandomLocation(Entity e) {
 		// get a random spawn on the chunk with the minimum player count
 		Spawn s = Arrays.stream(chunks).filter(c -> !c.getSpawns().isEmpty())
-				.collect(Collectors.minBy((c1, c2) -> c1.getPlayerCount() - c2.getPlayerCount()))
-				.get().getRandomSpawn();
+				.collect(Collectors.minBy((c1, c2) -> c1.getPlayerCount() - c2.getPlayerCount())).get()
+				.getRandomSpawn();
 		e.spawn(this, s.getRandomX(), s.getRandomY());
+	}
+
+	/**
+	 * run map logic
+	 */
+	public void tick() {
+		// TODO link tick method
+	}
+
+	@Override
+	public String toString() {
+		return "World [entities=" + entities + ", spawns=" + spawns + ", split=" + split + ", chunks="
+				+ Arrays.toString(chunks) + "]";
 	}
 }

@@ -19,7 +19,6 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import lombok.Getter;
 import ssixprojet.server.connection.ConnectionManager;
 import ssixprojet.server.packet.PacketManager;
 import ssixprojet.server.web.HttpServerHandler;
@@ -28,7 +27,6 @@ import ssixprojet.server.web.WebBuffer;
 import ssixprojet.server.web.WebByteBuffer;
 import ssixprojet.server.web.WebDirectoryBuffer;
 import ssixprojet.server.web.WebFileBuffer;
-@Getter
 public class WebServer extends Server {
 	private ConnectionManager connectionManager = new ConnectionManager();
 	private PacketManager packetManager = new PacketManager();
@@ -42,6 +40,30 @@ public class WebServer extends Server {
 		this.bufferiseFile = bufferiseFile;
 		// Register web context
 		registerDirectory("/", new File("web"));
+	}
+
+	public ConnectionManager getConnectionManager() {
+		return connectionManager;
+	}
+
+	public Map<String, WebBuffer> getContext() {
+		return context;
+	}
+
+	public WebBuffer getDefaultBuffer() {
+		return defaultBuffer;
+	}
+
+	public PacketManager getPacketManager() {
+		return packetManager;
+	}
+
+	public int getWebServerPort() {
+		return webServerPort;
+	}
+
+	public boolean isBufferiseFile() {
+		return bufferiseFile;
 	}
 
 	/**

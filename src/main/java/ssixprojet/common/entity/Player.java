@@ -9,8 +9,6 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
-import lombok.Getter;
-import lombok.Setter;
 import ssixprojet.common.world.World;
 import ssixprojet.server.AtlasGame;
 import ssixprojet.server.connection.Connection;
@@ -24,17 +22,12 @@ public class Player extends Entity implements ConnectionClient {
 	private static AtomicInteger lastId = new AtomicInteger(1);
 	private final int id;
 	private final UUID internalId;
-	@Getter
 	private String username;
-	@Getter
-	@Setter
 	private PlayerType type = PlayerType.SURVIVOR;
 	private boolean connected = false;
 	private Connection connection;
 	private int keepAliveCount = MAX_KEEP_ALIVE;
-	@Getter
 	private double x, y, lookX, lookY;
-	@Getter
 	private int health = 100, ammos = AtlasGame.getConfig().getStartAmmo();
 
 	public Player(Connection connection) {
@@ -154,5 +147,37 @@ public class Player extends Entity implements ConnectionClient {
 	public void respawn(double x, double y) {
 		super.respawn(x, y);
 		sendPacket(new PacketS03PlayerSpawn(id, x, y, lookX, lookY));
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public PlayerType getType() {
+		return type;
+	}
+
+	public double getX() {
+		return x;
+	}
+
+	public double getY() {
+		return y;
+	}
+
+	public double getLookX() {
+		return lookX;
+	}
+
+	public double getLookY() {
+		return lookY;
+	}
+
+	public int getHealth() {
+		return health;
+	}
+
+	public int getAmmos() {
+		return ammos;
 	}
 }

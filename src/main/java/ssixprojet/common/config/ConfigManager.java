@@ -9,15 +9,14 @@ import java.io.IOException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor
 public class ConfigManager {
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-	@NonNull
 	private final File configFile;
 	private Config config;
+
+	public ConfigManager(File configFile) {
+		this.configFile = configFile;
+	}
 
 	public Config getConfig() {
 		if (config == null)
