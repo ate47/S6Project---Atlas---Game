@@ -80,7 +80,7 @@ function setup() {
 	log("Create canvas("+windowWidth+", "+windowHeight+")");
 	canvas = createCanvas(windowWidth, windowHeight);
 
-	frameRate(60);
+	frameRate(24);
 	setInterval(tick, 20);
 }
 

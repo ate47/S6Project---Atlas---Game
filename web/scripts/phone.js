@@ -139,7 +139,7 @@ function setup() {
 	left = new PressPoint(windowWidth / 6, windowHeight * 3 / 5, -1, windowWidth / 8, IMAGE_CONTROLER_LEFT);
 	right = new PressPoint(windowWidth * 5 / 6, windowHeight * 3 / 5, -1, windowWidth / 8, IMAGE_CONTROLER_RIGHT);
 
-	frameRate(60);
+	frameRate(24);
 	setInterval(tick, 20);
 }
 
