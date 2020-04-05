@@ -34,6 +34,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 	private static String getUri(HttpRequest req) {
 		String uri = req.getUri();
 		int index = req.getUri().indexOf('?');
+		
 		return index == -1 ? uri : uri.substring(0, index);
 	}
 

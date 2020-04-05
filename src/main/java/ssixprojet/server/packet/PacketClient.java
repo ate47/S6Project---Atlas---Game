@@ -13,4 +13,5 @@ public abstract class PacketClient implements Packet {
 	 *             if the packet throw an exception
 	 */
 	public abstract void handle(ConnectionClient src) throws Exception;
+	
 }
