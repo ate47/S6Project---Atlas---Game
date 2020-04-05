@@ -142,7 +142,7 @@ public class World {
 	}
 
 	public void moveEntityChunk(Entity e) {
-
+		// TODO send chunk to screen
 	}
 
 	/**

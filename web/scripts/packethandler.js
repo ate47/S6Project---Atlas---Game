@@ -136,6 +136,32 @@ class PacketC04Move extends ClientPacket {
     }
 }
 
+class PacketS03PlayerSpawn extends ServerPacket{
+	read(dataview){
+		this.id = dateview.getInt32(0);
+		this.x = dateview.getFloat64(4);
+		this.y = dateview.getFloat64(12);
+		this.lookX = dateview.getFloat64(20);
+		this.lookY = dateview.getFloat64(28);
+	}
+}
+
+class PacketS04PlayerMove extends ServerPacket{
+	read(dataview){
+		this.id = dateview.getInt32(0);
+		this.x = dateview.getFloat64(4);
+		this.y = dateview.getFloat64(12);
+		this.lookX = dateview.getFloat64(20);
+		this.lookY = dateview.getFloat64(28);
+	}
+}
+
+class PacketS05PlayerDead extends ServerPacket{
+	read(dataview){
+		this.id = dataview.getInt32(0);
+	}
+}
+
 class PacketHandler {
     /**
      * 
