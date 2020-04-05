@@ -153,48 +153,6 @@ class PacketC04Move extends ClientPacket {
     }
 }
 
-class PacketS03PlayerSpawn extends ServerPacket {
-	read(dataview){
-		if (dataview.byteLength < 4 + 8 * 4)
-			return false;
-		this.id = dateview.getInt32(0);
-		this.x = dateview.getFloat64(4);
-		this.y = dateview.getFloat64(12);
-		this.lookX = dateview.getFloat64(20);
-		this.lookY = dateview.getFloat64(28);
-	}
-    handle() {
-    	// TODO: handle player spawn
-    }
-}
-
-class PacketS04PlayerMove extends ServerPacket {
-	read(dataview){
-		if (dataview.byteLength < 4 + 8 * 4)
-			return false;
-		this.id = dateview.getInt32(0);
-		this.x = dateview.getFloat64(4);
-		this.y = dateview.getFloat64(12);
-		this.lookX = dateview.getFloat64(20);
-		this.lookY = dateview.getFloat64(28);
-	}
-    handle() {
-    	// TODO: handle player move
-    }
-}
-
-class PacketS05PlayerDead extends ServerPacket {
-	read(dataview){
-		if (dataview.byteLength < 4)
-			return false;
-		this.id = dataview.getInt32(0);
-	}
-
-    handle() {
-    	// TODO: handle player death
-    }
-}
-
 class PacketHandler {
     /**
 	 * 
@@ -206,10 +164,6 @@ class PacketHandler {
         // Create WebSocket connection.
         this.url = url;
         this.packetBuilder = [];
-
-        this.registerPacketBuilder(0x03, () => new PacketS03PlayerSpawn());
-        this.registerPacketBuilder(0x04, () => new PacketS04PlayerMove());
-        this.registerPacketBuilder(0x05, () => new PacketS05PlayerDead());
     }
 
     openWebSocket(callback = false) {
