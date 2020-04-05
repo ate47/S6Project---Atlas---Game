@@ -28,11 +28,17 @@ packetHandler.openWebSocket(function() {
 class PressPoint {
 	/**
 	 * build a press point
-	 * @param {number} x origin x
-	 * @param {number} y origin y
-	 * @param {number} idf touch identifier
-	 * @param {number} radius the radius of the controller to draw
-	 * @param {*} img the image object
+	 * 
+	 * @param {number}
+	 *            x origin x
+	 * @param {number}
+	 *            y origin y
+	 * @param {number}
+	 *            idf touch identifier
+	 * @param {number}
+	 *            radius the radius of the controller to draw
+	 * @param {*}
+	 *            img the image object
 	 */
 	constructor(x, y, idf, radius, img) {
 		this.x = x;
@@ -49,8 +55,11 @@ class PressPoint {
 
 	/**
 	 * update the presspoint vector with a new (x,y) touch location
-	 * @param {number} inputX x client input
-	 * @param {number} inputY y client input
+	 * 
+	 * @param {number}
+	 *            inputX x client input
+	 * @param {number}
+	 *            inputY y client input
 	 */
 	updateVector(inputX, inputY) {
 		this.vectorX = inputX - this.x;
@@ -67,7 +76,9 @@ class PressPoint {
 	}
 	/**
 	 * update the identifier of this controller
-	 * @param {number} idf 
+	 * 
+	 * @param {number}
+	 *            idf
 	 */
 	updateIDF(idf) {
 		this.idf = idf;
@@ -77,8 +88,11 @@ class PressPoint {
 	}
 	/**
 	 * set a new location for the controller
-	 * @param {number} x the new x location
-	 * @param {number} y the new y location
+	 * 
+	 * @param {number}
+	 *            x the new x location
+	 * @param {number}
+	 *            y the new y location
 	 */
 	updateLocation(x, y, idf, radius) {
 		this.x = x;
@@ -94,6 +108,10 @@ class PressPoint {
 		return this.vectorY / this.radius;
 	}
 
+	is00() {
+		return this.vectorX == 0 && this.vectorY == 0;
+	}
+	
 	/**
 	 * end the controller input
 	 */
@@ -144,13 +162,15 @@ function setup() {
 }
 
 function tick() {
-	// left.getMoveX() * 5;
-	// left.getMoveY() * 5;
-	// move
+	if (!left.is00() || !right.is00()) {
+		// send move packet
+		packetHandler.sendPacket(new PacketC04Move(left.getMoveX(), left.getMoveY(), right.getMoveX(), right.getMoveY()));
+	}
 
 	let r2 = right.radius * right.radius;
 	if (right.d2 > r2 / 4) {
-		// shot
+		// send shot packet
+		packetHandler.sendPacket(new PacketC05Shot());
 	}
 }
 
@@ -158,10 +178,6 @@ function draw() {
 	fill(color(220, 220, 220));
 	rect(0, 0, windowWidth, windowHeight);
 	noStroke();
-	
-	//fill(color(255, 0, 0));
-	//text("LEFT: (x: " + left.vectorX + ", y: " + left.vectorX + ", norme: "+(Math.sqrt(left.vectorX * left.vectorX + left.vectorY * left.vectorY))+")", 0, textSize());
-	//text("RIGHT: (x: " + right.vectorX + ", y: " + right.vectorX + ", norme: "+(Math.sqrt(right.vectorX * right.vectorX + right.vectorY * right.vectorY))+")", 0, 2 * textSize() + 2);
 
 	left.draw();
 	right.draw();

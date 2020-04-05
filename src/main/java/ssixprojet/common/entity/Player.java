@@ -133,7 +133,7 @@ public class Player extends Entity implements ConnectionClient {
 		move(preDeltaX, preDeltaY);
 	}
 
-	public void shooting(boolean shooting) {
+	public void shooting() {
 		// TODO Auto-generated method stub
 	}
 

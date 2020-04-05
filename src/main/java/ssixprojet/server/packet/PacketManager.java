@@ -62,7 +62,7 @@ public class PacketManager {
 		registerPacket(0x02, PacketC02ConnectScreen::create);
 		registerPacket(0x03, PacketC03ReconnectPlayer::create);
 		registerPacket(0x04, PacketC04Move::create);
-		registerPacket(0x05, PacketC05Shot::create);
+		registerPacket(0x05, b -> new PacketC05Shot());
 	}
 
 	public PacketClient buildPacket(int type, ByteBuf buffer) {

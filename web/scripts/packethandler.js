@@ -139,7 +139,7 @@ class PacketC03ReconnectPlayer extends ClientPacket {
 
 class PacketC04Move extends ClientPacket {
     constructor(deltaX, deltaY, lx, ly) {
-        super(0x01, 32); // dx, dy, lx, ly
+        super(0x04, 32); // dx, dy, lx, ly
         this.deltaX = deltaX;
         this.deltaY = deltaY;
         this.lx = lx;
@@ -150,6 +150,11 @@ class PacketC04Move extends ClientPacket {
         dataView.setFloat64(8, this.deltaY);
         dataView.setFloat64(16, this.lx);
         dataView.setFloat64(24, this.ly);
+    }
+}
+class PacketC05Shot extends ClientPacket {
+    constructor() {
+        super(0x05, 0);
     }
 }
 
@@ -211,6 +216,8 @@ class PacketHandler {
     }
 
     webSocketOpen(ev) {
+    	if (this.open)
+    		return;
         this.open = true;
         console.log("WebSocket open");
         if (this.callback !== false)
@@ -233,6 +240,7 @@ class PacketHandler {
     	}
     }
     webSocketClose(ev) {
+        console.log(ev);
         this.open = false;
         this.openWebSocket();
     }
