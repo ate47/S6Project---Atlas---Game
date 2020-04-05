@@ -20,17 +20,22 @@ class UUID {
         this.view.setUint32(8, dataView.getUint32(offset + 8));
         this.view.setUint32(12, dataView.getUint32(offset + 12));
     }
+    
+    handle() {}
 }
 
 class ServerPacket {
     constructor() {}
 
     /**
-     * get a UTF8 string from a DataView
-     * @param {DataView} dataView the dataview to read
-     * @param {number} offset the offset
-     * @returns string
-     */
+	 * get a UTF8 string from a DataView
+	 * 
+	 * @param {DataView}
+	 *            dataView the dataview to read
+	 * @param {number}
+	 *            offset the offset
+	 * @returns string
+	 */
     getUTF8String(dataView, offset) {
         let l = dataView.getUint32(offset);
         let array = new Uint8Array(l);
@@ -45,9 +50,11 @@ class ServerPacket {
         return uuid;
     }
     /**
-     * read packet data from a DataView
-     * @param {DataView} dataView the dataview
-     */
+	 * read packet data from a DataView
+	 * 
+	 * @param {DataView}
+	 *            dataView the dataview
+	 */
     read(dataView) {}
 }
 
@@ -57,30 +64,38 @@ class ClientPacket {
         this.size = size;
     }
     /**
-     * prepare a UTF8 string to be send
-     * @param {string} str the string
-     * @returns Uint8Array
-     */
+	 * prepare a UTF8 string to be send
+	 * 
+	 * @param {string}
+	 *            str the string
+	 * @returns Uint8Array
+	 */
     prepareUTF8String(str) {
         let encodedString = textEncoder.encode(str);
         this.size += encodedString.length + 4;
         return encodedString;
     }
     /**
-     * set a prepared UTF8 string at an offset
-     * @param {DataView} dataView the dataview to set
-     * @param {number} offset the offset to put the prepared string
-     * @param {Uint8Array} preparedString the prepared string
-     */
+	 * set a prepared UTF8 string at an offset
+	 * 
+	 * @param {DataView}
+	 *            dataView the dataview to set
+	 * @param {number}
+	 *            offset the offset to put the prepared string
+	 * @param {Uint8Array}
+	 *            preparedString the prepared string
+	 */
     setUTF8String(dataView, offset, preparedString) {
         dataView.setUint32(offset, preparedString.length);
         for (let i = 0; i < preparedString.length; i++) 
             dataView.setUint8(offset + 4 + i, preparedString[i]);
     }
     /**
-     * write packet data to the DataView
-     * @param {DataView} dataView 
-     */
+	 * write packet data to the DataView
+	 * 
+	 * @param {DataView}
+	 *            dataView
+	 */
     write(dataView){}
 }
 
@@ -108,9 +123,11 @@ class PacketC02ConnectScreen extends ClientPacket {
 
 class PacketC03ReconnectPlayer extends ClientPacket {
     /**
-     * create a reconnect packet
-     * @param {UUID} uuid the player uuid
-     */
+	 * create a reconnect packet
+	 * 
+	 * @param {UUID}
+	 *            uuid the player uuid
+	 */
     constructor(uuid) {
         super(0x03, 16)
         this.uuid = uuid;
@@ -136,40 +153,63 @@ class PacketC04Move extends ClientPacket {
     }
 }
 
-class PacketS03PlayerSpawn extends ServerPacket{
+class PacketS03PlayerSpawn extends ServerPacket {
 	read(dataview){
+		if (dataview.byteLength < 4 + 8 * 4)
+			return false;
 		this.id = dateview.getInt32(0);
 		this.x = dateview.getFloat64(4);
 		this.y = dateview.getFloat64(12);
 		this.lookX = dateview.getFloat64(20);
 		this.lookY = dateview.getFloat64(28);
 	}
+    handle() {
+    	// TODO: handle player spawn
+    }
 }
 
-class PacketS04PlayerMove extends ServerPacket{
+class PacketS04PlayerMove extends ServerPacket {
 	read(dataview){
+		if (dataview.byteLength < 4 + 8 * 4)
+			return false;
 		this.id = dateview.getInt32(0);
 		this.x = dateview.getFloat64(4);
 		this.y = dateview.getFloat64(12);
 		this.lookX = dateview.getFloat64(20);
 		this.lookY = dateview.getFloat64(28);
 	}
+    handle() {
+    	// TODO: handle player move
+    }
 }
 
-class PacketS05PlayerDead extends ServerPacket{
+class PacketS05PlayerDead extends ServerPacket {
 	read(dataview){
+		if (dataview.byteLength < 4)
+			return false;
 		this.id = dataview.getInt32(0);
 	}
+
+    handle() {
+    	// TODO: handle player death
+    }
 }
 
 class PacketHandler {
     /**
-     * 
-     * @param {string} url the websocket url 'ws://' + window.location.host + '/game/screen' for screen
-     */
+	 * 
+	 * @param {string}
+	 *            url the websocket url 'ws://' + window.location.host +
+	 *            '/game/screen' for screen
+	 */
     constructor(url) {
         // Create WebSocket connection.
         this.url = url;
+        this.packetBuilder = [];
+
+        this.registerPacketBuilder(0x03, () => new PacketS03PlayerSpawn());
+        this.registerPacketBuilder(0x04, () => new PacketS04PlayerMove());
+        this.registerPacketBuilder(0x05, () => new PacketS05PlayerDead());
     }
 
     openWebSocket(callback = false) {
@@ -190,10 +230,20 @@ class PacketHandler {
         this.callback = callback;
     }
 
+    registerPacketBuilder(packetId, builder) {
+    	let old = this.packetBuilder[packetId];
+    	if (old !== undefined) {
+    		console.log("Overwriting already registered packet builder with id : " + packetId);
+    	}
+		this.packetBuilder[packetId] = builder;
+    }
+    
     /**
-     * send a packet to the server
-     * @param {ClientPacket} packet the packet to send
-     */
+	 * send a packet to the server
+	 * 
+	 * @param {ClientPacket}
+	 *            packet the packet to send
+	 */
     sendPacket(packet) {
         // create the buffer and set the packet ID
         const buffer = new ArrayBuffer(4 + packet.size);
@@ -213,7 +263,20 @@ class PacketHandler {
             this.callback();
     }
     webSocketMessage(ev) {
-        console.log(event.data);
+    	const viewint = new DataView(event.data);
+    	
+    	const packetId = viewint.getInt32(0);
+    	const builder = this.packetBuilder[packetId];
+    	
+    	if (builder != undefined) {
+    		const view = new DataView(buffer, 4);
+    		const packet = builder();
+    		
+    		if (packet.read(view) !== false)
+    			packet.handle();
+    	} else {
+    		console.log("Weird packet id: " + packetId);
+    	}
     }
     webSocketClose(ev) {
         this.open = false;
