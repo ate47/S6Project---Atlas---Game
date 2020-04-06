@@ -50,6 +50,9 @@ public class ConnectionManager {
 				synchronized (playerMap) {
 					playerMap.put(plr.getInternalId(), plr);
 				}
+				synchronized (playerInternalMap) {
+					playerInternalMap.put(plr.getId(), plr);
+				}
 				client = plr;
 				close = PLAYER;
 				// send the uuid for reconnection
@@ -129,12 +132,16 @@ public class ConnectionManager {
 	}
 
 	private Map<UUID, Player> playerMap = new HashMap<>();
+	private Map<Integer, Player> playerInternalMap = new HashMap<>();
 
 	private final ConnectionCloseOperation NONE = c -> {};
 	private final ConnectionCloseOperation PLAYER = c -> {
 		Player p = (Player) c;
 		synchronized (playerMap) {
 			playerMap.remove(p.getInternalId());
+		}
+		synchronized (playerInternalMap) {
+			playerInternalMap.remove(p.getId());
 		}
 		AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS05PlayerDead(p.getId()));
 		p.disconnect();
@@ -157,6 +164,10 @@ public class ConnectionManager {
 
 	public Map<UUID, Player> getPlayerMap() {
 		return playerMap;
+	}
+	
+	public Map<Integer, Player> getPlayerInternalMap() {
+		return playerInternalMap;
 	}
 
 }

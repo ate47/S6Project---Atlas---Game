@@ -144,7 +144,7 @@ public class Player extends Entity implements ConnectionClient {
 	}
 
 	public PacketS03PlayerSpawn createPacketSpawn() {
-		return new PacketS03PlayerSpawn(id, getX(), getY(), lookX, lookY);
+		return new PacketS03PlayerSpawn(id, getX(), getY(), lookX, lookY, type.getId());
 	}
 
 	@Override

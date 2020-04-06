@@ -3,6 +3,9 @@ const textEncoder = new TextEncoder();
 
 const DEBUG = true;
 
+const PLAYER_TYPE_INFECTED = 0;
+const PLAYER_TYPE_SURVIVOR = 1;
+
 class UUID {
     constructor() {
         const buffer = new ArrayBuffer(16);

@@ -1,7 +1,11 @@
 package ssixprojet.server.packet.client;
 
+import java.util.Map;
+
 import io.netty.buffer.ByteBuf;
 import ssixprojet.common.Screen;
+import ssixprojet.common.entity.Player;
+import ssixprojet.server.AtlasGame;
 import ssixprojet.server.packet.PacketScreen;
 
 public class PacketC06GuessPlayer extends PacketScreen {
@@ -21,7 +25,12 @@ public class PacketC06GuessPlayer extends PacketScreen {
 
 	@Override
 	public void handle(Screen screen) throws Exception {
-		// TODO send PacketS03PlayerSpawn packet for playerId
+		Map<Integer, Player> map = AtlasGame.getAtlas().getWebServer().getConnectionManager().getPlayerInternalMap();
+		synchronized (map) {
+			Player p = map.get(playerId);
+			if (p != null)
+				screen.sendPacket(p.createPacketSpawn());
+		}
 	}
 
 }
