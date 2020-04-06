@@ -1,5 +1,7 @@
 let log = console.log;
 let canvas;
+const fps = 24;
+const tps = 20;
 let IMAGE_CONTROLER_LEFT;
 let IMAGE_CONTROLER_RIGHT;
 
@@ -157,8 +159,8 @@ function setup() {
 	left = new PressPoint(windowWidth / 6, windowHeight * 3 / 5, -1, windowWidth / 8, IMAGE_CONTROLER_LEFT);
 	right = new PressPoint(windowWidth * 5 / 6, windowHeight * 3 / 5, -1, windowWidth / 8, IMAGE_CONTROLER_RIGHT);
 
-	frameRate(24);
-	setInterval(tick, 20);
+	frameRate(fps);
+	setInterval(tick, 1000 / tps);
 }
 
 function tick() {

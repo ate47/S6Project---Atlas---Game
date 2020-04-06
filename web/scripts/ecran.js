@@ -1,6 +1,8 @@
 let log = console.log;
 let canvas;
 let playerMap = [];
+const fps = 24;
+const tps = 20;
 
 class PlayerData {
 	constructor() {}
@@ -80,8 +82,8 @@ function setup() {
 	log("Create canvas("+windowWidth+", "+windowHeight+")");
 	canvas = createCanvas(windowWidth, windowHeight);
 
-	frameRate(24);
-	setInterval(tick, 20);
+	frameRate(fps);
+	setInterval(tick, 1000 / tps);
 }
 
 function tick() {
