@@ -1,6 +1,6 @@
 let log = console.log;
 let canvas;
-const fps = 24;
+const fps = 45;
 const tps = 20;
 let IMAGE_CONTROLER_LEFT;
 let IMAGE_CONTROLER_RIGHT;
