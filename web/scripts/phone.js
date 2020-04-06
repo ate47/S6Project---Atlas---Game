@@ -5,9 +5,16 @@ const tps = 20;
 let IMAGE_CONTROLER_LEFT;
 let IMAGE_CONTROLER_RIGHT;
 let IMAGE_DEAD;
+let IMAGE_ROTATE;
 
 let left;
 let right;
+
+let handle = false;
+
+function checkSize(w,h) {
+	handle = w > h;
+}
 
 const username = function() {
     let search = window.location.search;
@@ -157,6 +164,7 @@ function setup() {
 	IMAGE_CONTROLER_LEFT = loadImage("images/controler_view.png");
 	IMAGE_CONTROLER_RIGHT = loadImage("images/controler_weapon.png");
 	IMAGE_DEAD = loadImage("images/dead.png");
+	IMAGE_ROTATE = loadImage("images/rotate.png");
 
 	left = new PressPoint(windowWidth / 6, windowHeight * 3 / 5, -1, windowWidth / 8, IMAGE_CONTROLER_LEFT);
 	right = new PressPoint(windowWidth * 5 / 6, windowHeight * 3 / 5, -1, windowWidth / 6, IMAGE_CONTROLER_RIGHT);
@@ -164,12 +172,17 @@ function setup() {
 	frameRate(fps);
 	setInterval(tick, 1000 / tps);
 	textAlign(CENTER, CENTER);
+
+	checkSize(windowWidth, windowHeight);
 }
 
 function tick() {
 	if (!left.is00() || !right.is00()) {
 		// send move packet
-		packetHandler.sendPacket(new PacketC04Move(left.getMoveX(), left.getMoveY(), right.getMoveX(), right.getMoveY()));
+		if (right.is00())
+			packetHandler.sendPacket(new PacketC04Move(left.getMoveX(), left.getMoveY(), left.getMoveX(), left.getMoveY()));
+		else
+			packetHandler.sendPacket(new PacketC04Move(left.getMoveX(), left.getMoveY(), right.getMoveX(), right.getMoveY()));
 	}
 
 	let r2 = right.radius * right.radius;
@@ -189,7 +202,18 @@ function draw() {
 		text('Reconnexion...', 0, 0);
 		translate(0, windowHeight / 3);
 		rotate(time / 1000);
-		image(IMAGE_DEAD, -windowHeight / 12,-windowHeight / 12,windowHeight / 6,windowHeight / 6);
+		image(IMAGE_DEAD, -windowHeight / 12,-windowHeight / 12, windowHeight / 6, windowHeight / 6);
+		return;
+	}
+	
+	if (!handle) {
+		background(200);
+		fill(0);
+		textSize(windowWidth / 15);
+		translate(windowWidth / 2, windowHeight / 3);
+		text('Tournez votre téléphone', 0, 0);
+		translate(0, windowHeight / 3);
+		image(IMAGE_ROTATE, -windowHeight / 6,-windowHeight / 6, windowHeight / 3, windowHeight / 3)
 		return;
 	}
 	
@@ -202,7 +226,7 @@ function draw() {
 }
 
 function touchStarted(ev) {
-	if (ev instanceof TouchEvent) {
+	if (handle && ev instanceof TouchEvent) {
 		let touch;
 		let list = ev.changedTouches;
 		for (let i = 0; i < list.length; i++) {
@@ -217,7 +241,7 @@ function touchStarted(ev) {
 	return false;
 }
 function touchMoved(ev) {
-	if (ev instanceof TouchEvent) {
+	if (handle && ev instanceof TouchEvent) {
 		let touch;
 		let list = ev.changedTouches;
 		for (let i = 0; i < list.length; i++) {
@@ -233,7 +257,7 @@ function touchMoved(ev) {
 	return false;
 }
 function touchEnded(ev) {
-	if (ev instanceof TouchEvent) {
+	if (handle && ev instanceof TouchEvent) {
 		let touch;
 		let list = ev.changedTouches;
 		for (let i = 0; i < list.length; i++) {
@@ -254,4 +278,6 @@ function windowResized() {
 
 	left.updateLocation(windowWidth / 6, windowHeight * 3 / 5, -1, windowWidth / 8);
 	right.updateLocation(windowWidth * 5 / 6, windowHeight * 3 / 5, -1, windowWidth / 6);
+	
+	checkSize(windowWidth, windowHeight);
 }
