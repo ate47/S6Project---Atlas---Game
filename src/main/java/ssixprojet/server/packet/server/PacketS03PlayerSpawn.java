@@ -7,7 +7,7 @@ public class PacketS03PlayerSpawn extends PacketServer {
 	private double x, y, lookX, lookY;
 	private int id;
 	
-	public PacketS03PlayerSpawn(int id,double x, double y, double lookX, double lookY) {
+	public PacketS03PlayerSpawn(int id, double x, double y, double lookX, double lookY) {
 		super(0x03, 8 * 4 + 4);
 		
 		this.id = id;

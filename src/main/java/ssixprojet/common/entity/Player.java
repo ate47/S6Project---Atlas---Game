@@ -16,6 +16,7 @@ import ssixprojet.server.connection.ConnectionClient;
 import ssixprojet.server.packet.PacketServer;
 import ssixprojet.server.packet.client.PacketC04Move;
 import ssixprojet.server.packet.server.PacketS03PlayerSpawn;
+import ssixprojet.server.packet.server.PacketS04PlayerMove;
 
 public class Player extends Entity implements ConnectionClient {
 	public static final int MAX_KEEP_ALIVE = 20;
@@ -27,7 +28,7 @@ public class Player extends Entity implements ConnectionClient {
 	private boolean connected = false;
 	private Connection connection;
 	private int keepAliveCount = MAX_KEEP_ALIVE;
-	private double x, y, lookX, lookY;
+	private double lookX = 1, lookY;
 	private int health = 100, ammos = AtlasGame.getConfig().getStartAmmo();
 
 	public Player(Connection connection) {
@@ -44,7 +45,8 @@ public class Player extends Entity implements ConnectionClient {
 	/**
 	 * mark this player as connected
 	 * 
-	 * @param name the username to take in game
+	 * @param name
+	 *            the username to take in game
 	 */
 	public void connect(String name) {
 		connected = true;
@@ -111,7 +113,8 @@ public class Player extends Entity implements ConnectionClient {
 	/**
 	 * parse a {@link PacketC04Move} packet on this player
 	 * 
-	 * @param movePacket the move packet
+	 * @param movePacket
+	 *            the move packet
 	 */
 	public void updateMove(PacketC04Move movePacket) {
 		double preLookX = movePacket.getLookX();
@@ -128,25 +131,33 @@ public class Player extends Entity implements ConnectionClient {
 			return;
 		}
 
-		lookX = preLookX;
-		lookY = preLookY;
+		if (preLookX * preLookX + preLookY * preLookY > 0.01D) {
+			lookX = preLookX;
+			lookY = preLookY;
+		}
 		move(preDeltaX, preDeltaY);
+
+		AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS04PlayerMove(id, getX(), getY(), lookX, lookY));
 	}
 
 	public void shooting() {
 		// TODO Auto-generated method stub
 	}
 
+	public PacketS03PlayerSpawn createPacketSpawn() {
+		return new PacketS03PlayerSpawn(id, getX(), getY(), lookX, lookY);
+	}
+
 	@Override
 	public void spawn(World w, double x, double y) {
 		super.spawn(w, x, y);
-		sendPacket(new PacketS03PlayerSpawn(id, x, y, lookX, lookY));
+		AtlasGame.getAtlas().sendToAllScreens(this::createPacketSpawn);
 	}
-	
+
 	@Override
 	public void respawn(double x, double y) {
 		super.respawn(x, y);
-		sendPacket(new PacketS03PlayerSpawn(id, x, y, lookX, lookY));
+		AtlasGame.getAtlas().sendToAllScreens(this::createPacketSpawn);
 	}
 
 	public String getUsername() {
@@ -155,14 +166,6 @@ public class Player extends Entity implements ConnectionClient {
 
 	public PlayerType getType() {
 		return type;
-	}
-
-	public double getX() {
-		return x;
-	}
-
-	public double getY() {
-		return y;
 	}
 
 	public double getLookX() {

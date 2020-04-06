@@ -77,8 +77,11 @@ public class World {
 					sBottom = c.getY() + c.getUnit();
 				else
 					sBottom = y + height;
-
-				spawns.add(new Spawn(sLeft, sTop, sRight - sLeft, sBottom - sTop, outside));
+				
+				Spawn newSpawn = new Spawn(sLeft, sTop, sRight - sLeft, sBottom - sTop, outside);
+				
+				c.getSpawns().add(newSpawn);
+				spawns.add(newSpawn);
 			}
 	}
 

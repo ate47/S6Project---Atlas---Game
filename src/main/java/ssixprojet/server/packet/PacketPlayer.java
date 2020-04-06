@@ -10,7 +10,7 @@ public abstract class PacketPlayer extends PacketClient {
 		if (src instanceof Player) {
 			handle0((Player) src);
 		} else
-			src.kick("Bad packet type");
+			src.kick("Bad packet type: " + src.getClass().getCanonicalName());
 	}
 	public abstract void handle0(Player player) throws Exception;
 }

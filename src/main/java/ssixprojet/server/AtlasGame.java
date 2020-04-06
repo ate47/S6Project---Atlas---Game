@@ -1,15 +1,21 @@
 package ssixprojet.server;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Supplier;
 
 import ssixprojet.common.GameMap;
 import ssixprojet.common.MapEdge;
 import ssixprojet.common.MapEdge.Orientation;
+import ssixprojet.common.Screen;
 import ssixprojet.common.SpawnLocation;
 import ssixprojet.common.config.Config;
 import ssixprojet.common.config.ConfigManager;
+import ssixprojet.common.entity.Player;
 import ssixprojet.common.entity.Wall;
 import ssixprojet.common.world.World;
+import ssixprojet.server.packet.PacketServer;
 
 public class AtlasGame {
 	private static ConfigManager configManager = new ConfigManager(new File(new File("config"), "server.json"));
@@ -19,7 +25,7 @@ public class AtlasGame {
 	public static AtlasGame getAtlas() {
 		return atlas;
 	}
-	
+
 	public static Config getConfig() {
 		return configManager.getConfig();
 	}
@@ -31,6 +37,8 @@ public class AtlasGame {
 	private GameMap gameMap;
 
 	private WebServer webServer;
+
+	private final Map<Integer, Screen> screens = new HashMap<>();
 
 	private World mainWorld;
 
@@ -94,12 +102,15 @@ public class AtlasGame {
 	public World getMainWorld() {
 		return mainWorld;
 	}
+
 	public double getMapFactorX() {
 		return mapFactorX;
 	}
+
 	public double getMapFactorY() {
 		return mapFactorY;
 	}
+
 	public double getPlayerSizeX() {
 		return playerSizeX;
 	}
@@ -110,6 +121,30 @@ public class AtlasGame {
 
 	public WebServer getWebServer() {
 		return webServer;
+	}
+
+	public Map<Integer, Screen> getScreens() {
+		return screens;
+	}
+
+	/**
+	 * register a screen to the set
+	 * 
+	 * @param screen
+	 *            the screen to register
+	 */
+	public void registerScreen(Screen screen) {
+		synchronized (screens) {
+			screens.put(screen.getInternalId(), screen);
+		}
+		getWebServer().getConnectionManager().getPlayers().stream().map(Player::createPacketSpawn)
+				.forEach(screen::sendPacket);
+	}
+
+	public void sendToAllScreens(Supplier<PacketServer> packetSupplier) {
+		synchronized (screens) {
+			screens.forEach((id, screen) -> screen.sendPacket(packetSupplier.get()));
+		}
 	}
 
 	/**

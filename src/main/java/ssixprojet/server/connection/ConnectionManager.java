@@ -15,6 +15,7 @@ import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import ssixprojet.common.Screen;
 import ssixprojet.common.entity.Player;
+import ssixprojet.server.AtlasGame;
 import ssixprojet.server.packet.PacketServer;
 import ssixprojet.server.packet.server.PacketS02PlayerRegister;
 
@@ -47,6 +48,8 @@ public class ConnectionManager {
 			if (checkConnected()) {
 				Player plr = new Player(this);
 				plr.connect(name);
+				AtlasGame.getAtlas().getMainWorld().spawnEntityAtRandomLocation(plr);
+				
 				playerMap.put(plr.getInternalId(), plr);
 				client = plr;
 				close = PLAYER;
@@ -59,6 +62,9 @@ public class ConnectionManager {
 		public void connectScreen() {
 			if (checkConnected()) {
 				Screen screen = new Screen(this);
+				
+				AtlasGame.getAtlas().registerScreen(screen);
+				
 				client = screen;
 				close = SCREEN;
 			}

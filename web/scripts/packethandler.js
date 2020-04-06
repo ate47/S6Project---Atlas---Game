@@ -1,6 +1,8 @@
 const textDecoder = new TextDecoder();
 const textEncoder = new TextEncoder();
 
+const DEBUG = true;
+
 class UUID {
     constructor() {
         const buffer = new ArrayBuffer(16);
@@ -157,7 +159,15 @@ class PacketC05Shot extends ClientPacket {
         super(0x05, 0);
     }
 }
-
+class PacketC06GuessPlayer extends ClientPacket {
+	constructor(playerID) {
+		super(0x06, 4);
+		this.playerID = playerID;
+	}
+    write(dataView) {
+    	dataView.setInt32(0, this.playerID);
+    }
+}
 class PacketHandler {
     /**
 	 * 
@@ -204,10 +214,14 @@ class PacketHandler {
 	 *            packet the packet to send
 	 */
     sendPacket(packet) {
+        if (DEBUG)
+        	console.log(packet);
+        
         // create the buffer and set the packet ID
         const buffer = new ArrayBuffer(4 + packet.size);
         const viewint = new DataView(buffer);
         viewint.setUint32(0, packet.id);
+        
         // load packet data
         const view = new DataView(buffer, 4);
         packet.write(view);
@@ -230,11 +244,14 @@ class PacketHandler {
     	const builder = this.packetBuilder[packetId];
     	
     	if (builder != undefined) {
-    		const view = new DataView(buffer, 4);
+    		const view = new DataView(event.data, 4);
     		const packet = builder();
     		
-    		if (packet.read(view) !== false)
-    			packet.handle();
+    		if (packet.read(view) === false)
+    			return;
+            if (DEBUG)
+            	console.log(packet);
+    		packet.handle();
     	} else {
     		console.log("Weird packet id: " + packetId);
     	}

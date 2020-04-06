@@ -10,7 +10,7 @@ public abstract class PacketScreen extends PacketClient {
 		if (src instanceof Screen) {
 			handle((Screen) src);
 		} else
-			src.kick("Bad packet type");
+			src.kick("Bad packet type: " + src.getClass().getCanonicalName());
 	}
 	public abstract void handle(Screen screen) throws Exception;
 }

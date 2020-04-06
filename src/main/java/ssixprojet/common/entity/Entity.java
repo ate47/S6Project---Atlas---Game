@@ -54,6 +54,9 @@ public class Entity {
 	 */
 	public void move(double dx, double dy) {
 		// TODO move algorithm
+
+		this.x += dx * width * 0.25;
+		this.y += dy * height * 0.25;
 	}
 
 	/**
