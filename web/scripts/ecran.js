@@ -3,6 +3,7 @@ let canvas;
 let playerMap = [];
 const fps = 24;
 const tps = 20;
+let IMAGE_MAP;
 
 class PlayerData {
 	constructor() {}
@@ -81,6 +82,8 @@ packetHandler.openWebSocket(function() {
 function setup() {
 	log("Create canvas("+windowWidth+", "+windowHeight+")");
 	canvas = createCanvas(windowWidth, windowHeight);
+	
+	IMAGE_MAP = loadImage("images/map.png");
 
 	frameRate(fps);
 	setInterval(tick, 1000 / tps);
@@ -91,10 +94,10 @@ function tick() {
 }
 
 function draw() {
-	fill(color(220, 220, 220));
-	rect(0, 0, windowWidth, windowHeight);
-	noStroke();
+	image(IMAGE_MAP, 0, 0, windowWidth, windowHeight);
 	
+	
+	noStroke();
 }
 
 function windowResized() {
