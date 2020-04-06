@@ -3,6 +3,7 @@ package ssixprojet.server;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 import ssixprojet.common.GameMap;
@@ -137,9 +138,20 @@ public class AtlasGame {
 		synchronized (screens) {
 			screens.put(screen.getInternalId(), screen);
 		}
-		getWebServer().getConnectionManager().getPlayers().stream().map(Player::createPacketSpawn)
-				.forEach(screen::sendPacket);
+		
+		Map<UUID, Player> map =getWebServer().getConnectionManager().getPlayerMap();
+		synchronized (map) {
+			map.values().stream().map(Player::createPacketSpawn)
+					.forEach(screen::sendPacket);
+		}
 	}
+	
+	public void unregisterScreen(Screen screen) {
+		synchronized (screens) {
+			screens.remove(screen.getInternalId());
+		}
+	}
+	
 
 	public void sendToAllScreens(Supplier<PacketServer> packetSupplier) {
 		synchronized (screens) {

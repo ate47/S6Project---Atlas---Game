@@ -51,7 +51,6 @@ public class Player extends Entity implements ConnectionClient {
 	public void connect(String name) {
 		connected = true;
 		this.username = name;
-		System.out.println(name + " connected!");
 	}
 
 	public synchronized void decrementKeepAliveCount() {

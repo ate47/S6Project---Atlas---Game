@@ -1,10 +1,6 @@
 package ssixprojet.server.connection;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -18,6 +14,7 @@ import ssixprojet.common.entity.Player;
 import ssixprojet.server.AtlasGame;
 import ssixprojet.server.packet.PacketServer;
 import ssixprojet.server.packet.server.PacketS02PlayerRegister;
+import ssixprojet.server.packet.server.PacketS05PlayerDead;
 
 public class ConnectionManager {
 	@FunctionalInterface
@@ -49,12 +46,15 @@ public class ConnectionManager {
 				Player plr = new Player(this);
 				plr.connect(name);
 				AtlasGame.getAtlas().getMainWorld().spawnEntityAtRandomLocation(plr);
-				
-				playerMap.put(plr.getInternalId(), plr);
+
+				synchronized (playerMap) {
+					playerMap.put(plr.getInternalId(), plr);
+				}
 				client = plr;
 				close = PLAYER;
 				// send the uuid for reconnection
 				plr.sendPacket(new PacketS02PlayerRegister(plr.getInternalId()));
+				System.out.println("[Player] " + name + " connected!");
 			}
 		}
 
@@ -62,11 +62,12 @@ public class ConnectionManager {
 		public void connectScreen() {
 			if (checkConnected()) {
 				Screen screen = new Screen(this);
-				
+
 				AtlasGame.getAtlas().registerScreen(screen);
-				
+
 				client = screen;
 				close = SCREEN;
+				System.out.println("[Screen#" + screen.getInternalId() + "] new screen connected!");
 			}
 		}
 
@@ -128,13 +129,19 @@ public class ConnectionManager {
 	}
 
 	private Map<UUID, Player> playerMap = new HashMap<>();
-	private List<Screen> screens = new ArrayList<>();
 
 	private final ConnectionCloseOperation NONE = c -> {};
-	private final ConnectionCloseOperation PLAYER = c -> ((Player) c).disconnect();
+	private final ConnectionCloseOperation PLAYER = c -> {
+		Player p = (Player) c;
+		synchronized (playerMap) {
+			playerMap.remove(p.getInternalId());
+		}
+		AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS05PlayerDead(p.getId()));
+		p.disconnect();
+	};
 	private final ConnectionCloseOperation SCREEN = c -> {
+		AtlasGame.getAtlas().unregisterScreen((Screen) c);
 		((Screen) c).disconnect();
-		screens.remove(((Screen) c));
 	};
 
 	/**
@@ -148,17 +155,8 @@ public class ConnectionManager {
 		return new ConnectionImpl(channel);
 	}
 
-	/**
-	 * @return a unmodifiable collection of the players
-	 */
-	public Collection<Player> getPlayers() {
-		return Collections.unmodifiableCollection(playerMap.values());
+	public Map<UUID, Player> getPlayerMap() {
+		return playerMap;
 	}
 
-	/**
-	 * @return a unmodifiable collection of the screens
-	 */
-	public Collection<Screen> getScreens() {
-		return Collections.unmodifiableCollection(screens);
-	}
 }

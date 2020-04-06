@@ -157,7 +157,7 @@ function setup() {
 	IMAGE_CONTROLER_RIGHT = loadImage("images/controler_weapon.png");
 
 	left = new PressPoint(windowWidth / 6, windowHeight * 3 / 5, -1, windowWidth / 8, IMAGE_CONTROLER_LEFT);
-	right = new PressPoint(windowWidth * 5 / 6, windowHeight * 3 / 5, -1, windowWidth / 8, IMAGE_CONTROLER_RIGHT);
+	right = new PressPoint(windowWidth * 5 / 6, windowHeight * 3 / 5, -1, windowWidth / 6, IMAGE_CONTROLER_RIGHT);
 
 	frameRate(fps);
 	setInterval(tick, 1000 / tps);
@@ -237,5 +237,5 @@ function windowResized() {
 	resizeCanvas(windowWidth, windowHeight);
 
 	left.updateLocation(windowWidth / 6, windowHeight * 3 / 5, -1, windowWidth / 8);
-	right.updateLocation(windowWidth * 5 / 6, windowHeight * 3 / 5, -1, windowWidth / 8);
+	right.updateLocation(windowWidth * 5 / 6, windowHeight * 3 / 5, -1, windowWidth / 6);
 }

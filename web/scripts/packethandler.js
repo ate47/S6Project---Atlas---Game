@@ -259,7 +259,7 @@ class PacketHandler {
     webSocketClose(ev) {
         console.log(ev);
         this.open = false;
-        this.openWebSocket();
+        this.openWebSocket(this.callback);
     }
     webSocketError(msg) {
         console.log(msg);
