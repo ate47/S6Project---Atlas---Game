@@ -6,6 +6,7 @@ const tps = 20;
 let IMAGE_MAP;
 let IMAGE_PLAYER_S;
 let IMAGE_PLAYER_I;
+let IMAGE_DEAD;
 
 const packetHandler = new PacketHandler('ws://' + window.location.host + '/game');
 
@@ -91,9 +92,11 @@ function setup() {
 
 	IMAGE_PLAYER_S = loadImage("images/plr_survivant.png");
 	IMAGE_PLAYER_I = loadImage("images/plr_zombie.png");
+	IMAGE_DEAD = loadImage("images/dead.png");
 
 	frameRate(fps);
 	setInterval(tick, 1000 / tps);
+	textAlign(CENTER, CENTER);
 }
 
 function tick() {
@@ -101,6 +104,20 @@ function tick() {
 }
 
 function draw() {
+	if (!packetHandler.open) {
+		background(200);
+		fill(0);
+
+		let time = millis();
+		textSize(Math.min(windowWidth, windowHeight) / 8);
+		translate(windowWidth / 2, windowHeight / 3);
+		text('Reconnexion...', 0, 0);
+		translate(0, windowHeight / 3);
+		rotate(time / 1000);
+		image(IMAGE_DEAD, -windowHeight / 12,-windowHeight / 12,windowHeight / 6,windowHeight / 6);
+		return;
+	}
+	
 	image(IMAGE_MAP, 0, 0, windowWidth, windowHeight);
 	
 	playerMap.forEach(function (player) {

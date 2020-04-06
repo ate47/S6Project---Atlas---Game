@@ -4,6 +4,7 @@ const fps = 45;
 const tps = 20;
 let IMAGE_CONTROLER_LEFT;
 let IMAGE_CONTROLER_RIGHT;
+let IMAGE_DEAD;
 
 let left;
 let right;
@@ -155,12 +156,14 @@ function setup() {
 	canvas = createCanvas(windowWidth, windowHeight);
 	IMAGE_CONTROLER_LEFT = loadImage("images/controler_view.png");
 	IMAGE_CONTROLER_RIGHT = loadImage("images/controler_weapon.png");
+	IMAGE_DEAD = loadImage("images/dead.png");
 
 	left = new PressPoint(windowWidth / 6, windowHeight * 3 / 5, -1, windowWidth / 8, IMAGE_CONTROLER_LEFT);
 	right = new PressPoint(windowWidth * 5 / 6, windowHeight * 3 / 5, -1, windowWidth / 6, IMAGE_CONTROLER_RIGHT);
 
 	frameRate(fps);
 	setInterval(tick, 1000 / tps);
+	textAlign(CENTER, CENTER);
 }
 
 function tick() {
@@ -177,6 +180,19 @@ function tick() {
 }
 
 function draw() {
+	if (!packetHandler.open) {
+		background(200);
+		fill(0);
+		let time = millis();
+		textSize(Math.min(windowWidth, windowHeight) / 8);
+		translate(windowWidth / 2, windowHeight / 3);
+		text('Reconnexion...', 0, 0);
+		translate(0, windowHeight / 3);
+		rotate(time / 1000);
+		image(IMAGE_DEAD, -windowHeight / 12,-windowHeight / 12,windowHeight / 6,windowHeight / 6);
+		return;
+	}
+	
 	fill(color(220, 220, 220));
 	rect(0, 0, windowWidth, windowHeight);
 	noStroke();
