@@ -97,5 +97,7 @@ public class Entity {
 		this.y = y;
 		this.exist = true;
 	}
-
+	
+	public void shot(Player p) {
+	}
 }

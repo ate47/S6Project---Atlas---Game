@@ -94,10 +94,26 @@ class PacketS06PlayerType extends ServerPacket {
     }
 }
 
+class PacketS08Shot extends ServerPacket{
+	read(dataview){
+		if(dataview.byteLength < 32)
+			return false;
+		this.x1 = dataview.getFloat64(0);
+		this.y1 = dataview.getFloat64(8);
+		this.x2 = dataview.getFloat64(16);
+		this.y2 = dataview.getFloat64(24);
+	}
+	
+	handle(){
+		//TODO afficher tir wesh
+	}
+}
+
 packetHandler.registerPacketBuilder(0x03, () => new PacketS03PlayerSpawn());
 packetHandler.registerPacketBuilder(0x04, () => new PacketS04PlayerMove());
 packetHandler.registerPacketBuilder(0x05, () => new PacketS05PlayerDead());
 packetHandler.registerPacketBuilder(0x06, () => new PacketS06PlayerType());
+packetHandler.registerPacketBuilder(0x08, () => new PacketS08Shot ());
 
 packetHandler.openWebSocket(function() {
 	packetHandler.sendPacket(new PacketC02ConnectScreen());
