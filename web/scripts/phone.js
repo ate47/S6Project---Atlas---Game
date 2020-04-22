@@ -13,6 +13,7 @@ let right;
 let handle = false;
 let playerData = {
 	health: 100,
+	ammos: 0,
 	type: PLAYER_TYPE_SURVIVOR
 };
 
@@ -64,7 +65,7 @@ class PressPoint {
 		this.radius = radius;
 		this.img = img;
 		this.drawControler = false;
-		this.color = color(100, 100, 255, 50);
+		this.color = color(255, 255, 255, 50);
 	}
 
 	/**
@@ -184,9 +185,21 @@ class PacketS09ChangeHealth extends ServerPacket {
     	playerData.health = this.health;
     }
 }
+class PacketS0AChangeAmmos extends ServerPacket {
+	read(dataview){
+		if (dataview.byteLength < 4)
+			return false;
+		this.ammos = dataview.getInt32(0);
+	}
+
+    handle() {
+    	playerData.ammos = this.ammos;
+    }
+}
 
 packetHandler.registerPacketBuilder(0x06, () => new PacketS06PlayerType());
 packetHandler.registerPacketBuilder(0x09, () => new PacketS09ChangeHealth());
+packetHandler.registerPacketBuilder(0x0A, () => new PacketS0AChangeAmmos());
 
 function setup() {
 	log("Create canvas("+windowWidth+", "+windowHeight+")");
@@ -248,10 +261,46 @@ function draw() {
 		image(IMAGE_ROTATE, -windowHeight / 6,-windowHeight / 6, windowHeight / 3, windowHeight / 3)
 		return;
 	}
-	
-	fill(color(220, 220, 220));
-	rect(0, 0, windowWidth, windowHeight);
+
+	textSize(windowHeight / 10);
 	noStroke();
+	switch (playerData.type) {
+	case PLAYER_TYPE_INFECTED:
+		// display background
+		fill(color(0, 80, 0));
+		rect(0, 0, windowWidth, windowHeight);
+
+		translate(windowWidth / 2, windowHeight / 5);
+		fill(127);
+		rect(-windowWidth/4, -windowHeight / 20, windowWidth/2, windowHeight / 10);
+		
+		if (playerData.health < 25)
+			fill(color(255, 0, 0));
+		else if(playerData.health < 50)
+			fill(color(255, 255, 0));
+		else
+			fill(color(0, 255, 0));
+
+		rect(-windowWidth/4, -windowHeight / 20, playerData.health * windowWidth / 200, windowHeight / 10);
+		
+
+		fill(0);
+		text("Vie: "+playerData.health, 0, 0);
+
+		break;
+	case PLAYER_TYPE_SURVIVOR:
+		// display background
+		fill(color(0, 0, 80));
+		rect(0, 0, windowWidth, windowHeight);
+
+		translate(windowWidth / 2, windowHeight / 5);
+		fill(255);
+		text("Munitions: " + playerData.ammos, 0, 0);
+		
+		break;
+	}
+
+	translate(-windowWidth / 2, -windowHeight / 5);
 
 	left.draw();
 	right.draw();

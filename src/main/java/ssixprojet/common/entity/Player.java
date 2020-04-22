@@ -21,6 +21,7 @@ import ssixprojet.server.packet.server.PacketS04PlayerMove;
 import ssixprojet.server.packet.server.PacketS06PlayerType;
 import ssixprojet.server.packet.server.PacketS08Shot;
 import ssixprojet.server.packet.server.PacketS09ChangeHealth;
+import ssixprojet.server.packet.server.PacketS0AChangeAmmos;
 import ssixprojet.utils.Vector;
 
 public class Player extends Entity implements ConnectionClient {
@@ -36,7 +37,7 @@ public class Player extends Entity implements ConnectionClient {
 	private Connection connection;
 	private int keepAliveCount = MAX_KEEP_ALIVE;
 	private double lookX = 1, lookY;
-	private int health = 100, ammos = AtlasGame.getConfig().getStartAmmo();
+	private int health = 100, ammos;
 	private long lastTimeShooted = 0L;
 	public final PlayerScore score = new PlayerScore();
 
@@ -60,6 +61,8 @@ public class Player extends Entity implements ConnectionClient {
 	public void connect(String name) {
 		connected = true;
 		this.username = name;
+		setHealth(100);
+		setAmmos(AtlasGame.getConfig().getStartAmmo());
 	}
 
 	public PacketS03PlayerSpawn createPacketSpawn() {
@@ -125,7 +128,7 @@ public class Player extends Entity implements ConnectionClient {
 	public boolean isConnected() {
 		return connected;
 	}
-	
+
 	@Override
 	public void kick(String msg) {
 		Channel channel = connection.getChannel();
@@ -154,6 +157,10 @@ public class Player extends Entity implements ConnectionClient {
 		connection.getChannel().writeAndFlush(frame);
 	}
 
+	public void setAmmos(int ammos) {
+		sendPacket(new PacketS0AChangeAmmos(this.ammos = Math.max(0, ammos)));
+	}
+
 	public void setConnection(Connection connection) {
 		this.connection = connection;
 		this.connected = this.connection != null;
@@ -175,10 +182,11 @@ public class Player extends Entity implements ConnectionClient {
 
 	public void shooting() {
 		long currentTime = System.currentTimeMillis();
-		if (this.getWorld() == null || lastTimeShooted + TIME_BEFORE_RESHOOT > currentTime)
+		if (this.getWorld() == null || lastTimeShooted + TIME_BEFORE_RESHOOT > currentTime || ammos <= 0)
 			return;
 
 		lastTimeShooted = currentTime;
+		setAmmos(getAmmos() - 1);
 
 		Vector tir = new Vector(this.lookX, this.lookY).normalized();
 
@@ -267,13 +275,13 @@ public class Player extends Entity implements ConnectionClient {
 		} else
 			setHealth(getHealth() - AMMO_POWER);
 	}
-	
+
 	@Override
 	public void spawn(World w, double x, double y) {
 		super.spawn(w, x, y);
 		AtlasGame.getAtlas().sendToAllScreens(this::createPacketSpawn);
 	}
-	
+
 	/**
 	 * parse a {@link PacketC04Move} packet on this player
 	 * 

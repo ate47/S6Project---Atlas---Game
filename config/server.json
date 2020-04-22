@@ -10,5 +10,6 @@
   "timeInTickBeforeEnd": 4800,
   "timeInTickBeforeInfection": 600,
   "chunkSplit": 20,
-  "millisBeforeReshooting": 100
+  "millisBeforeReshooting": 100,
+  "ammoPower": 21
 }
