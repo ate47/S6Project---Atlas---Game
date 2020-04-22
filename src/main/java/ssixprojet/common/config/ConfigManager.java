@@ -44,9 +44,10 @@ public class ConfigManager {
 			config = GSON.fromJson(r, Config.class);
 		} catch (FileNotFoundException e) {
 			config = new Config();
-			save();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
+		} finally {
+			save();			
 		}
 	}
 }
