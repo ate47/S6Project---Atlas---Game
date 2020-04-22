@@ -12,4 +12,5 @@ public interface Connection {
 	void onClose();
 	void reconnectPlayer(UUID id);
 	void setAttachedClient(ConnectionClient client);
+	void onError(String error);
 }

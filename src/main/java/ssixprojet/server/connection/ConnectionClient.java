@@ -20,4 +20,6 @@ public interface ConnectionClient {
 	void sendPacket(PacketServer packet);
 	
 	Connection getConnection();
+	
+	void onDisconnect(String reason);
 }

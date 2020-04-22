@@ -138,6 +138,11 @@ public class Player extends Entity implements ConnectionClient {
 		channel.close();
 	}
 
+	@Override
+	public void onDisconnect(String reason) {
+		System.out.println("[Player] " + username + " disconnected : " + reason);
+	}
+
 	public synchronized void resetKeepAliveCount() {
 		keepAliveCount = MAX_KEEP_ALIVE;
 	}

@@ -33,6 +33,10 @@ public class Screen implements ConnectionClient {
 	public int getInternalId() {
 		return internalId;
 	}
+	@Override
+	public void onDisconnect(String reason) {
+		System.out.println("[Screen#" + getInternalId() + "] diconnected : " + reason);
+	}
 
 	@Override
 	public void kick(String msg) {

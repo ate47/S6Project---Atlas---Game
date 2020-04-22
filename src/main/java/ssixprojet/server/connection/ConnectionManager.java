@@ -99,6 +99,7 @@ public class ConnectionManager {
 		@Override
 		public void onClose() {
 			close.onClose(client);
+			client.onDisconnect("Disconnected");
 		}
 
 		@Override
@@ -127,6 +128,16 @@ public class ConnectionManager {
 		@Override
 		public void setAttachedClient(ConnectionClient client) {
 			this.client = client;
+		}
+
+		@Override
+		public void onError(String error) {
+			client.onDisconnect(error);
+		}
+
+		@Override
+		public void onDisconnect(String reason) {
+			// connection closed without error
 		}
 
 	}
@@ -165,7 +176,7 @@ public class ConnectionManager {
 	public Map<UUID, Player> getPlayerMap() {
 		return playerMap;
 	}
-	
+
 	public Map<Integer, Player> getPlayerInternalMap() {
 		return playerInternalMap;
 	}

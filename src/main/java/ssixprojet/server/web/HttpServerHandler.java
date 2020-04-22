@@ -34,7 +34,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 	private static String getUri(HttpRequest req) {
 		String uri = req.getUri();
 		int index = req.getUri().indexOf('?');
-		
+
 		return index == -1 ? uri : uri.substring(0, index);
 	}
 
@@ -44,7 +44,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 			HttpRequest req = (HttpRequest) msg;
 
 			HttpHeaders headers = req.headers();
-			
+
 			String uri = getUri(req);
 			System.out.println("[" + req.getProtocolVersion() + "] " + uri);
 
@@ -104,5 +104,10 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 
 	protected String getWebSocketURL(HttpRequest req) {
 		return "ws://" + req.headers().get("Host") + getUri(req);
+	}
+
+	@Override
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+		// nothing to do
 	}
 }

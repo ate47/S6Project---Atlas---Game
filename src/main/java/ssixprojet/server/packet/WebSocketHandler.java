@@ -20,6 +20,20 @@ public class WebSocketHandler extends ChannelInboundHandlerAdapter implements Ch
 		source.getChannel().closeFuture().addListener(this);
 	}
 
+	@Override
+	public void channelRead(ChannelHandlerContext ctx, Object msg) {
+		if (msg instanceof WebSocketFrame) {
+			if (msg instanceof BinaryWebSocketFrame) {
+				channelRead0(ctx, (BinaryWebSocketFrame) msg);
+			} else if (msg instanceof CloseWebSocketFrame) {
+				ctx.close();
+			} else {
+				ctx.close();
+				System.out.println("Unsupported WebSocketFrame: " + msg.getClass().getCanonicalName());
+			}
+		}
+	}
+
 	protected void channelRead0(ChannelHandlerContext ctx, BinaryWebSocketFrame frame) {
 		PacketClient packet = manager.buildPacket(frame);
 		ConnectionClient client = src.getAttachedClient();
@@ -37,19 +51,9 @@ public class WebSocketHandler extends ChannelInboundHandlerAdapter implements Ch
 	}
 
 	@Override
-	public void channelRead(ChannelHandlerContext ctx, Object msg) {
-		if (msg instanceof WebSocketFrame) {
-			if (msg instanceof BinaryWebSocketFrame) {
-				channelRead0(ctx, (BinaryWebSocketFrame) msg);
-			} else if (msg instanceof CloseWebSocketFrame) {
-				ctx.close();
-			} else {
-				ctx.close();
-				System.out.println("Unsupported WebSocketFrame: " + msg.getClass().getCanonicalName());
-			}
-		}
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+		src.onError(cause.getMessage());
 	}
-
 	@Override
 	public void operationComplete(ChannelFuture future) throws Exception {
 		// close operation
