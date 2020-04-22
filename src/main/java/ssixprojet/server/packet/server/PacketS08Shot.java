@@ -7,7 +7,7 @@ public class PacketS08Shot extends PacketServer {
 	private double x1, y1, x2, y2;
 
 	public PacketS08Shot(double x1, double y1, double x2, double y2) {
-		super(0x06, 4 * 8);
+		super(0x08, 4 * 8);
 		this.x1 = x1;
 		this.y1 = y1;
 		this.x2 = x2;
