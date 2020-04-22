@@ -1,6 +1,7 @@
 let log = console.log;
 let canvas;
 let playerMap = [];
+let shoots = [];
 let playerSizeX = 0.005;
 let playerSizeY = 0.005;
 const fps = 24;
@@ -11,6 +12,23 @@ let IMAGE_PLAYER_I;
 let IMAGE_DEAD;
 
 const packetHandler = new PacketHandler('ws://' + window.location.host + '/game');
+
+class Shoot {
+	constructor(x1, y1, x2, y2) {
+		this.ticks = 5;
+		this.x1 = x1;
+		this.y1 = y1;
+		this.x2 = x2;
+		this.y2 = y2;
+	}
+	
+	tick() {
+		return (--this.ticks) < 0;
+	}
+	draw() {
+		line(this.x1 * windowWidth, this.y1 * windowHeight, this.x2 * windowWidth, this.y2 * windowHeight);
+	}
+}
 
 class PlayerData {
 	constructor() {}
@@ -121,7 +139,7 @@ class PacketS08Shot extends ServerPacket{
 	}
 	
 	handle(){
-		//TODO afficher tir wesh
+		shoots.push(new Shoot(this.x1, this.y1, this.x2, this.y2));
 	}
 }
 packetHandler.registerPacketBuilder(0x03, () => new PacketS03PlayerSpawn());
@@ -152,7 +170,10 @@ function setup() {
 }
 
 function tick() {
-	
+	Object.keys(shoots).forEach(key => {
+		if (shoots[key].tick())
+			delete shoots[key];
+	});
 }
 
 function draw() {
@@ -189,6 +210,10 @@ function draw() {
 
 		translate(-realX - sizeX / 2, -realY - sizeY / 2);
 	});
+	
+	stroke(40);
+	
+	shoots.forEach(s => s.draw());
 	
 	noStroke();
 }
