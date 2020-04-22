@@ -17,6 +17,8 @@ import ssixprojet.server.packet.PacketServer;
 import ssixprojet.server.packet.client.PacketC04Move;
 import ssixprojet.server.packet.server.PacketS03PlayerSpawn;
 import ssixprojet.server.packet.server.PacketS04PlayerMove;
+import ssixprojet.server.packet.server.PacketS08Shot;
+import ssixprojet.utils.Vector;
 
 public class Player extends Entity implements ConnectionClient {
 	public static final int MAX_KEEP_ALIVE = 20;
@@ -45,8 +47,7 @@ public class Player extends Entity implements ConnectionClient {
 	/**
 	 * mark this player as connected
 	 * 
-	 * @param name
-	 *            the username to take in game
+	 * @param name the username to take in game
 	 */
 	public void connect(String name) {
 		connected = true;
@@ -112,8 +113,7 @@ public class Player extends Entity implements ConnectionClient {
 	/**
 	 * parse a {@link PacketC04Move} packet on this player
 	 * 
-	 * @param movePacket
-	 *            the move packet
+	 * @param movePacket the move packet
 	 */
 	public void updateMove(PacketC04Move movePacket) {
 		double preLookX = movePacket.getLookX();
@@ -140,7 +140,79 @@ public class Player extends Entity implements ConnectionClient {
 	}
 
 	public void shooting() {
-		// TODO Auto-generated method stub
+		if (this.getWorld() == null)
+			return;
+
+		Vector tir = new Vector(this.lookX, this.lookY).normalized();
+
+		double x, y, // tireur
+				xt, yt, 
+				xi = 0, yi = 0, //impacte
+				k = 0, d = 2.0, dt; // distance
+		Entity cible = null;
+
+		for (Entity e : this.getWorld().getEntities()) {
+			if (e == this)
+				continue;
+
+			// opti : 2 bord a calcule
+			if (lookX > 0) {
+				x = e.getX() + e.getWidth();
+			} else {
+				x = e.getX();
+			}
+			if (lookY > 0) {
+				y = e.getY() + e.getHeight();
+			} else {
+				y = e.getY();
+			}
+
+			if (tir.getY() != 0) {
+				k = ((y - this.getY()) / tir.getY());
+				xt = k * tir.getX() + this.getX();
+				if (xt >= e.getX() && xt <= e.getX() + e.getWidth()) {
+					dt = (y - this.getY()) * (y - this.getY()) + (xt - this.getX()) * (xt - this.getX());
+
+					if (dt < d) {
+						d = dt;
+						cible = e;
+						xi = xt;
+						yi = y;
+						continue;
+					}
+				}
+				
+				
+			}
+
+			if (tir.getX() != 0) {
+				k = ((x - this.getX()) / tir.getX());
+				yt = k * tir.getY() + this.getY();
+				if (yt >= e.getY() && yt <= e.getY() + e.getHeight()) {
+					dt = (y - this.getY()) * (y - this.getY()) + (yt - this.getY()) * (yt - this.getY());
+
+					if (dt < d) {
+						d = dt;
+						cible = e;
+						xi = x;
+						yi = yt;
+						continue;
+					}
+				}
+			}
+			
+		}
+		
+		
+		if(cible != null) {
+			double xf, yf; //java est chelou
+			xf = xi;
+			yf = yi;
+			cible.shot(this);
+			AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS08Shot(this.getX(), this.getY(), xf, yf));
+		}
+		
+		
 	}
 
 	public PacketS03PlayerSpawn createPacketSpawn() {

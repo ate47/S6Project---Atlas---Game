@@ -128,6 +128,9 @@ public class Entity {
 		this.exist = true;
 	}
 
+	public void shot(Player p) {
+	}
+	
 	@Override
 	public String toString() {
 		return "Entity [exist=" + exist + ", x=" + x + ", y=" + y + ", width=" + width + ", height=" + height
