@@ -20,6 +20,7 @@ import ssixprojet.server.packet.server.PacketS03PlayerSpawn;
 import ssixprojet.server.packet.server.PacketS04PlayerMove;
 import ssixprojet.server.packet.server.PacketS06PlayerType;
 import ssixprojet.server.packet.server.PacketS08Shot;
+import ssixprojet.server.packet.server.PacketS09ChangeHealth;
 import ssixprojet.utils.Vector;
 
 public class Player extends Entity implements ConnectionClient {
@@ -61,6 +62,10 @@ public class Player extends Entity implements ConnectionClient {
 		this.username = name;
 	}
 
+	public PacketS03PlayerSpawn createPacketSpawn() {
+		return new PacketS03PlayerSpawn(id, getX(), getY(), lookX, lookY, type.getId());
+	}
+
 	public synchronized void decrementKeepAliveCount() {
 		keepAliveCount--;
 	}
@@ -69,9 +74,17 @@ public class Player extends Entity implements ConnectionClient {
 		setConnection(null);
 	}
 
+	public int getAmmos() {
+		return ammos;
+	}
+
 	@Override
 	public Connection getConnection() {
 		return connection;
+	}
+
+	public int getHealth() {
+		return health;
 	}
 
 	public int getId() {
@@ -86,10 +99,33 @@ public class Player extends Entity implements ConnectionClient {
 		return keepAliveCount;
 	}
 
+	public double getLookX() {
+		return lookX;
+	}
+
+	public double getLookY() {
+		return lookY;
+	}
+
+	@Override
+	public double getSpeed() {
+		return type == PlayerType.INFECTED
+				? AtlasGame.getConfig().getSpeedAccelerationPercentage() * super.getSpeed() / 100
+				: super.getSpeed();
+	}
+
+	public PlayerType getType() {
+		return type;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
 	public boolean isConnected() {
 		return connected;
 	}
-
+	
 	@Override
 	public void kick(String msg) {
 		Channel channel = connection.getChannel();
@@ -101,6 +137,12 @@ public class Player extends Entity implements ConnectionClient {
 
 	public synchronized void resetKeepAliveCount() {
 		keepAliveCount = MAX_KEEP_ALIVE;
+	}
+
+	@Override
+	public void respawn(double x, double y) {
+		super.respawn(x, y);
+		AtlasGame.getAtlas().sendToAllScreens(this::createPacketSpawn);
 	}
 
 	@Override
@@ -117,34 +159,18 @@ public class Player extends Entity implements ConnectionClient {
 		this.connected = this.connection != null;
 	}
 
-	/**
-	 * parse a {@link PacketC04Move} packet on this player
-	 * 
-	 * @param movePacket
-	 *            the move packet
-	 */
-	public void updateMove(PacketC04Move movePacket) {
-		double preLookX = movePacket.getLookX();
-		double preLookY = movePacket.getLookY();
-		double preDeltaX = movePacket.getDeltaX();
-		double preDeltaY = movePacket.getDeltaY();
+	public void setHealth(int health) {
+		sendPacket(new PacketS09ChangeHealth(this.health = Math.max(0, health)));
+	}
 
-		if (preLookX * preLookX + preLookY * preLookY > 1.05D) {
-			kick("Bad look vector");
-			return;
+	public void setType(PlayerType type) {
+		if (this.type != type) {
+			this.type = type;
+			// update phone type
+			sendPacket(new PacketS06PlayerType(type.getId(), 0));
+			// update type on every screens
+			AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS06PlayerType(type.getId(), id));
 		}
-		if (preDeltaX * preDeltaX + preDeltaY * preDeltaY > 1.05D) {
-			kick("Bad move vector");
-			return;
-		}
-
-		if (preLookX * preLookX + preLookY * preLookY > 0.01D) {
-			lookX = preLookX;
-			lookY = preLookY;
-		}
-		move(preDeltaX, preDeltaY);
-
-		AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS04PlayerMove(id, getX(), getY(), lookX, lookY));
 	}
 
 	public void shooting() {
@@ -227,18 +253,19 @@ public class Player extends Entity implements ConnectionClient {
 
 	}
 
-	public PacketS03PlayerSpawn createPacketSpawn() {
-		return new PacketS03PlayerSpawn(id, getX(), getY(), lookX, lookY, type.getId());
-	}
-
-	public void setType(PlayerType type) {
-		if (this.type != type) {
-			this.type = type;
-			// update phone type
-			sendPacket(new PacketS06PlayerType(type.getId(), 0));
-			// update type on every screens
-			AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS06PlayerType(type.getId(), id));
-		}
+	@Override
+	public void shot(Player p) {
+		score.damageTaken += AMMO_POWER;
+		p.score.damageGiven += AMMO_POWER;
+		if (getHealth() - AMMO_POWER <= 0) {
+			score.death++;
+			p.score.kills++;
+			setHealth(100);
+			setType(PlayerType.INFECTED);
+			// respawn the player
+			getWorld().spawnEntityAtRandomLocation(this);
+		} else
+			setHealth(getHealth() - AMMO_POWER);
 	}
 	
 	@Override
@@ -246,56 +273,34 @@ public class Player extends Entity implements ConnectionClient {
 		super.spawn(w, x, y);
 		AtlasGame.getAtlas().sendToAllScreens(this::createPacketSpawn);
 	}
-
-	@Override
-	public void respawn(double x, double y) {
-		super.respawn(x, y);
-		AtlasGame.getAtlas().sendToAllScreens(this::createPacketSpawn);
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public PlayerType getType() {
-		return type;
-	}
-
-	public double getLookX() {
-		return lookX;
-	}
-
-	public double getLookY() {
-		return lookY;
-	}
-
-	public int getHealth() {
-		return health;
-	}
-
-	public int getAmmos() {
-		return ammos;
-	}
-
-	@Override
-	public void shot(Player p) {
-		score.damageTaken += AMMO_POWER;
-		p.score.damageGiven += AMMO_POWER;
-		if (health - AMMO_POWER <= 0) {
-			score.death++;
-			p.score.kills++;
-			health = 100;
-			setType(PlayerType.INFECTED);
-			// respawn the player
-			getWorld().spawnEntityAtRandomLocation(this);
-		} else
-			health -= AMMO_POWER;
-	}
 	
-	@Override
-	public double getSpeed() {
-		return type == PlayerType.INFECTED
-				? AtlasGame.getConfig().getSpeedAccelerationPercentage() * super.getSpeed() / 100
-				: super.getSpeed();
+	/**
+	 * parse a {@link PacketC04Move} packet on this player
+	 * 
+	 * @param movePacket
+	 *            the move packet
+	 */
+	public void updateMove(PacketC04Move movePacket) {
+		double preLookX = movePacket.getLookX();
+		double preLookY = movePacket.getLookY();
+		double preDeltaX = movePacket.getDeltaX();
+		double preDeltaY = movePacket.getDeltaY();
+
+		if (preLookX * preLookX + preLookY * preLookY > 1.05D) {
+			kick("Bad look vector");
+			return;
+		}
+		if (preDeltaX * preDeltaX + preDeltaY * preDeltaY > 1.05D) {
+			kick("Bad move vector");
+			return;
+		}
+
+		if (preLookX * preLookX + preLookY * preLookY > 0.01D) {
+			lookX = preLookX;
+			lookY = preLookY;
+		}
+		move(preDeltaX, preDeltaY);
+
+		AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS04PlayerMove(id, getX(), getY(), lookX, lookY));
 	}
 }

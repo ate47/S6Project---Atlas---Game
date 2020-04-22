@@ -11,6 +11,10 @@ let left;
 let right;
 
 let handle = false;
+let playerData = {
+	health: 100,
+	type: PLAYER_TYPE_SURVIVOR
+};
 
 function checkSize(w,h) {
 	handle = w > h;
@@ -166,11 +170,23 @@ class PacketS06PlayerType extends ServerPacket {
 	}
 
     handle() {
-    	// TODO set type
+    	playerData.type = this.type;
+    }
+}
+class PacketS09ChangeHealth extends ServerPacket {
+	read(dataview){
+		if (dataview.byteLength < 4)
+			return false;
+		this.health = dataview.getInt32(0);
+	}
+
+    handle() {
+    	playerData.health = this.health;
     }
 }
 
 packetHandler.registerPacketBuilder(0x06, () => new PacketS06PlayerType());
+packetHandler.registerPacketBuilder(0x09, () => new PacketS09ChangeHealth());
 
 function setup() {
 	log("Create canvas("+windowWidth+", "+windowHeight+")");
