@@ -65,8 +65,6 @@ public class Entity {
 	 *            the y delta
 	 */
 	public void move(double dx, double dy) {
-		// TODO move algorithm
-
 		double newLocationX = x + dx * width * getSpeed();
 		double newLocationY = y + dy * height * getSpeed();
 
