@@ -47,7 +47,8 @@ public class Player extends Entity implements ConnectionClient {
 	/**
 	 * mark this player as connected
 	 * 
-	 * @param name the username to take in game
+	 * @param name
+	 *            the username to take in game
 	 */
 	public void connect(String name) {
 		connected = true;
@@ -113,7 +114,8 @@ public class Player extends Entity implements ConnectionClient {
 	/**
 	 * parse a {@link PacketC04Move} packet on this player
 	 * 
-	 * @param movePacket the move packet
+	 * @param movePacket
+	 *            the move packet
 	 */
 	public void updateMove(PacketC04Move movePacket) {
 		double preLookX = movePacket.getLookX();
@@ -146,13 +148,12 @@ public class Player extends Entity implements ConnectionClient {
 		Vector tir = new Vector(this.lookX, this.lookY).normalized();
 
 		double x, y, // tireur
-				xt, yt, 
-				xi = 0, yi = 0, //impacte
+				xt, yt, xi = 0, yi = 0, // impacte
 				k = 0, d = 2.0, dt; // distance
 		Entity cible = null;
 
 		for (Entity e : this.getWorld().getEntities()) {
-			if (e == this)
+			if (e == this || (e instanceof Player && ((Player) e).type == type))
 				continue;
 
 			// opti : 2 bord a calcule
@@ -181,8 +182,7 @@ public class Player extends Entity implements ConnectionClient {
 						continue;
 					}
 				}
-				
-				
+
 			}
 
 			if (tir.getX() != 0) {
@@ -200,19 +200,17 @@ public class Player extends Entity implements ConnectionClient {
 					}
 				}
 			}
-			
+
 		}
-		
-		
-		if(cible != null) {
-			double xf, yf; //java est chelou
+
+		if (cible != null) {
+			double xf, yf; // java est chelou
 			xf = xi;
 			yf = yi;
 			cible.shot(this);
 			AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS08Shot(this.getX(), this.getY(), xf, yf));
 		}
-		
-		
+
 	}
 
 	public PacketS03PlayerSpawn createPacketSpawn() {
