@@ -186,7 +186,7 @@ public class World {
 	 *            the entity
 	 */
 	public void spawnEntity(Entity e) {
-		if (e.getWorld() != this || !e.isExist())
+		if (e.getWorld() == this && !e.isExist())
 			entities.add(e);
 		// TODO set entity on chunks
 		// TODO send spawn packet to screen
@@ -216,7 +216,6 @@ public class World {
 
 	@Override
 	public String toString() {
-		return "World [entities=" + entities + ", spawns=" + spawns + ", split=" + split + ", chunks="
-				+ Arrays.toString(chunks) + "]";
+		return "World [entities=" + entities + ", spawns=" + spawns + ", split=" + split + "]";
 	}
 }

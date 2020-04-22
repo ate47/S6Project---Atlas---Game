@@ -1,6 +1,8 @@
 let log = console.log;
 let canvas;
 let playerMap = [];
+let playerSizeX = 0.005;
+let playerSizeY = 0.005;
 const fps = 24;
 const tps = 20;
 let IMAGE_MAP;
@@ -94,12 +96,28 @@ class PacketS06PlayerType extends ServerPacket {
     }
 }
 
+class PacketS07PlayerSize extends ServerPacket {
+	read(dataview) {
+		if (dataview.byteLength < 16)
+			return false;
+		this.sizeX = dataview.getFloat64(0);
+		this.sizeY = dataview.getFloat64(8);
+	}
+	
+	handle() {
+		playerSizeX = this.sizeX;
+		playerSizeY = this.sizeY;		
+	}
+}
+
 packetHandler.registerPacketBuilder(0x03, () => new PacketS03PlayerSpawn());
 packetHandler.registerPacketBuilder(0x04, () => new PacketS04PlayerMove());
 packetHandler.registerPacketBuilder(0x05, () => new PacketS05PlayerDead());
 packetHandler.registerPacketBuilder(0x06, () => new PacketS06PlayerType());
+packetHandler.registerPacketBuilder(0x07, () => new PacketS07PlayerSize());
 
 packetHandler.openWebSocket(function() {
+	playerMap = [];
 	packetHandler.sendPacket(new PacketC02ConnectScreen());
 });
 
@@ -138,20 +156,23 @@ function draw() {
 	}
 	
 	image(IMAGE_MAP, 0, 0, windowWidth, windowHeight);
+
+	let sizeX = playerSizeX * windowWidth;
+	let sizeY = playerSizeY * windowHeight;
 	
 	playerMap.forEach(function (player) {
 		let realX = player.x * windowWidth;
 		let realY = player.y * windowHeight;
 
-		translate(realX - 40, realY - 40);
+		translate(realX + sizeX / 2, realY + sizeY / 2);
 
 		let img = player.type == PLAYER_TYPE_INFECTED ? IMAGE_PLAYER_I : IMAGE_PLAYER_S;
 		
 		rotate(player.rotation);
-		image(img, -40, -40, 80, 80);
+		image(img, - sizeX / 2, - sizeY / 2, sizeX, sizeY);
 		rotate(-player.rotation);
 
-		translate(-realX + 40, -realY + 40);
+		translate(-realX - sizeX / 2, -realY - sizeY / 2);
 	});
 	
 	noStroke();

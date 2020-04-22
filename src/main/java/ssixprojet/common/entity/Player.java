@@ -182,4 +182,11 @@ public class Player extends Entity implements ConnectionClient {
 	public int getAmmos() {
 		return ammos;
 	}
+
+	@Override
+	public double getSpeed() {
+		return type == PlayerType.INFECTED
+				? AtlasGame.getConfig().getSpeedAccelerationPercentage() * super.getSpeed() / 100
+				: super.getSpeed();
+	}
 }

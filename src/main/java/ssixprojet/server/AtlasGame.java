@@ -17,6 +17,7 @@ import ssixprojet.common.entity.Player;
 import ssixprojet.common.entity.Wall;
 import ssixprojet.common.world.World;
 import ssixprojet.server.packet.PacketServer;
+import ssixprojet.server.packet.server.PacketS07PlayerSize;
 
 public class AtlasGame {
 	private static ConfigManager configManager = new ConfigManager(new File(new File("config"), "server.json"));
@@ -65,8 +66,8 @@ public class AtlasGame {
 		// add world edges
 		new Wall(mapFactorX, 1).spawn(mainWorld, 0, 0);
 		new Wall(1, mapFactorY).spawn(mainWorld, 0, 0);
-		new Wall(mapFactorX, 1).spawn(mainWorld, 0, 1);
-		new Wall(1, mapFactorY).spawn(mainWorld, 1, 0);
+		new Wall(mapFactorX, 1).spawn(mainWorld, 1, 0);
+		new Wall(1, mapFactorY).spawn(mainWorld, 0, 1);
 
 		// add world walls
 		for (MapEdge edge : gameMap.getEdges()) {
@@ -139,11 +140,13 @@ public class AtlasGame {
 			screens.put(screen.getInternalId(), screen);
 		}
 		
-		Map<UUID, Player> map =getWebServer().getConnectionManager().getPlayerMap();
+		Map<UUID, Player> map = getWebServer().getConnectionManager().getPlayerMap();
 		synchronized (map) {
 			map.values().stream().map(Player::createPacketSpawn)
 					.forEach(screen::sendPacket);
 		}
+		
+		screen.sendPacket(new PacketS07PlayerSize(playerSizeX, playerSizeY));
 	}
 	
 	public void unregisterScreen(Screen screen) {

@@ -262,7 +262,10 @@ class PacketHandler {
     webSocketClose(ev) {
         console.log(ev);
         this.open = false;
-        this.openWebSocket(this.callback);
+        setTimeout(function(packetHandler) {
+        	packetHandler.openWebSocket(packetHandler.callback);
+        }, 2000, this);
+        
     }
     webSocketError(msg) {
         console.log(msg);
