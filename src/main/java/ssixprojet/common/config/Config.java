@@ -53,8 +53,17 @@ public class Config {
 	 * time before a player can reshoot
 	 */
 	private long millisBeforeReshooting = 100;
-
+	
+	/**
+	 * power of ammunition
+	 */
+	private int ammoPower = 21;
+	
 	public Config() {}
+
+	public int getAmmoPower() {
+		return ammoPower;
+	}
 
 	public int getChunkSplit() {
 		return chunkSplit;
@@ -102,6 +111,10 @@ public class Config {
 
 	public boolean isBufferiseFile() {
 		return bufferiseFile;
+	}
+
+	public void setAmmoPower(int ammoPower) {
+		this.ammoPower = ammoPower;
 	}
 
 	public void setBufferiseFile(boolean bufferiseFile) {

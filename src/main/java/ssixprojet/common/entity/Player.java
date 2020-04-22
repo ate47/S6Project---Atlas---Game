@@ -9,6 +9,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
+import ssixprojet.common.config.PlayerScore;
 import ssixprojet.common.world.World;
 import ssixprojet.server.AtlasGame;
 import ssixprojet.server.connection.Connection;
@@ -17,11 +18,13 @@ import ssixprojet.server.packet.PacketServer;
 import ssixprojet.server.packet.client.PacketC04Move;
 import ssixprojet.server.packet.server.PacketS03PlayerSpawn;
 import ssixprojet.server.packet.server.PacketS04PlayerMove;
+import ssixprojet.server.packet.server.PacketS06PlayerType;
 import ssixprojet.server.packet.server.PacketS08Shot;
 import ssixprojet.utils.Vector;
 
 public class Player extends Entity implements ConnectionClient {
 	public static final long TIME_BEFORE_RESHOOT = AtlasGame.getConfig().getMillisBeforeReshooting();
+	public static final int AMMO_POWER = AtlasGame.getConfig().getAmmoPower();
 	public static final int MAX_KEEP_ALIVE = 20;
 	private static AtomicInteger lastId = new AtomicInteger(1);
 	private final int id;
@@ -34,6 +37,7 @@ public class Player extends Entity implements ConnectionClient {
 	private double lookX = 1, lookY;
 	private int health = 100, ammos = AtlasGame.getConfig().getStartAmmo();
 	private long lastTimeShooted = 0L;
+	public final PlayerScore score = new PlayerScore();
 
 	public Player(Connection connection) {
 		this(connection, AtlasGame.getAtlas());
@@ -227,6 +231,16 @@ public class Player extends Entity implements ConnectionClient {
 		return new PacketS03PlayerSpawn(id, getX(), getY(), lookX, lookY, type.getId());
 	}
 
+	public void setType(PlayerType type) {
+		if (this.type != type) {
+			this.type = type;
+			// update phone type
+			sendPacket(new PacketS06PlayerType(type.getId(), 0));
+			// update type on every screens
+			AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS06PlayerType(type.getId(), id));
+		}
+	}
+	
 	@Override
 	public void spawn(World w, double x, double y) {
 		super.spawn(w, x, y);
@@ -263,6 +277,21 @@ public class Player extends Entity implements ConnectionClient {
 		return ammos;
 	}
 
+	@Override
+	public void shot(Player p) {
+		score.damageTaken += AMMO_POWER;
+		p.score.damageGiven += AMMO_POWER;
+		if (health - AMMO_POWER <= 0) {
+			score.death++;
+			p.score.kills++;
+			health = 100;
+			setType(PlayerType.INFECTED);
+			// respawn the player
+			getWorld().spawnEntityAtRandomLocation(this);
+		} else
+			health -= AMMO_POWER;
+	}
+	
 	@Override
 	public double getSpeed() {
 		return type == PlayerType.INFECTED

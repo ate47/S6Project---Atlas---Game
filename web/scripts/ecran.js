@@ -99,9 +99,10 @@ class PacketS05PlayerDead extends ServerPacket {
 }
 class PacketS06PlayerType extends ServerPacket {
 	read(dataview){
-		if (dataview.byteLength < 4)
+		if (dataview.byteLength < 8)
 			return false;
 		this.type = dataview.getInt32(0);
+		this.id = dataview.getInt32(4);
 	}
 
     handle() {
@@ -167,6 +168,8 @@ function setup() {
 	frameRate(fps);
 	setInterval(tick, 1000 / tps);
 	textAlign(CENTER, CENTER);
+	
+	noSmooth();
 }
 
 function tick() {

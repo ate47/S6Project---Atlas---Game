@@ -158,6 +158,20 @@ class PressPoint {
 	}
 }
 
+class PacketS06PlayerType extends ServerPacket {
+	read(dataview){
+		if (dataview.byteLength < 4)
+			return false;
+		this.type = dataview.getInt32(0);
+	}
+
+    handle() {
+    	// TODO set type
+    }
+}
+
+packetHandler.registerPacketBuilder(0x06, () => new PacketS06PlayerType());
+
 function setup() {
 	log("Create canvas("+windowWidth+", "+windowHeight+")");
 	canvas = createCanvas(windowWidth, windowHeight);
@@ -174,6 +188,8 @@ function setup() {
 	textAlign(CENTER, CENTER);
 
 	checkSize(windowWidth, windowHeight);
+	
+	noSmooth();
 }
 
 function tick() {
