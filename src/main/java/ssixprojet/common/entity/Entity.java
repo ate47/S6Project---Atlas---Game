@@ -75,8 +75,7 @@ public class Entity {
 					newLocationX + width > wall.getX() &&
 					   newLocationY < wall.getY() + wall.height &&
 					   newLocationY + height > wall.getY())
-				return;
-			
+				return; // TODO: better algorithm
 		}
 		x = newLocationX;
 		y = newLocationY;

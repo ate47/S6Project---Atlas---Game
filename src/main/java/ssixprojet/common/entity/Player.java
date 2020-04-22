@@ -21,6 +21,7 @@ import ssixprojet.server.packet.server.PacketS08Shot;
 import ssixprojet.utils.Vector;
 
 public class Player extends Entity implements ConnectionClient {
+	public static final long TIME_BEFORE_RESHOOT = AtlasGame.getConfig().getMillisBeforeReshooting();
 	public static final int MAX_KEEP_ALIVE = 20;
 	private static AtomicInteger lastId = new AtomicInteger(1);
 	private final int id;
@@ -32,6 +33,7 @@ public class Player extends Entity implements ConnectionClient {
 	private int keepAliveCount = MAX_KEEP_ALIVE;
 	private double lookX = 1, lookY;
 	private int health = 100, ammos = AtlasGame.getConfig().getStartAmmo();
+	private long lastTimeShooted = 0L;
 
 	public Player(Connection connection) {
 		this(connection, AtlasGame.getAtlas());
@@ -142,14 +144,20 @@ public class Player extends Entity implements ConnectionClient {
 	}
 
 	public void shooting() {
-		if (this.getWorld() == null)
+		long currentTime = System.currentTimeMillis();
+		if (this.getWorld() == null || lastTimeShooted + TIME_BEFORE_RESHOOT > currentTime)
 			return;
+
+		lastTimeShooted = currentTime;
 
 		Vector tir = new Vector(this.lookX, this.lookY).normalized();
 
-		double x, y, // tireur
-				xt, yt, xi = 0, yi = 0, // impacte
-				k = 0, d = 2.0, dt; // distance
+		double x, y; // tireur
+		double xt, yt, xi = 0, yi = 0; // impact
+		double d = 2.0, dt; // distance
+		double k;
+		final double ox = getX() + getWidth() / 2;
+		final double oy = getY() + getHeight() / 2;
 		Entity cible = null;
 
 		for (Entity e : this.getWorld().getEntities()) {
@@ -157,46 +165,49 @@ public class Player extends Entity implements ConnectionClient {
 				continue;
 
 			// opti : 2 bord a calcule
-			if (lookX > 0) {
+			if (lookX < 0) {
 				x = e.getX() + e.getWidth();
 			} else {
 				x = e.getX();
 			}
-			if (lookY > 0) {
+			if (lookY < 0) {
 				y = e.getY() + e.getHeight();
 			} else {
 				y = e.getY();
 			}
 
 			if (tir.getY() != 0) {
-				k = ((y - this.getY()) / tir.getY());
-				xt = k * tir.getX() + this.getX();
-				if (xt >= e.getX() && xt <= e.getX() + e.getWidth()) {
-					dt = (y - this.getY()) * (y - this.getY()) + (xt - this.getX()) * (xt - this.getX());
+				k = ((y - oy) / tir.getY());
+				if (k > 0) {
+					xt = k * tir.getX() + ox;
+					if (xt >= e.getX() && xt <= e.getX() + e.getWidth()) {
+						dt = (xt - ox) * (xt - ox) + (y - oy) * (y - oy);
 
-					if (dt < d) {
-						d = dt;
-						cible = e;
-						xi = xt;
-						yi = y;
-						continue;
+						if (dt < d) {
+							d = dt;
+							cible = e;
+							xi = xt;
+							yi = y;
+							continue;
+						}
 					}
 				}
-
 			}
 
 			if (tir.getX() != 0) {
-				k = ((x - this.getX()) / tir.getX());
-				yt = k * tir.getY() + this.getY();
-				if (yt >= e.getY() && yt <= e.getY() + e.getHeight()) {
-					dt = (y - this.getY()) * (y - this.getY()) + (yt - this.getY()) * (yt - this.getY());
+				k = ((x - ox) / tir.getX());
+				if (k > 0) {
+					yt = k * tir.getY() + oy;
+					if (yt >= e.getY() && yt <= e.getY() + e.getHeight()) {
+						dt = (x - ox) * (x - ox) + (yt - oy) * (yt - oy);
 
-					if (dt < d) {
-						d = dt;
-						cible = e;
-						xi = x;
-						yi = yt;
-						continue;
+						if (dt < d) {
+							d = dt;
+							cible = e;
+							xi = x;
+							yi = yt;
+							continue;
+						}
 					}
 				}
 			}
@@ -204,11 +215,10 @@ public class Player extends Entity implements ConnectionClient {
 		}
 
 		if (cible != null) {
-			double xf, yf; // java est chelou
-			xf = xi;
-			yf = yi;
+			final double xf = xi;
+			final double yf = yi;
 			cible.shot(this);
-			AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS08Shot(this.getX(), this.getY(), xf, yf));
+			AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS08Shot(ox, oy, xf, yf));
 		}
 
 	}

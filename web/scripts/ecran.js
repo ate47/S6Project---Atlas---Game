@@ -15,7 +15,7 @@ const packetHandler = new PacketHandler('ws://' + window.location.host + '/game'
 
 class Shoot {
 	constructor(x1, y1, x2, y2) {
-		this.ticks = 5;
+		this.ticks = 2;
 		this.x1 = x1;
 		this.y1 = y1;
 		this.x2 = x2;
@@ -193,6 +193,10 @@ function draw() {
 	
 	image(IMAGE_MAP, 0, 0, windowWidth, windowHeight);
 
+	stroke(40);
+	
+	shoots.forEach(s => s.draw());
+	
 	let sizeX = playerSizeX * windowWidth;
 	let sizeY = playerSizeY * windowHeight;
 	
@@ -211,9 +215,6 @@ function draw() {
 		translate(-realX - sizeX / 2, -realY - sizeY / 2);
 	});
 	
-	stroke(40);
-	
-	shoots.forEach(s => s.draw());
 	
 	noStroke();
 }

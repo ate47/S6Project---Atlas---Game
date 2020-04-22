@@ -9,5 +9,6 @@
   "startAmmo": 90,
   "timeInTickBeforeEnd": 4800,
   "timeInTickBeforeInfection": 600,
-  "chunkSplit": 20
+  "chunkSplit": 20,
+  "millisBeforeReshooting": 100
 }

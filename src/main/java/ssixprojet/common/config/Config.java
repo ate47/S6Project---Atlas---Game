@@ -48,37 +48,58 @@ public class Config {
 	 * chunkSplit)
 	 */
 	private int chunkSplit = 20;
+
+	/**
+	 * time before a player can reshoot
+	 */
+	private long millisBeforeReshooting = 100;
+
 	public Config() {}
+
 	public int getChunkSplit() {
 		return chunkSplit;
 	}
+
 	public int getInitialInfectionPercentage() {
 		return initialInfectionPercentage;
 	}
+
+	public long getMillisBeforeReshooting() {
+		return millisBeforeReshooting;
+	}
+
 	public String getPasswordMaster() {
 		return passwordMaster;
 	}
+
 	public int getPort() {
 		return port;
 	}
+
 	public double getSpawnCrateLuck() {
 		return spawnCrateLuck;
 	}
+
 	public int getSpeedAccelerationPercentage() {
 		return speedAccelerationPercentage;
 	}
+
 	public int getStartAmmo() {
 		return startAmmo;
 	}
+
 	public int getTickRate() {
 		return tickRate;
 	}
+
 	public int getTimeInTickBeforeEnd() {
 		return timeInTickBeforeEnd;
 	}
+
 	public int getTimeInTickBeforeInfection() {
 		return timeInTickBeforeInfection;
 	}
+
 	public boolean isBufferiseFile() {
 		return bufferiseFile;
 	}
@@ -86,27 +107,39 @@ public class Config {
 	public void setBufferiseFile(boolean bufferiseFile) {
 		this.bufferiseFile = bufferiseFile;
 	}
+
 	public void setChunkSplit(int chunkSplit) {
 		this.chunkSplit = chunkSplit;
 	}
+
 	public void setInitialInfectionPercentage(int initialInfectionPercentage) {
 		this.initialInfectionPercentage = initialInfectionPercentage;
 	}
+
+	public void setMillisBeforeReshooting(long millisBeforeReshooting) {
+		this.millisBeforeReshooting = millisBeforeReshooting;
+	}
+
 	public void setPasswordMaster(String passwordMaster) {
 		this.passwordMaster = passwordMaster;
 	}
+
 	public void setPort(int port) {
 		this.port = port;
 	}
+
 	public void setSpawnCrateLuck(double spawnCrateLuck) {
 		this.spawnCrateLuck = spawnCrateLuck;
 	}
+
 	public void setSpeedAccelerationPercentage(int speedAccelerationPercentage) {
 		this.speedAccelerationPercentage = speedAccelerationPercentage;
 	}
+
 	public void setStartAmmo(int startAmmo) {
 		this.startAmmo = startAmmo;
 	}
+
 	public void setTickRate(int tickRate) {
 		this.tickRate = tickRate;
 	}
@@ -114,6 +147,7 @@ public class Config {
 	public void setTimeInTickBeforeEnd(int timeInTickBeforeEnd) {
 		this.timeInTickBeforeEnd = timeInTickBeforeEnd;
 	}
+
 	public void setTimeInTickBeforeInfection(int timeInTickBeforeInfection) {
 		this.timeInTickBeforeInfection = timeInTickBeforeInfection;
 	}
