@@ -7,16 +7,19 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
+import ssixprojet.server.GameServer;
 import ssixprojet.server.connection.Connection;
 import ssixprojet.server.connection.ConnectionClient;
 
 public class WebSocketHandler extends ChannelInboundHandlerAdapter implements ChannelFutureListener {
 	protected final PacketManager manager;
+	private final GameServer gameServer;
 	private final Connection src;
 
-	public WebSocketHandler(PacketManager manager, Connection source) {
+	public WebSocketHandler(PacketManager manager, Connection source, GameServer gameServer) {
 		this.manager = manager;
 		this.src = source;
+		this.gameServer = gameServer;
 		source.getChannel().closeFuture().addListener(this);
 	}
 
@@ -41,19 +44,21 @@ public class WebSocketHandler extends ChannelInboundHandlerAdapter implements Ch
 			client.kick("Bad packet format");
 			return;
 		}
-
-		try {
-			packet.handle(client);
-		} catch (Exception e) {
-			e.printStackTrace();
-			client.kick("Error while handling the packet");
-		}
+		gameServer.registerAction(() -> {
+			try {
+				packet.handle(client);
+			} catch (Exception e) {
+				e.printStackTrace();
+				client.kick("Error while handling the packet");
+			}
+		});
 	}
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		src.onError(cause.getMessage());
 	}
+
 	@Override
 	public void operationComplete(ChannelFuture future) throws Exception {
 		// close operation

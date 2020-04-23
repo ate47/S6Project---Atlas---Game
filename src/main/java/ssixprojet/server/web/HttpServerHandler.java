@@ -13,17 +13,21 @@ import io.netty.handler.codec.http.HttpHeaders.Values;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
+import ssixprojet.server.AtlasGame;
+import ssixprojet.server.GameServer;
 import ssixprojet.server.WebServer;
 import ssixprojet.server.packet.WebSocketHandler;
 
 public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 	private static final WebBuffer BAD_WEBSOCKET_RESPONSE = new WebByteBuffer("", MimeTypeProvider.TEXT_PLAIN,
 			"BAD WEBSOCKET URI".getBytes());
-	private WebServer server;
+	private WebServer webServer;
+	private GameServer gameServer;
 	private WebSocketServerHandshaker handshaker;
 
-	public HttpServerHandler(WebServer server) throws IOException {
-		this.server = server;
+	public HttpServerHandler(AtlasGame atlas) throws IOException {
+		this.webServer = atlas.getWebServer();
+		this.gameServer = atlas.getGameServer();
 	}
 
 	@Override
@@ -58,8 +62,8 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 
 				// create a WebSocketHandler for the good actor
 				if (uri.equals("/game")) {
-					handler = new WebSocketHandler(server.getPacketManager(),
-							server.getConnectionManager().createConnection(ctx.channel()));
+					handler = new WebSocketHandler(webServer.getPacketManager(),
+							webServer.getConnectionManager().createConnection(ctx.channel()), gameServer);
 				} else {
 					System.out.println("Bad WS actor: " + uri);
 					ctx.write(BAD_WEBSOCKET_RESPONSE.buildResponse(false));
@@ -73,12 +77,12 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 				handleHandshake(ctx, req);
 			} else {
 				// simple HTTP request
-				WebBuffer file = server.getContext().get(uri.toLowerCase());
+				WebBuffer file = webServer.getContext().get(uri.toLowerCase());
 				if (file == null)
-					file = server.getDefaultBuffer();
+					file = webServer.getDefaultBuffer();
 
 				boolean keepAlive = HttpHeaders.isKeepAlive(req);
-				FullHttpResponse response = file.buildResponse(!server.isBufferiseFile());
+				FullHttpResponse response = file.buildResponse(!webServer.isBufferiseFile());
 				if (!keepAlive) {
 					ctx.write(response).addListener(ChannelFutureListener.CLOSE);
 				} else {

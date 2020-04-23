@@ -39,6 +39,8 @@ public class AtlasGame {
 	private GameMap gameMap;
 
 	private WebServer webServer;
+	
+	private GameServer gameServer;
 
 	private final Map<Integer, Screen> screens = new HashMap<>();
 
@@ -52,6 +54,7 @@ public class AtlasGame {
 		atlas = this;
 		Config cfg = getConfig();
 		this.webServer = new WebServer(cfg.getPort(), cfg.isBufferiseFile());
+		this.gameServer = new GameServer(this);
 		if ((gameMap = GameMap.readMap(new File(new File("config"), "map.json"))) == null)
 			throw new RuntimeException("Can't load the game map");
 
@@ -97,6 +100,10 @@ public class AtlasGame {
 		return gameMap;
 	}
 
+	public GameServer getGameServer() {
+		return gameServer;
+	}
+	
 	public double getHeight() {
 		return height;
 	}
@@ -121,12 +128,12 @@ public class AtlasGame {
 		return playerSizeY;
 	}
 
-	public WebServer getWebServer() {
-		return webServer;
-	}
-
 	public Map<Integer, Screen> getScreens() {
 		return screens;
+	}
+	
+	public WebServer getWebServer() {
+		return webServer;
 	}
 
 	/**
@@ -149,24 +156,30 @@ public class AtlasGame {
 		screen.sendPacket(new PacketS07PlayerSize(playerSizeX, playerSizeY));
 	}
 	
-	public void unregisterScreen(Screen screen) {
-		synchronized (screens) {
-			screens.remove(screen.getInternalId());
-		}
-	}
-	
-
 	public void sendToAllScreens(Supplier<PacketServer> packetSupplier) {
 		synchronized (screens) {
 			screens.forEach((id, screen) -> screen.sendPacket(packetSupplier.get()));
 		}
 	}
+	
 
 	/**
 	 * launch the server
 	 */
 	public void startServer() {
 		webServer.start();
+		gameServer.start();
+	}
+
+	public void tick() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void unregisterScreen(Screen screen) {
+		synchronized (screens) {
+			screens.remove(screen.getInternalId());
+		}
 	}
 
 }

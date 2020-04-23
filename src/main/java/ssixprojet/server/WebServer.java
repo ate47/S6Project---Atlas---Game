@@ -27,6 +27,7 @@ import ssixprojet.server.web.WebBuffer;
 import ssixprojet.server.web.WebByteBuffer;
 import ssixprojet.server.web.WebDirectoryBuffer;
 import ssixprojet.server.web.WebFileBuffer;
+
 public class WebServer extends Server {
 	private ConnectionManager connectionManager = new ConnectionManager();
 	private PacketManager packetManager = new PacketManager();
@@ -34,7 +35,7 @@ public class WebServer extends Server {
 	private WebBuffer defaultBuffer = new WebByteBuffer("", "text/plain", "Bad URI".getBytes());
 	private final int webServerPort;
 	private boolean bufferiseFile;
-	
+
 	public WebServer(int port, boolean bufferiseFile) {
 		this.webServerPort = port;
 		this.bufferiseFile = bufferiseFile;
@@ -69,8 +70,10 @@ public class WebServer extends Server {
 	/**
 	 * register all sub files of a directory
 	 * 
-	 * @param context the context to enter to this directory
-	 * @param dir     the directory
+	 * @param context
+	 *            the context to enter to this directory
+	 * @param dir
+	 *            the directory
 	 */
 	public void registerDirectory(String context, File dir) {
 		// pass if not a directory
@@ -108,7 +111,8 @@ public class WebServer extends Server {
 	/**
 	 * register a buffer
 	 * 
-	 * @param buffer the buffer
+	 * @param buffer
+	 *            the buffer
 	 */
 	public void registerWebContext(WebBuffer buffer) {
 		Objects.requireNonNull(buffer, "File buffer can't be null");
@@ -132,8 +136,7 @@ public class WebServer extends Server {
 							ChannelPipeline pipeline = ch.pipeline();
 
 							pipeline.addLast("httpCodec", new HttpServerCodec());
-							pipeline.addLast("httpHandler",
-									new HttpServerHandler(WebServer.this));
+							pipeline.addLast("httpHandler", new HttpServerHandler(AtlasGame.getAtlas()));
 						}
 					});
 
