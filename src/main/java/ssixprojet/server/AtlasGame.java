@@ -16,6 +16,7 @@ import ssixprojet.common.config.ConfigManager;
 import ssixprojet.common.entity.Player;
 import ssixprojet.common.entity.Wall;
 import ssixprojet.common.world.World;
+import ssixprojet.server.command.CommandManager;
 import ssixprojet.server.packet.PacketServer;
 import ssixprojet.server.packet.server.PacketS07PlayerSize;
 
@@ -39,8 +40,12 @@ public class AtlasGame {
 	private GameMap gameMap;
 
 	private WebServer webServer;
-	
+
 	private GameServer gameServer;
+
+	private CommandManager commandManager;
+
+	private CommandHandler commandHandler;
 
 	private final Map<Integer, Screen> screens = new HashMap<>();
 
@@ -58,6 +63,8 @@ public class AtlasGame {
 		if ((gameMap = GameMap.readMap(new File(new File("config"), "map.json"))) == null)
 			throw new RuntimeException("Can't load the game map");
 
+		commandManager = new CommandManager(this);
+		commandHandler = new CommandHandler(this);
 		this.mainWorld = new World();
 		mapFactorX = 1. / gameMap.getWidth();
 		mapFactorY = 1. / gameMap.getHeight();
@@ -96,6 +103,14 @@ public class AtlasGame {
 				System.err.println("Can't add the spawn location : " + location);
 	}
 
+	public CommandHandler getCommandHandler() {
+		return commandHandler;
+	}
+
+	public CommandManager getCommandManager() {
+		return commandManager;
+	}
+
 	public GameMap getGameMap() {
 		return gameMap;
 	}
@@ -103,7 +118,7 @@ public class AtlasGame {
 	public GameServer getGameServer() {
 		return gameServer;
 	}
-	
+
 	public double getHeight() {
 		return height;
 	}
@@ -131,7 +146,7 @@ public class AtlasGame {
 	public Map<Integer, Screen> getScreens() {
 		return screens;
 	}
-	
+
 	public WebServer getWebServer() {
 		return webServer;
 	}
@@ -146,22 +161,20 @@ public class AtlasGame {
 		synchronized (screens) {
 			screens.put(screen.getInternalId(), screen);
 		}
-		
+
 		Map<UUID, Player> map = getWebServer().getConnectionManager().getPlayerMap();
 		synchronized (map) {
-			map.values().stream().map(Player::createPacketSpawn)
-					.forEach(screen::sendPacket);
+			map.values().stream().map(Player::createPacketSpawn).forEach(screen::sendPacket);
 		}
-		
+
 		screen.sendPacket(new PacketS07PlayerSize(playerSizeX, playerSizeY));
 	}
-	
+
 	public void sendToAllScreens(Supplier<PacketServer> packetSupplier) {
 		synchronized (screens) {
 			screens.forEach((id, screen) -> screen.sendPacket(packetSupplier.get()));
 		}
 	}
-	
 
 	/**
 	 * launch the server
@@ -169,11 +182,11 @@ public class AtlasGame {
 	public void startServer() {
 		webServer.start();
 		gameServer.start();
+		commandHandler.start();
 	}
 
 	public void tick() {
-		// TODO Auto-generated method stub
-		
+		mainWorld.tick();
 	}
 
 	public void unregisterScreen(Screen screen) {
