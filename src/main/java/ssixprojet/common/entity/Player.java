@@ -275,12 +275,16 @@ public class Player extends Entity implements ConnectionClient {
 		if (getHealth() - AMMO_POWER <= 0) {
 			score.death++;
 			p.score.kills++;
-			setHealth(100);
-			setType(PlayerType.INFECTED);
-			// respawn the player
-			getWorld().spawnEntityAtRandomLocation(this);
+			infect();
 		} else
 			setHealth(getHealth() - AMMO_POWER);
+	}
+
+	public void infect() {
+		setHealth(100);
+		setType(PlayerType.INFECTED);
+		// respawn the player
+		getWorld().spawnEntityAtRandomLocation(this);
 	}
 
 	@Override
@@ -320,9 +324,11 @@ public class Player extends Entity implements ConnectionClient {
 			World w = getWorld();
 
 			if (w != null) {
-				w.getEntities().stream().filter(e -> e instanceof Player).map(e -> (Player) e)
-						.filter(p -> p.type == PlayerType.SURVIVOR && p.collide(this))
-						.forEach(p -> p.setType(PlayerType.INFECTED));
+				score.infections += w.getEntities().stream().filter(e -> e instanceof Player).map(e -> (Player) e)
+						.filter(p -> p.type == PlayerType.SURVIVOR && p.collide(this)).mapToInt(p -> {
+							p.infect();
+							return 1;
+						}).sum();
 			}
 		}
 

@@ -5,4 +5,5 @@ public class PlayerScore {
 	public int damageTaken = 0;
 	public int death = 0;
 	public int kills = 0;
+	public int infections = 0;
 }
