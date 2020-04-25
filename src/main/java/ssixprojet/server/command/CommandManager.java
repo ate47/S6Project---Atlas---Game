@@ -35,6 +35,8 @@ public class CommandManager {
 		}));
 
 		registerCommand("kick", new CommandKick());
+		
+		registerCommand("type", new CommandSetType());
 	}
 
 	public static <T> RequiredArgumentBuilder<AtlasGame, T> argument(String name, ArgumentType<T> type) {
