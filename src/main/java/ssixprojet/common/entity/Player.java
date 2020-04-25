@@ -148,6 +148,7 @@ public class Player extends Entity implements ConnectionClient {
 
 	@Override
 	public void onDisconnect(String reason) {
+		connected = false;
 		System.out.println("[Player] " + username + " disconnected : " + reason);
 	}
 
