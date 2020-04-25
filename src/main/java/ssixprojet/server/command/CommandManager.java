@@ -7,6 +7,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
+import ssixprojet.common.GamePhase;
 import ssixprojet.server.AtlasGame;
 
 public class CommandManager {
@@ -45,6 +46,19 @@ public class CommandManager {
 					c.getSource().randomInfection(IntegerArgumentType.getInteger(c, "percentage"));
 					return 0;
 				})));
+
+		registerCommand("phase", command -> command
+				.then(argument("gamephase", EnumArgumentType.enumValue(GamePhase.class)).executes(c -> {
+					GamePhase phase = c.getArgument("gamephase", GamePhase.class);
+					c.getSource().setPhase(phase);
+					System.out.println("New phase: " + phase);
+					return 0;
+				})).executes(c -> {
+					System.out.println("Liste des phases:");
+					for (GamePhase t : GamePhase.values())
+						System.out.println("- " + t.name());
+					return 0;
+				}));
 	}
 
 	public static <T> RequiredArgumentBuilder<AtlasGame, T> argument(String name, ArgumentType<T> type) {

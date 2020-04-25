@@ -6,6 +6,7 @@ let playerSizeX = 0.005;
 let playerSizeY = 0.005;
 const fps = 24;
 const tps = 20;
+let IMAGE_LOGO;
 let IMAGE_MAP;
 let IMAGE_PLAYER_S;
 let IMAGE_PLAYER_I;
@@ -163,6 +164,8 @@ function setup() {
 	log("Create canvas("+windowWidth+", "+windowHeight+")");
 	canvas = createCanvas(windowWidth, windowHeight);
 	
+	IMAGE_LOGO = loadImage("images/logo_atlas.png");
+	
 	IMAGE_MAP = loadImage("images/map.png");
 
 	IMAGE_PLAYER_S = loadImage("images/plr_survivant.png");
@@ -197,33 +200,73 @@ function draw() {
 		image(IMAGE_DEAD, -windowHeight / 12,-windowHeight / 12,windowHeight / 6,windowHeight / 6);
 		return;
 	}
-	
-	image(IMAGE_MAP, 0, 0, windowWidth, windowHeight);
 
-	stroke(40);
-	
-	shoots.forEach(s => s.draw());
-	
-	let sizeX = playerSizeX * windowWidth;
-	let sizeY = playerSizeY * windowHeight;
-	
-	playerMap.forEach(function (player) {
-		let realX = player.x * windowWidth;
-		let realY = player.y * windowHeight;
-
-		translate(realX + sizeX / 2, realY + sizeY / 2);
-
-		let img = player.type == PLAYER_TYPE_INFECTED ? IMAGE_PLAYER_I : IMAGE_PLAYER_S;
+	if (phase == GAME_PHASE_WAITING) {
+		fill(color(0x3A, 0x46, 0));
+		rect(0, 0, windowWidth, windowHeight);
 		
-		rotate(player.rotation);
-		image(img, - sizeX / 2, - sizeY / 2, sizeX, sizeY);
-		rotate(-player.rotation);
+		translate(windowWidth / 2, 0);
 
-		translate(-realX - sizeX / 2, -realY - sizeY / 2);
-	});
+		image(IMAGE_LOGO, -windowHeight / 4, 0, windowHeight / 2, windowHeight / 4);
+
+		fill(255);
+		translate(0, windowHeight / 16 + windowHeight / 6);
+
+		translate(-windowWidth / 2, 0);
+		textSize(windowHeight / 40);
+		
+
+		stroke(255);
+		
+		let x;
+		for (let i = 0; i < 4; i++) {
+			x = (2 * i + 3) * windowWidth / 12;
+			line(x, -windowHeight / 80, x, 11 * windowHeight / 16);
+		}
+		
+		noStroke();
+			
+		let i = 0;
+		
+		
+		playerMap.forEach(function (player) {
+			text(player.name, (i + 1) * windowWidth / 6, 0);
+			if ((i = (i + 1) % 5) == 0)
+				translate(0, windowHeight / 40);
+		});
+		
+		
+	} else if (phase == GAME_PHASE_PLAYING) {
+
+		image(IMAGE_MAP, 0, 0, windowWidth, windowHeight);
+		
+		stroke(40);
+		
+		shoots.forEach(s => s.draw());
+		
+		let sizeX = playerSizeX * windowWidth;
+		let sizeY = playerSizeY * windowHeight;
+		
+		playerMap.forEach(function (player) {
+			let realX = player.x * windowWidth;
+			let realY = player.y * windowHeight;
 	
+			translate(realX + sizeX / 2, realY + sizeY / 2);
 	
-	noStroke();
+			let img = player.type == PLAYER_TYPE_INFECTED ? IMAGE_PLAYER_I : IMAGE_PLAYER_S;
+			
+			rotate(player.rotation);
+			image(img, - sizeX / 2, - sizeY / 2, sizeX, sizeY);
+			rotate(-player.rotation);
+	
+			translate(-realX - sizeX / 2, -realY - sizeY / 2);
+		});
+
+	} else if (phase == GAME_PHASE_SCORE) {
+		
+		
+		
+	}
 }
 
 function windowResized() {

@@ -11,8 +11,8 @@ public class CommandSetType implements Command {
 	@Override
 	public void register(LiteralArgumentBuilder<AtlasGame> command) {
 		command.then(CommandManager.argument("player", PlayerArgumentType.player())
-				.then(CommandManager.argument("type", PlayerTypeArgumentType.playerType()).executes(c -> {
-					PlayerType type = PlayerTypeArgumentType.getPlayerType(c, "type");
+				.then(CommandManager.argument("type", EnumArgumentType.enumValue(PlayerType.class)).executes(c -> {
+					PlayerType type = c.getArgument("type", PlayerType.class);
 					Player p = PlayerArgumentType.getPlayer(c, "player");
 					p.setType(type);
 

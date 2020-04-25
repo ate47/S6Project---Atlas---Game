@@ -15,6 +15,7 @@ import ssixprojet.server.AtlasGame;
 import ssixprojet.server.packet.PacketServer;
 import ssixprojet.server.packet.server.PacketS02PlayerRegister;
 import ssixprojet.server.packet.server.PacketS05PlayerDead;
+import ssixprojet.server.packet.server.PacketS0BSetGamePhase;
 
 public class ConnectionManager {
 	@FunctionalInterface
@@ -30,6 +31,8 @@ public class ConnectionManager {
 		public ConnectionImpl(Channel channel) {
 			this.channel = channel;
 			this.client = this;
+
+			sendPacket(new PacketS0BSetGamePhase(AtlasGame.getAtlas().getPhase()));
 		}
 
 		private boolean checkConnected() {

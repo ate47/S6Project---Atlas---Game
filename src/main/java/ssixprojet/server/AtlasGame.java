@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 import ssixprojet.common.GameMap;
+import ssixprojet.common.GamePhase;
 import ssixprojet.common.MapEdge;
 import ssixprojet.common.MapEdge.Orientation;
 import ssixprojet.common.Screen;
@@ -21,6 +22,7 @@ import ssixprojet.common.world.World;
 import ssixprojet.server.command.CommandManager;
 import ssixprojet.server.packet.PacketServer;
 import ssixprojet.server.packet.server.PacketS07PlayerSize;
+import ssixprojet.server.packet.server.PacketS0BSetGamePhase;
 
 public class AtlasGame {
 	private static final Random RANDOM = new Random();
@@ -57,6 +59,8 @@ public class AtlasGame {
 	private double mapFactorX, mapFactorY, playerSizeX, playerSizeY;
 
 	private double height;
+
+	private GamePhase phase = GamePhase.WAITING;
 
 	public AtlasGame() {
 		atlas = this;
@@ -138,6 +142,10 @@ public class AtlasGame {
 		return mapFactorY;
 	}
 
+	public GamePhase getPhase() {
+		return phase;
+	}
+
 	public double getPlayerSizeX() {
 		return playerSizeX;
 	}
@@ -170,7 +178,7 @@ public class AtlasGame {
 		Player p;
 		for (int i = 0; i < toInfect; i++) {
 			int chosen = i + RANDOM.nextInt(toInfect - i);
-			
+
 			p = players[chosen];
 			players[chosen] = players[i];
 			players[i] = p;
@@ -198,10 +206,24 @@ public class AtlasGame {
 		screen.sendPacket(new PacketS07PlayerSize(playerSizeX, playerSizeY));
 	}
 
+	public void sendToAll(Supplier<PacketServer> packetSupplier) {
+		sendToAllScreens(packetSupplier);
+		Map<UUID, Player> map = getWebServer().getConnectionManager().getPlayerMap();
+
+		synchronized (map) {
+			map.values().stream().filter(Player::isConnected).forEach(p -> p.sendPacket(packetSupplier.get()));
+		}
+	}
+
 	public void sendToAllScreens(Supplier<PacketServer> packetSupplier) {
 		synchronized (screens) {
 			screens.forEach((id, screen) -> screen.sendPacket(packetSupplier.get()));
 		}
+	}
+	
+	public void setPhase(GamePhase phase) {
+		this.phase = phase;
+		sendToAll(() -> new PacketS0BSetGamePhase(phase));
 	}
 
 	/**

@@ -6,6 +6,12 @@ const DEBUG = true;
 const PLAYER_TYPE_INFECTED = 0;
 const PLAYER_TYPE_SURVIVOR = 1;
 
+const GAME_PHASE_WAITING = 0;
+const GAME_PHASE_PLAYING = 1;
+const GAME_PHASE_SCORE = 2;
+
+let phase = 0;
+
 class UUID {
     constructor() {
         const buffer = new ArrayBuffer(16);
@@ -175,6 +181,19 @@ class PacketC06GuessPlayer extends ClientPacket {
     	dataView.setInt32(0, this.playerID);
     }
 }
+
+class PacketS0BSetGamePhase extends ServerPacket {
+	read(dataview) {
+		if (dataview.byteLength < 4)
+			return false;
+		this.phase = dataview.getInt32(0);
+	}
+	
+	handle() {
+		phase = this.phase;
+	}
+}
+
 class PacketHandler {
     /**
 	 * 
@@ -204,6 +223,7 @@ class PacketHandler {
         this.open = false;
 
         this.callback = callback;
+        packetHandler.registerPacketBuilder(0x0B, () => new PacketS0BSetGamePhase());
     }
 
     registerPacketBuilder(packetId, builder) {
