@@ -63,6 +63,7 @@ public class Player extends Entity implements ConnectionClient {
 		this.username = name;
 		setHealth(100);
 		setAmmos(AtlasGame.getConfig().getStartAmmo());
+		setType(PlayerType.SURVIVOR);
 	}
 
 	public PacketS03PlayerSpawn createPacketSpawn() {
@@ -176,19 +177,17 @@ public class Player extends Entity implements ConnectionClient {
 	}
 
 	public void setType(PlayerType type) {
-		if (this.type != type) {
-			this.type = type;
-			// update phone type
-			sendPacket(new PacketS06PlayerType(type.getId(), 0));
-			// update type on every screens
-			AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS06PlayerType(type.getId(), id));
-		}
+		this.type = type;
+		// update phone type
+		sendPacket(new PacketS06PlayerType(type.getId(), 0));
+		// update type on every screens
+		AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS06PlayerType(type.getId(), id));
 	}
 
 	public void shooting() {
 		if (type == PlayerType.INFECTED)
 			return;
-		
+
 		long currentTime = System.currentTimeMillis();
 		if (this.getWorld() == null || lastTimeShooted + TIME_BEFORE_RESHOOT > currentTime || ammos <= 0)
 			return;
@@ -316,6 +315,16 @@ public class Player extends Entity implements ConnectionClient {
 			lookY = preLookY;
 		}
 		move(preDeltaX, preDeltaY);
+
+		if (type == PlayerType.INFECTED) {
+			World w = getWorld();
+
+			if (w != null) {
+				w.getEntities().stream().filter(e -> e instanceof Player).map(e -> (Player) e)
+						.filter(p -> p.type == PlayerType.SURVIVOR && p.collide(this))
+						.forEach(p -> p.setType(PlayerType.INFECTED));
+			}
+		}
 
 		AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS04PlayerMove(id, getX(), getY(), lookX, lookY));
 	}

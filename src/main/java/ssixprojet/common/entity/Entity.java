@@ -65,22 +65,29 @@ public class Entity {
 	 *            the y delta
 	 */
 	public void move(double dx, double dy) {
-		double newLocationX = x + dx * width * getSpeed();
-		double newLocationY = y + dy * height * getSpeed();
+		double oldX = x;
+		double oldY = y;
+		x = x + dx * width * getSpeed();
+		y = y + dy * height * getSpeed();
 
 		for (Iterator<Entity> it = world.getEntities().stream().filter(Entity::isSolid).iterator(); it.hasNext();) {
 			Entity wall = it.next();
 
-			if (newLocationX < wall.getX() + wall.width &&
-					newLocationX + width > wall.getX() &&
-					   newLocationY < wall.getY() + wall.height &&
-					   newLocationY + height > wall.getY())
+			if (collide(wall)) {
+				x = oldX;
+				y = oldY;
 				return; // TODO: better algorithm
+			}
 		}
-		x = newLocationX;
-		y = newLocationY;
 	}
 
+	public boolean collide(Entity e) {
+		return x < e.getX() + e.width &&
+				x + width > e.getX() &&
+				   y < e.getY() + e.height &&
+				   y + height > e.getY();
+	}
+	
 	/**
 	 * respawn this entity in the same world, does nothing if the entity isn't in a
 	 * world
