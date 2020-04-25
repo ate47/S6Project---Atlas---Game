@@ -3,6 +3,7 @@ package ssixprojet.server;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -14,6 +15,7 @@ import ssixprojet.common.SpawnLocation;
 import ssixprojet.common.config.Config;
 import ssixprojet.common.config.ConfigManager;
 import ssixprojet.common.entity.Player;
+import ssixprojet.common.entity.PlayerType;
 import ssixprojet.common.entity.Wall;
 import ssixprojet.common.world.World;
 import ssixprojet.server.command.CommandManager;
@@ -21,6 +23,7 @@ import ssixprojet.server.packet.PacketServer;
 import ssixprojet.server.packet.server.PacketS07PlayerSize;
 
 public class AtlasGame {
+	private static final Random RANDOM = new Random();
 	private static ConfigManager configManager = new ConfigManager(new File(new File("config"), "server.json"));
 
 	private static AtlasGame atlas;
@@ -152,6 +155,31 @@ public class AtlasGame {
 	}
 
 	/**
+	 * infect a certain percentage of players, this method guaranty at least 1
+	 * infected
+	 * 
+	 * @param percentage
+	 *            infection percentage
+	 */
+	public void randomInfection(int percentage) {
+		Player[] players = getWebServer().getConnectionManager().getPlayerMap().values().stream()
+				.filter(p -> p.isConnected() && p.getType() == PlayerType.SURVIVOR).toArray(Player[]::new);
+
+		int toInfect = Math.max(1, percentage * players.length / 100);
+
+		Player p;
+		for (int i = 0; i < toInfect; i++) {
+			int chosen = i + RANDOM.nextInt(toInfect - i);
+			
+			p = players[chosen];
+			players[chosen] = players[i];
+			players[i] = p;
+
+			p.infect();
+		}
+	}
+
+	/**
 	 * register a screen to the set
 	 * 
 	 * @param screen
@@ -194,5 +222,4 @@ public class AtlasGame {
 			screens.remove(screen.getInternalId());
 		}
 	}
-
 }
