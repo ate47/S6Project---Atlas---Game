@@ -42,7 +42,11 @@ class ServerPacket {
 	 * @returns string
 	 */
     getUTF8String(dataView, offset) {
+    	if (dataView.byteLength - offset < 4)
+    		return false;
         let l = dataView.getUint32(offset);
+    	if (dataView.byteLength - offset - 4 < l)
+    		return false;
         let array = new Uint8Array(l);
         for (let i = 0; i < l; i++)
             array[i] = dataView.getUint8(offset + 4 + i);

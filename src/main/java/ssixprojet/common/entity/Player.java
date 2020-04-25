@@ -67,7 +67,7 @@ public class Player extends Entity implements ConnectionClient {
 	}
 
 	public PacketS03PlayerSpawn createPacketSpawn() {
-		return new PacketS03PlayerSpawn(id, getX(), getY(), lookX, lookY, type.getId());
+		return new PacketS03PlayerSpawn(id, getX(), getY(), lookX, lookY, type.getId(), username);
 	}
 
 	public synchronized void decrementKeepAliveCount() {

@@ -54,6 +54,9 @@ class PacketS03PlayerSpawn extends ServerPacket {
 		this.lookX = dataview.getFloat64(20);
 		this.lookY = dataview.getFloat64(28);
 		this.type = dataview.getInt32(36);
+		this.name = this.getUTF8String(dataview, 40);
+		if (this.name === false)
+			return false;
 	}
     handle() {
     	let plr = playerMap[this.id];
@@ -62,6 +65,7 @@ class PacketS03PlayerSpawn extends ServerPacket {
     	
     	plr.move(this.x, this.y, this.lookX, this.lookY);
     	plr.type = this.type;
+    	plr.name = this.name;
     }
 }
 
