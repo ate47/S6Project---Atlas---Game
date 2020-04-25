@@ -262,48 +262,63 @@ function draw() {
 		return;
 	}
 
-	textSize(windowHeight / 10);
-	noStroke();
-	switch (playerData.type) {
-	case PLAYER_TYPE_INFECTED:
-		// display background
-		fill(color(0, 80, 0));
+	if (phase == GAME_PHASE_WAITING) {
+		fill(color(0x3A, 0x46, 0));
 		rect(0, 0, windowWidth, windowHeight);
 
-		translate(windowWidth / 2, windowHeight / 5);
-		fill(127);
-		rect(-windowWidth/4, -windowHeight / 20, windowWidth/2, windowHeight / 10);
-		
-		if (playerData.health < 25)
-			fill(color(255, 0, 0));
-		else if(playerData.health < 50)
-			fill(color(255, 255, 0));
-		else
-			fill(color(0, 255, 0));
-
-		rect(-windowWidth/4, -windowHeight / 20, playerData.health * windowWidth / 200, windowHeight / 10);
-		
-
-		fill(0);
-		text("Vie: "+playerData.health, 0, 0);
-
-		break;
-	case PLAYER_TYPE_SURVIVOR:
-		// display background
-		fill(color(0, 0, 80));
-		rect(0, 0, windowWidth, windowHeight);
-
-		translate(windowWidth / 2, windowHeight / 5);
 		fill(255);
-		text("Munitions: " + playerData.ammos, 0, 0);
+		translate(windowWidth / 2, windowHeight / 2);
+		textSize(windowHeight / 12);
+		text('En attente du lancement...', 0, 0);
+	} else if (phase == GAME_PHASE_PLAYING) {
+		textSize(windowHeight / 10);
+		noStroke();
+		switch (playerData.type) {
+		case PLAYER_TYPE_INFECTED:
+			// display background
+			fill(color(0, 80, 0));
+			rect(0, 0, windowWidth, windowHeight);
+	
+			translate(windowWidth / 2, windowHeight / 5);
+			fill(127);
+			rect(-windowWidth/4, -windowHeight / 20, windowWidth/2, windowHeight / 10);
+			
+			if (playerData.health < 25)
+				fill(color(255, 0, 0));
+			else if(playerData.health < 50)
+				fill(color(255, 255, 0));
+			else
+				fill(color(0, 255, 0));
+	
+			rect(-windowWidth/4, -windowHeight / 20, playerData.health * windowWidth / 200, windowHeight / 10);
+			
+	
+			fill(0);
+			text("Vie: "+playerData.health, 0, 0);
+	
+			break;
+		case PLAYER_TYPE_SURVIVOR:
+			// display background
+			fill(color(0, 0, 80));
+			rect(0, 0, windowWidth, windowHeight);
+	
+			translate(windowWidth / 2, windowHeight / 5);
+			fill(255);
+			text("Munitions: " + playerData.ammos, 0, 0);
+			
+			break;
+		}
+	
+		translate(-windowWidth / 2, -windowHeight / 5);
+	
+		left.draw();
+		right.draw();
+
+	} else if (phase == GAME_PHASE_SCORE) {
 		
-		break;
+		
+		
 	}
-
-	translate(-windowWidth / 2, -windowHeight / 5);
-
-	left.draw();
-	right.draw();
 }
 
 function touchStarted(ev) {
