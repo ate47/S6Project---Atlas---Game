@@ -186,6 +186,9 @@ public class Player extends Entity implements ConnectionClient {
 	}
 
 	public void shooting() {
+		if (type == PlayerType.INFECTED)
+			return;
+		
 		long currentTime = System.currentTimeMillis();
 		if (this.getWorld() == null || lastTimeShooted + TIME_BEFORE_RESHOOT > currentTime || ammos <= 0)
 			return;
