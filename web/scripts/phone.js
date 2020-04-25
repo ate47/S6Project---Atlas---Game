@@ -315,7 +315,18 @@ function draw() {
 		right.draw();
 
 	} else if (phase == GAME_PHASE_SCORE) {
-		
+
+		switch (playerData.type) {
+		case PLAYER_TYPE_INFECTED:
+			// display background
+			fill(color(0, 80, 0));
+			break;
+		case PLAYER_TYPE_SURVIVOR:
+			// display background
+			fill(color(0, 0, 80));
+			break;
+		}
+		rect(0, 0, windowWidth, windowHeight);
 		
 		
 	}

@@ -263,7 +263,9 @@ function draw() {
 		});
 
 	} else if (phase == GAME_PHASE_SCORE) {
-		
+
+		fill(color(0xaa, 0x80, 0));
+		rect(0, 0, windowWidth, windowHeight);
 		
 		
 	}

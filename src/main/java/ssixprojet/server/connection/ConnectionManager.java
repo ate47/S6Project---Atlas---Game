@@ -9,6 +9,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
+import ssixprojet.common.GamePhase;
 import ssixprojet.common.Screen;
 import ssixprojet.common.entity.Player;
 import ssixprojet.server.AtlasGame;
@@ -46,6 +47,10 @@ public class ConnectionManager {
 		@Override
 		public void connectPlayer(String name) {
 			if (checkConnected()) {
+				if (AtlasGame.getAtlas().getPhase() != GamePhase.WAITING) {
+					kick("bad phase");
+					return;
+				}
 				Player plr = new Player(this);
 				plr.connect(name);
 				AtlasGame.getAtlas().getMainWorld().spawnEntityAtRandomLocation(plr);
