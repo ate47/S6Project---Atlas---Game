@@ -9,6 +9,7 @@ public class GameServer extends Server {
 	private AtlasGame atlas;
 	
 	public GameServer(AtlasGame atlas) {
+		super("GameServer");
 		this.atlas = atlas;
 	}
 	

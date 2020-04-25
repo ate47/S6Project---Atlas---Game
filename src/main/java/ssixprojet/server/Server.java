@@ -2,6 +2,10 @@ package ssixprojet.server;
 
 public abstract class Server extends Thread {
 
+	public Server(String name) {
+		super(name);
+	}
+	
 	@Override
 	public void run() {
 		try {

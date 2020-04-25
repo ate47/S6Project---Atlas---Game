@@ -37,6 +37,7 @@ public class WebServer extends Server {
 	private boolean bufferiseFile;
 
 	public WebServer(int port, boolean bufferiseFile) {
+		super("WebServer");
 		this.webServerPort = port;
 		this.bufferiseFile = bufferiseFile;
 		// Register web context

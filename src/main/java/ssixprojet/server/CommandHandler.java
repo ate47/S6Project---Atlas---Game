@@ -11,6 +11,7 @@ public class CommandHandler extends Thread {
 	private CommandManager manager;
 
 	public CommandHandler(AtlasGame game) {
+		super("CommandHandler");
 		this.manager = game.getCommandManager();
 	}
 
