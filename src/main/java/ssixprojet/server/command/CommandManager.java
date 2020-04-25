@@ -2,6 +2,7 @@ package ssixprojet.server.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -26,7 +27,8 @@ public class CommandManager {
 			System.out.println(
 					"Joueurs  (" + c.getSource().getWebServer().getConnectionManager().getPlayerMap().size() + ")");
 			c.getSource().getWebServer().getConnectionManager().getPlayerInternalMap().entrySet().stream()
-					.map(e -> "- id: " + e.getKey() + ", nom: " + e.getValue().getUsername())
+					.map(e -> "- id: " + e.getKey() + ", nom: " + e.getValue().getUsername() + ", type: "
+							+ e.getValue().getType().name())
 					.forEach(System.out::println);
 			System.out.println("Ecran(s)  (" + c.getSource().getScreens().size() + ")");
 			c.getSource().getScreens().entrySet().stream().map(e -> "- id: " + e.getKey()).forEach(System.out::println);
@@ -35,8 +37,14 @@ public class CommandManager {
 		}));
 
 		registerCommand("kick", new CommandKick());
-		
+
 		registerCommand("type", new CommandSetType());
+
+		registerCommand("infect",
+				command -> command.then(argument("percentage", IntegerArgumentType.integer(0, 100)).executes(c -> {
+					c.getSource().randomInfection(IntegerArgumentType.getInteger(c, "percentage"));
+					return 0;
+				})));
 	}
 
 	public static <T> RequiredArgumentBuilder<AtlasGame, T> argument(String name, ArgumentType<T> type) {
