@@ -7,6 +7,7 @@ import io.netty.channel.Channel;
 public interface Connection {
 	void connectPlayer(String name);
 	void connectScreen();
+	void connectMaster(String password);
 	ConnectionClient getAttachedClient();
 	Channel getChannel();
 	void onClose();

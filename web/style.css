@@ -40,7 +40,7 @@ a:hover {
 	image-rendering: pixelated;
 	height: 50%;
 }
-#connect_form input[type=text] {
+#connect_form input[type=text], #connect_form input[type=password] {
     width: 60%;
     height: 15%;
     text-align: center;

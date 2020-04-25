@@ -333,6 +333,8 @@ function draw() {
 }
 
 function touchStarted(ev) {
+	if (phase != GAME_PHASE_PLAYING)
+		return false;
 	if (handle && ev instanceof TouchEvent) {
 		let touch;
 		let list = ev.changedTouches;
@@ -348,6 +350,8 @@ function touchStarted(ev) {
 	return false;
 }
 function touchMoved(ev) {
+	if (phase != GAME_PHASE_PLAYING)
+		return false;
 	if (handle && ev instanceof TouchEvent) {
 		let touch;
 		let list = ev.changedTouches;
@@ -364,6 +368,8 @@ function touchMoved(ev) {
 	return false;
 }
 function touchEnded(ev) {
+	if (phase != GAME_PHASE_PLAYING)
+		return false;
 	if (handle && ev instanceof TouchEvent) {
 		let touch;
 		let list = ev.changedTouches;

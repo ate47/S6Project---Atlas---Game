@@ -15,6 +15,8 @@ import ssixprojet.server.packet.client.PacketC03ReconnectPlayer;
 import ssixprojet.server.packet.client.PacketC04Move;
 import ssixprojet.server.packet.client.PacketC05Shot;
 import ssixprojet.server.packet.client.PacketC06GuessPlayer;
+import ssixprojet.server.packet.client.PacketC07ConnectMaster;
+import ssixprojet.server.packet.client.PacketC08LaunchPlayingPhase;
 
 public class PacketManager {
 	/**
@@ -65,6 +67,8 @@ public class PacketManager {
 		registerPacket(0x04, PacketC04Move::create);
 		registerPacket(0x05, b -> new PacketC05Shot());
 		registerPacket(0x06, PacketC06GuessPlayer::create);
+		registerPacket(0x07, PacketC07ConnectMaster::create);
+		registerPacket(0x08, b -> new PacketC08LaunchPlayingPhase());
 	}
 
 	public PacketClient buildPacket(int type, ByteBuf buffer) {

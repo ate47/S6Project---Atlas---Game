@@ -10,6 +10,7 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import ssixprojet.common.GamePhase;
+import ssixprojet.common.Master;
 import ssixprojet.common.Screen;
 import ssixprojet.common.entity.Player;
 import ssixprojet.server.AtlasGame;
@@ -17,6 +18,8 @@ import ssixprojet.server.packet.PacketServer;
 import ssixprojet.server.packet.server.PacketS02PlayerRegister;
 import ssixprojet.server.packet.server.PacketS05PlayerDead;
 import ssixprojet.server.packet.server.PacketS0BSetGamePhase;
+import ssixprojet.server.packet.server.PacketS0CBadPassword;
+import ssixprojet.server.packet.server.PacketS0DMasterLogged;
 
 public class ConnectionManager {
 	@FunctionalInterface
@@ -148,12 +151,27 @@ public class ConnectionManager {
 			// connection closed without error
 		}
 
+		@Override
+		public void connectMaster(String password) {
+			if (!password.equals(AtlasGame.getConfig().getPasswordMaster())) {
+				sendPacket(new PacketS0CBadPassword());
+				return;
+			}
+
+			Master master = new Master(this);
+
+			client = master;
+			close = MASTER;
+			System.out.println("[Master] new master connected!");
+			master.sendPacket(new PacketS0DMasterLogged());
+		}
+
 	}
 
 	private Map<UUID, Player> playerMap = new HashMap<>();
 	private Map<Integer, Player> playerInternalMap = new HashMap<>();
-
 	private final ConnectionCloseOperation NONE = c -> {};
+	private final ConnectionCloseOperation MASTER = c -> {};
 	private final ConnectionCloseOperation PLAYER = c -> {
 		Player p = (Player) c;
 		synchronized (playerMap) {

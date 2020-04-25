@@ -60,7 +60,7 @@ public class AtlasGame {
 
 	private double height;
 
-	private GamePhase phase = GamePhase.WAITING;
+	private GamePhase phase;
 
 	public AtlasGame() {
 		atlas = this;
@@ -108,6 +108,8 @@ public class AtlasGame {
 						(location.getHeight() - size) * mapFactorX, location.isOutside());
 			else
 				System.err.println("Can't add the spawn location : " + location);
+		
+		setPhase(GamePhase.WAITING);
 	}
 
 	public CommandHandler getCommandHandler() {
@@ -223,6 +225,7 @@ public class AtlasGame {
 	
 	public void setPhase(GamePhase phase) {
 		this.phase = phase;
+		phase.onInit();
 		sendToAll(() -> new PacketS0BSetGamePhase(phase));
 	}
 
