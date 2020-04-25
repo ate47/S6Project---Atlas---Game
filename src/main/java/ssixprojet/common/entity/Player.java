@@ -126,6 +126,13 @@ public class Player extends Entity implements ConnectionClient {
 		return username;
 	}
 
+	public void infect() {
+		setHealth(100);
+		setType(PlayerType.INFECTED);
+		// respawn the player
+		getWorld().spawnEntityAtRandomLocation(this);
+	}
+
 	public boolean isConnected() {
 		return connected;
 	}
@@ -278,13 +285,6 @@ public class Player extends Entity implements ConnectionClient {
 			infect();
 		} else
 			setHealth(getHealth() - AMMO_POWER);
-	}
-
-	public void infect() {
-		setHealth(100);
-		setType(PlayerType.INFECTED);
-		// respawn the player
-		getWorld().spawnEntityAtRandomLocation(this);
 	}
 
 	@Override
