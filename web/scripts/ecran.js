@@ -157,6 +157,7 @@ packetHandler.registerPacketBuilder(0x08, () => new PacketS08Shot ());
 
 packetHandler.openWebSocket(function() {
 	playerMap = [];
+	IMAGE_MAP = loadImage("images/map.png");
 	packetHandler.sendPacket(new PacketC02ConnectScreen());
 });
 
@@ -166,8 +167,6 @@ function setup() {
 	
 	IMAGE_LOGO = loadImage("images/logo_atlas.png");
 	
-	IMAGE_MAP = loadImage("images/map.png");
-
 	IMAGE_PLAYER_S = loadImage("images/plr_survivant.png");
 	IMAGE_PLAYER_I = loadImage("images/plr_zombie.png");
 	IMAGE_DEAD = loadImage("images/dead.png");
