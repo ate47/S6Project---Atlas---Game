@@ -176,6 +176,9 @@ public class AtlasGame {
 		Player[] players = getWebServer().getConnectionManager().getPlayerMap().values().stream()
 				.filter(p -> p.isConnected() && p.getType() == PlayerType.SURVIVOR).toArray(Player[]::new);
 
+		if (players.length == 0)
+			return;
+		
 		int toInfect = Math.max(1, percentage * players.length / 100);
 
 		Player p;
