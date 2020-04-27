@@ -205,6 +205,7 @@ class PacketHandler {
         // Create WebSocket connection.
         this.url = url;
         this.packetBuilder = [];
+        this.registerPacketBuilder(0x0B, () => new PacketS0BSetGamePhase());
     }
 
     openWebSocket(callback = false) {
@@ -223,7 +224,6 @@ class PacketHandler {
         this.open = false;
 
         this.callback = callback;
-        packetHandler.registerPacketBuilder(0x0B, () => new PacketS0BSetGamePhase());
     }
 
     registerPacketBuilder(packetId, builder) {

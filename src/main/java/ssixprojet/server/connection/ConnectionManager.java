@@ -35,10 +35,12 @@ public class ConnectionManager {
 		public ConnectionImpl(Channel channel) {
 			this.channel = channel;
 			this.client = this;
-
-			sendPacket(new PacketS0BSetGamePhase(AtlasGame.getAtlas().getPhase()));
 		}
 
+		private void sendConnectionsPacket() {
+			client.sendPacket(new PacketS0BSetGamePhase(AtlasGame.getAtlas().getPhase()));
+		}
+		
 		private boolean checkConnected() {
 			if (client != this) {
 				client.kick("Connection already registered");
@@ -66,6 +68,7 @@ public class ConnectionManager {
 				}
 				client = plr;
 				close = PLAYER;
+				sendConnectionsPacket();
 				// send the uuid for reconnection
 				plr.sendPacket(new PacketS02PlayerRegister(plr.getInternalId()));
 				System.out.println("[Player] " + name + " connected!");
@@ -81,6 +84,7 @@ public class ConnectionManager {
 
 				client = screen;
 				close = SCREEN;
+				sendConnectionsPacket();
 				System.out.println("[Screen#" + screen.getInternalId() + "] new screen connected!");
 			}
 		}
@@ -159,9 +163,13 @@ public class ConnectionManager {
 			}
 
 			Master master = new Master(this);
+			synchronized (masters) {
+				masters.put(master.getId(), master);
+			}
 
 			client = master;
 			close = MASTER;
+			sendConnectionsPacket();
 			System.out.println("[Master] new master connected!");
 			master.sendPacket(new PacketS0DMasterLogged());
 		}
@@ -170,8 +178,13 @@ public class ConnectionManager {
 
 	private Map<UUID, Player> playerMap = new HashMap<>();
 	private Map<Integer, Player> playerInternalMap = new HashMap<>();
+	private Map<Integer, Master> masters = new HashMap<>();
 	private final ConnectionCloseOperation NONE = c -> {};
-	private final ConnectionCloseOperation MASTER = c -> {};
+	private final ConnectionCloseOperation MASTER = c -> {
+		synchronized (masters) {
+			masters.remove(((Master) c).getId());
+		}
+	};
 	private final ConnectionCloseOperation PLAYER = c -> {
 		Player p = (Player) c;
 		synchronized (playerMap) {
@@ -197,6 +210,10 @@ public class ConnectionManager {
 	 */
 	public Connection createConnection(Channel channel) {
 		return new ConnectionImpl(channel);
+	}
+
+	public Map<Integer, Master> getMasters() {
+		return masters;
 	}
 
 	public Map<UUID, Player> getPlayerMap() {

@@ -11,6 +11,7 @@ import ssixprojet.common.GameMap;
 import ssixprojet.common.GamePhase;
 import ssixprojet.common.MapEdge;
 import ssixprojet.common.MapEdge.Orientation;
+import ssixprojet.common.Master;
 import ssixprojet.common.Screen;
 import ssixprojet.common.SpawnLocation;
 import ssixprojet.common.config.Config;
@@ -210,10 +211,15 @@ public class AtlasGame {
 
 	public void sendToAll(Supplier<PacketServer> packetSupplier) {
 		sendToAllScreens(packetSupplier);
-		Map<UUID, Player> map = getWebServer().getConnectionManager().getPlayerMap();
+		Map<UUID, Player> players = getWebServer().getConnectionManager().getPlayerMap();
 
-		synchronized (map) {
-			map.values().stream().filter(Player::isConnected).forEach(p -> p.sendPacket(packetSupplier.get()));
+		synchronized (players) {
+			players.values().stream().filter(Player::isConnected).forEach(p -> p.sendPacket(packetSupplier.get()));
+		}
+		Map<Integer, Master> masters = getWebServer().getConnectionManager().getMasters();
+
+		synchronized (masters) {
+			masters.values().stream().forEach(p -> p.sendPacket(packetSupplier.get()));
 		}
 	}
 

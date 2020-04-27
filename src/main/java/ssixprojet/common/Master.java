@@ -1,5 +1,7 @@
 package ssixprojet.common;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -10,15 +12,22 @@ import ssixprojet.server.connection.ConnectionClient;
 import ssixprojet.server.packet.PacketServer;
 
 public class Master implements ConnectionClient {
+	private static final AtomicInteger COUNT = new AtomicInteger(0);
 	private Connection connection;
+	private final int id;
 
 	public Master(Connection connection) {
 		this.connection = connection;
+		this.id = COUNT.incrementAndGet();
 	}
 
 	@Override
 	public Connection getConnection() {
 		return connection;
+	}
+	
+	public int getId() {
+		return id;
 	}
 
 	@Override
