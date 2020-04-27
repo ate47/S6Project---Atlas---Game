@@ -31,6 +31,15 @@ class PacketC08LaunchPlayingPhase extends ClientPacket {
         super(0x08, 0);
     }
 }
+class PacketC09SendInfection extends ClientPacket {
+    constructor(percentage) {
+        super(0x09, 4);
+        this.percentage = percentage;
+    }
+    write(dataView) {
+        dataView.setInt32(0, this.percentage);
+    }
+}
 class PacketS0CBadPassword extends ServerPacket {
 	read(dataview){}
 
@@ -45,6 +54,10 @@ class PacketS0DMasterLogged extends ServerPacket {
     handle() {
     	handle = true;
     }
+}
+
+function inRect(mouseX, mouseY, x, y, w, h) {
+	return mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h;
 }
 
 packetHandler.registerPacketBuilder(0x0C, () => new PacketS0CBadPassword());
@@ -105,12 +118,58 @@ function draw() {
 		
 	} else if (phase == GAME_PHASE_PLAYING) {
 
+		if (windowWidth < windowHeight) { // vertical
+
+			let size = windowWidth / 3;
+			let y = windowHeight / 2 - size * 3 / 2;
+			
+			fill(color(255, 0, 0));
+			rect(windowWidth / 3, y, size, size);
+			image(IMAGE_BIOHAZARD, windowWidth / 3, y, size, size);
+			
+			
+			fill(color(50, 255, 50));
+			rect(windowWidth / 3, y + size, size, size);
+			
+			fill(color(0, 127, 255));
+			rect(windowWidth / 3, y + size * 2, size, size);
+			
+		} else { // horizontal
+
+			let size = windowHeight / 3;
+			let x = windowWidth / 2 - size * 3 / 2;
+
+			fill(color(255, 0, 0));
+			rect(x, windowHeight / 3, size, size);
+			image(IMAGE_BIOHAZARD, x, windowHeight / 3, size, size);
+			
+			fill(color(50, 255, 50));
+			rect(x + size, windowHeight / 3, size, size);
+			
+			fill(color(0, 127, 255));
+			rect(x + size * 2, windowHeight / 3, size, size);
+			
+		}
 
 	} else if (phase == GAME_PHASE_SCORE) {
 
 		
 	}
 	
+}
+
+function playActionButton(button) {
+	if (button == 1) { // infect
+		let percentage = prompt("Pourcentage d'infection ?", 50);
+		
+		if (percentage != null && Number(percentage) != NaN) {
+			packetHandler.sendPacket(new PacketC09SendInfection(Number(percentage)));
+		}
+	} else if (button == 2) {
+		
+	} else if (button == 3) {
+		
+	}
 }
 
 function mousePressed() {
@@ -131,6 +190,32 @@ function mousePressed() {
 		
 	} else if (phase == GAME_PHASE_PLAYING) {
 
+
+		if (windowWidth < windowHeight) { // vertical
+
+			let size = windowWidth / 3;
+			let y = windowHeight / 2 - size * 3 / 2;
+			
+			if (inRect(mouseX, mouseY, windowWidth / 3, y, size, size)) {
+				playActionButton(1);
+			} else if (inRect(mouseX, mouseY, windowWidth / 3, y + size, size, size)) {
+				playActionButton(2);
+			} else if (inRect(mouseX, mouseY, windowWidth / 3, y + size * 2, size, size)) {
+				playActionButton(3);
+			}
+			
+		} else { // horizontal
+			let size = windowHeight / 3;
+			let x = windowWidth / 2 - size * 3 / 2
+
+			if (inRect(mouseX, mouseY, x, windowHeight / 3, size, size)) {
+				playActionButton(1);
+			} else if (inRect(mouseX, mouseY, x + size, windowHeight / 3, size, size)) {
+				playActionButton(2);
+			} else if (inRect(mouseX, mouseY, x + size * 2, windowHeight / 3, size, size)) {
+				playActionButton(3);
+			}
+		}
 
 	} else if (phase == GAME_PHASE_SCORE) {
 
