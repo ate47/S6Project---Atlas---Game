@@ -26,13 +26,17 @@ public class CommandManager {
 
 		registerCommand("list", bld -> bld.executes(c -> {
 			System.out.println(
-					"Joueurs  (" + c.getSource().getWebServer().getConnectionManager().getPlayerMap().size() + ")");
+					"Joueurs (" + c.getSource().getWebServer().getConnectionManager().getPlayerMap().size() + ")");
 			c.getSource().getWebServer().getConnectionManager().getPlayerInternalMap().entrySet().stream()
 					.map(e -> "- id: " + e.getKey() + ", nom: " + e.getValue().getUsername() + ", type: "
 							+ e.getValue().getType().name())
 					.forEach(System.out::println);
-			System.out.println("Ecran(s)  (" + c.getSource().getScreens().size() + ")");
+			System.out.println("Ecran(s) (" + c.getSource().getScreens().size() + ")");
 			c.getSource().getScreens().entrySet().stream().map(e -> "- id: " + e.getKey()).forEach(System.out::println);
+			System.out.println(
+					"Maitre(s) (" + c.getSource().getWebServer().getConnectionManager().getMasters().size() + ")");
+			c.getSource().getWebServer().getConnectionManager().getMasters().entrySet().stream()
+					.map(e -> "- id: " + e.getKey()).forEach(System.out::println);
 
 			return 0;
 		}));
