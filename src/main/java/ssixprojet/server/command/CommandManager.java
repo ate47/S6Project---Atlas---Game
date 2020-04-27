@@ -58,6 +58,7 @@ public class CommandManager {
 					System.out.println("New phase: " + phase);
 					return 0;
 				})).executes(c -> {
+					System.out.println("Phase: " + c.getSource().getPhase().name());
 					System.out.println("Liste des phases:");
 					for (GamePhase t : GamePhase.values())
 						System.out.println("- " + t.name());
