@@ -211,15 +211,22 @@ public class AtlasGame {
 
 	public void sendToAll(Supplier<PacketServer> packetSupplier) {
 		sendToAllScreens(packetSupplier);
-		Map<UUID, Player> players = getWebServer().getConnectionManager().getPlayerMap();
-
-		synchronized (players) {
-			players.values().stream().filter(Player::isConnected).forEach(p -> p.sendPacket(packetSupplier.get()));
-		}
+		sendToAllMaster(packetSupplier);
+		sendToAllPlayer(packetSupplier);
+	}
+	public void sendToAllMaster(Supplier<PacketServer> packetSupplier) {
 		Map<Integer, Master> masters = getWebServer().getConnectionManager().getMasters();
 
 		synchronized (masters) {
 			masters.values().stream().forEach(p -> p.sendPacket(packetSupplier.get()));
+		}
+	}
+
+	public void sendToAllPlayer(Supplier<PacketServer> packetSupplier) {
+		Map<UUID, Player> players = getWebServer().getConnectionManager().getPlayerMap();
+
+		synchronized (players) {
+			players.values().stream().filter(Player::isConnected).forEach(p -> p.sendPacket(packetSupplier.get()));
 		}
 	}
 
