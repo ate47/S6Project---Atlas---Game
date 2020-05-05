@@ -222,6 +222,9 @@ function setup() {
 }
 
 function tick() {
+	if (phase != GAME_PHASE_PLAYING)
+		return;
+	
 	if (!left.is00() || !right.is00()) {
 		// send move packet
 		if (right.is00())
