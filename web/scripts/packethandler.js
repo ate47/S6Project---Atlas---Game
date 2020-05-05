@@ -11,6 +11,7 @@ const GAME_PHASE_PLAYING = 1;
 const GAME_PHASE_SCORE = 2;
 
 let phase = 0;
+let time = 0;
 
 class UUID {
     constructor() {
@@ -194,6 +195,17 @@ class PacketS0BSetGamePhase extends ServerPacket {
 	}
 }
 
+class PacketS0ETimeToWaitPing extends ServerPacket {
+	read(dataview) {
+		if (dataview.byteLength < 4)
+			return false;
+		this.time = dataview.getInt32(0);
+	}
+
+	handle() {
+		time = this.time;
+	}
+}
 class PacketHandler {
     /**
 	 * 
@@ -206,6 +218,7 @@ class PacketHandler {
         this.url = url;
         this.packetBuilder = [];
         this.registerPacketBuilder(0x0B, () => new PacketS0BSetGamePhase());
+        this.registerPacketBuilder(0x0E, () => new PacketS0ETimeToWaitPing());
     }
 
     openWebSocket(callback = false) {
@@ -259,6 +272,7 @@ class PacketHandler {
     webSocketOpen(ev) {
     	if (this.open)
     		return;
+    	time = 0;
         this.open = true;
         console.log("WebSocket open");
         if (this.callback !== false)

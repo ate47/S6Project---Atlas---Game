@@ -6,6 +6,7 @@ let playerSizeX = 0.005;
 let playerSizeY = 0.005;
 const fps = 24;
 const tps = 20;
+let isSetup = false;
 let IMAGE_LOGO;
 let IMAGE_MAP;
 let IMAGE_PLAYER_S;
@@ -157,7 +158,8 @@ packetHandler.registerPacketBuilder(0x08, () => new PacketS08Shot ());
 
 packetHandler.openWebSocket(function() {
 	playerMap = [];
-	IMAGE_MAP = loadImage("images/map.png");
+	if (isSetup)
+		IMAGE_MAP = loadImage("images/map.png");
 	packetHandler.sendPacket(new PacketC02ConnectScreen());
 });
 
@@ -170,6 +172,9 @@ function setup() {
 	IMAGE_PLAYER_S = loadImage("images/plr_survivant.png");
 	IMAGE_PLAYER_I = loadImage("images/plr_zombie.png");
 	IMAGE_DEAD = loadImage("images/dead.png");
+	IMAGE_MAP = loadImage("images/map.png");
+	
+	isSetup = true;
 
 	frameRate(fps);
 	setInterval(tick, 1000 / tps);
@@ -238,6 +243,16 @@ function draw() {
 	} else if (phase == GAME_PHASE_PLAYING) {
 
 		image(IMAGE_MAP, 0, 0, windowWidth, windowHeight);
+
+		if (time > 0) {
+			textSize(windowHeight / 20);
+			let txt = "Infection dans " + time + "s";
+			let tw = textWidth(txt) * 1.25;
+			fill(0);
+			rect(windowWidth / 2 - tw / 2, 0, tw, windowHeight / 20);
+			fill(255);
+			text(txt, windowWidth / 2, windowHeight / 40);
+		}
 		
 		stroke(40);
 		

@@ -242,7 +242,8 @@ public class AtlasGame {
 	public void setPhase(GamePhase phase) {
 		this.phase = phase;
 		phase.onInit();
-		sendToAll(() -> new PacketS0BSetGamePhase(phase));
+		if (this.phase == phase)
+			sendToAll(() -> new PacketS0BSetGamePhase(phase));
 	}
 
 	/**
@@ -256,6 +257,7 @@ public class AtlasGame {
 
 	public void tick() {
 		mainWorld.tick();
+		phase.tick();
 	}
 
 	public void unregisterScreen(Screen screen) {
