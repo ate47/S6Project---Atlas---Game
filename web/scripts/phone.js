@@ -37,6 +37,8 @@ log("Pseudo: " + username);
 const packetHandler = new PacketHandler('ws://' + window.location.host + '/game');
 
 packetHandler.openWebSocket(function() {
+	left.set00();
+	right.set00();
 	packetHandler.sendPacket(new PacketC00ConnectPlayer(username));
 });
 
@@ -125,6 +127,11 @@ class PressPoint {
 
 	is00() {
 		return this.vectorX == 0 && this.vectorY == 0;
+	}
+	
+	set00() {
+		this.vectorX = 0;
+		this.vectorY = 0;
 	}
 	
 	/**
