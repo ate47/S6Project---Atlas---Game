@@ -310,6 +310,17 @@ function draw() {
 		}
 	
 		translate(-windowWidth / 2, -windowHeight / 5);
+		
+
+		if (time > 0) {
+			textSize(windowHeight / 10);
+			let txt = "Infection dans " + time + "s";
+			let tw = textWidth(txt) * 1.25;
+			fill(0);
+			rect(windowWidth / 2 - tw / 2, 0, tw, windowHeight / 10);
+			fill(255);
+			text(txt, windowWidth / 2, windowHeight / 20);
+		}
 	
 		left.draw();
 		right.draw();
