@@ -6,7 +6,10 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import ssixprojet.common.GamePhase;
 import ssixprojet.common.entity.Entity;
+import ssixprojet.common.entity.Player;
+import ssixprojet.common.entity.PlayerType;
 import ssixprojet.server.AtlasGame;
 
 public class World {
@@ -211,7 +214,9 @@ public class World {
 	 * run map logic
 	 */
 	public void tick() {
-		// TODO link tick method
+		if (!getEntities().stream().filter(e -> e instanceof Player).map(e -> (Player) e).filter(p -> p.getType() != PlayerType.INFECTED).findAny().isPresent()) {
+			AtlasGame.getAtlas().setPhase(GamePhase.SCORE);
+		}
 	}
 
 	@Override
