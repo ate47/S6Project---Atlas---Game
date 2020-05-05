@@ -19,13 +19,6 @@ class UUID {
         this.view = new DataView(buffer);
     }
 
-    write(dataView, offset) {
-        dataView.setUint32(offset, this.view.getUint32(0));
-        dataView.setUint32(offset + 4, this.view.getUint32(4));
-        dataView.setUint32(offset + 8, this.view.getUint32(8));
-        dataView.setUint32(offset + 12, this.view.getUint32(12));
-    }
-
     read(dataView, offset) {
         this.view.setUint32(0, dataView.getUint32(offset));
         this.view.setUint32(4, dataView.getUint32(offset + 4));
@@ -33,7 +26,12 @@ class UUID {
         this.view.setUint32(12, dataView.getUint32(offset + 12));
     }
     
-    handle() {}
+    write(dataView, offset) {
+        dataView.setUint32(offset, this.view.getUint32(0));
+        dataView.setUint32(offset + 4, this.view.getUint32(4));
+        dataView.setUint32(offset + 8, this.view.getUint32(8));
+        dataView.setUint32(offset + 12, this.view.getUint32(12));
+    }
 }
 
 class ServerPacket {
@@ -61,6 +59,8 @@ class ServerPacket {
     }
 
     getUUID(dataView, offset) {
+    	if (dataView.byteLength - offset < 16)
+    		return false;
         let uuid = new UUID();
         uuid.read(dataView, offset);
         return uuid;
@@ -144,12 +144,14 @@ class PacketC03ReconnectPlayer extends ClientPacket {
 	 * @param {UUID}
 	 *            uuid the player uuid
 	 */
-    constructor(uuid) {
+    constructor(uuid, username) {
         super(0x03, 16)
         this.uuid = uuid;
+        this.username = this.prepareUTF8String(username);
     }
     write(dataView) {
         this.uuid.write(dataView, 0);
+        this.setUTF8String(dataView, 16, this.username);
     }
 }
 

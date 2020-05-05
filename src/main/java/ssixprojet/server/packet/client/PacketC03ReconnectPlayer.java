@@ -10,18 +10,23 @@ import ssixprojet.server.packet.PacketManager;
 public class PacketC03ReconnectPlayer extends PacketClient {
 	public static PacketC03ReconnectPlayer create(ByteBuf buf) {
 		UUID uuid = PacketManager.readUUID(buf);
-		return uuid == null ? null : new PacketC03ReconnectPlayer(uuid);
+		if (uuid == null)
+			return null;
+		String name = PacketManager.readUTF8String(buf);
+		return name == null ? null : new PacketC03ReconnectPlayer(uuid, name);
 	}
 
 	private UUID uuid;
+	private String name;
 
-	private PacketC03ReconnectPlayer(UUID uuid) {
+	private PacketC03ReconnectPlayer(UUID uuid, String name) {
 		this.uuid = uuid;
+		this.name = name;
 	}
 
 	@Override
 	public void handle(ConnectionClient src) throws Exception {
-		src.getConnection().reconnectPlayer(uuid);
+		src.getConnection().reconnectPlayer(uuid, name);
 	}
 
 }

@@ -50,11 +50,9 @@ public class PacketManager {
 	public static UUID readUUID(ByteBuf buf) {
 		if (!buf.isReadable(16))
 			return null;
-		int mostTop = buf.readInt();
-		int mostBottom = buf.readInt();
-		int leastTop = buf.readInt();
-		int leastBottom = buf.readInt();
-		return new UUID(((long) mostTop << 32) | mostBottom, ((long) leastTop << 32) | leastBottom);
+		long most = buf.readLong();
+		long least = buf.readLong();
+		return new UUID(most, least);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -71,20 +69,6 @@ public class PacketManager {
 		registerPacket(0x07, PacketC07ConnectMaster::create);
 		registerPacket(0x08, b -> new PacketC08LaunchPlayingPhase());
 		registerPacket(0x09, PacketC09SendInfection::create);
-	}
-
-	public PacketClient buildPacket(int type, ByteBuf buffer) {
-		if (type < 0 || type >= packets.length) {
-			return null;
-		}
-		// get the packet builder for this type
-		PacketBuilder<?> bld = packets[type];
-		if (bld == null) {
-			return null;
-		}
-
-		// build the packet and release the buffer data
-		return (PacketClient) bld.build(buffer);
 	}
 
 	/**
@@ -105,6 +89,20 @@ public class PacketManager {
 		} catch (Exception e) {
 			return null;
 		}
+	}
+
+	public PacketClient buildPacket(int type, ByteBuf buffer) {
+		if (type < 0 || type >= packets.length) {
+			return null;
+		}
+		// get the packet builder for this type
+		PacketBuilder<?> bld = packets[type];
+		if (bld == null) {
+			return null;
+		}
+
+		// build the packet and release the buffer data
+		return (PacketClient) bld.build(buffer);
 	}
 
 	/**

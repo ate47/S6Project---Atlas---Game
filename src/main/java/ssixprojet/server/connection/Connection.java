@@ -11,7 +11,7 @@ public interface Connection {
 	ConnectionClient getAttachedClient();
 	Channel getChannel();
 	void onClose();
-	void reconnectPlayer(UUID id);
+	void reconnectPlayer(UUID id, String name);
 	void setAttachedClient(ConnectionClient client);
 	void onError(String error);
 }

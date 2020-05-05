@@ -6,14 +6,14 @@ import io.netty.buffer.ByteBuf;
 import ssixprojet.server.packet.PacketServer;
 
 public class PacketS02PlayerRegister extends PacketServer {
-	private UUID uuid;
-	public PacketS02PlayerRegister(UUID uuid) {
+	private UUID playerUUID;
+	public PacketS02PlayerRegister(UUID playerUUID) {
 		super(0x02, 16);
-		this.uuid = uuid;
+		this.playerUUID = playerUUID;
 	}
 
 	@Override
 	public void write(ByteBuf buf) {
-		writeUUID(buf, uuid);
+		writeUUID(buf, playerUUID);
 	}
 }

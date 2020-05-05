@@ -43,6 +43,8 @@ public class AtlasGame {
 		return configManager;
 	}
 
+	private UUID serverUUID = UUID.randomUUID();
+	
 	private GameMap gameMap;
 
 	private WebServer webServer;
@@ -161,6 +163,10 @@ public class AtlasGame {
 		return screens;
 	}
 
+	public UUID getServerUUID() {
+		return serverUUID;
+	}
+
 	public WebServer getWebServer() {
 		return webServer;
 	}
@@ -193,16 +199,6 @@ public class AtlasGame {
 		}
 	}
 
-	public void restart() {
-		Map<Integer, Player> map = getWebServer().getConnectionManager().getPlayerInternalMap();
-
-		setPhase(GamePhase.WAITING);
-
-		synchronized (map) {
-			map.values().stream().filter(Player::isConnected).forEach(p -> p.kick("restarting..."));
-		}
-	}
-
 	/**
 	 * register a screen to the set
 	 * 
@@ -220,6 +216,18 @@ public class AtlasGame {
 		}
 
 		screen.sendPacket(new PacketS07PlayerSize(playerSizeX, playerSizeY));
+	}
+	
+	public void restart() {
+		Map<Integer, Player> map = getWebServer().getConnectionManager().getPlayerInternalMap();
+
+		setPhase(GamePhase.WAITING);
+
+		serverUUID = UUID.randomUUID();
+		
+		synchronized (map) {
+			map.values().stream().filter(Player::isConnected).forEach(p -> p.kick("restarting..."));
+		}
 	}
 
 	public void sendToAll(Supplier<PacketServer> packetSupplier) {

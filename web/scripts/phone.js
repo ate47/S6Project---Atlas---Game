@@ -6,6 +6,7 @@ let IMAGE_CONTROLER_LEFT;
 let IMAGE_CONTROLER_RIGHT;
 let IMAGE_DEAD;
 let IMAGE_ROTATE;
+let playerUUID = false;
 
 let left = false;
 let right = false;
@@ -41,7 +42,10 @@ packetHandler.openWebSocket(function() {
 		left.set00();
 	if (right !== false)
 		right.set00();
-	packetHandler.sendPacket(new PacketC00ConnectPlayer(username));
+	if (playerUUID === false)
+		packetHandler.sendPacket(new PacketC00ConnectPlayer(username));
+	else
+		packetHandler.sendPacket(new PacketC03ReconnectPlayer(playerUUID, username));
 });
 
 class PressPoint {
@@ -172,6 +176,19 @@ class PressPoint {
 	}
 }
 
+class PacketS02PlayerRegister extends ServerPacket {
+	read(dataview){
+		this.uuid = this.getUUID(dataview, 0);
+		if (this.uuid === false)
+			return false;
+	}
+
+    handle() {
+    	playerUUID = this.uuid;
+    	log(this.uuid);
+    }
+}
+
 class PacketS06PlayerType extends ServerPacket {
 	read(dataview){
 		if (dataview.byteLength < 4)
@@ -206,6 +223,7 @@ class PacketS0AChangeAmmos extends ServerPacket {
     }
 }
 
+packetHandler.registerPacketBuilder(0x02, () => new PacketS02PlayerRegister());
 packetHandler.registerPacketBuilder(0x06, () => new PacketS06PlayerType());
 packetHandler.registerPacketBuilder(0x09, () => new PacketS09ChangeHealth());
 packetHandler.registerPacketBuilder(0x0A, () => new PacketS0AChangeAmmos());

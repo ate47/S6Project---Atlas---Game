@@ -40,7 +40,7 @@ public class ConnectionManager {
 		private void sendConnectionsPacket() {
 			client.sendPacket(new PacketS0BSetGamePhase(AtlasGame.getAtlas().getPhase()));
 		}
-		
+
 		private boolean checkConnected() {
 			if (client != this) {
 				client.kick("Connection already registered");
@@ -118,12 +118,16 @@ public class ConnectionManager {
 		}
 
 		@Override
-		public void reconnectPlayer(UUID uuid) {
+		public void reconnectPlayer(UUID uuid, String name) {
 			if (checkConnected()) {
-				Player plr = playerMap.get(uuid);
-				if (plr == null) {
-					kick("Bad player UUID");
+				Player plr;
+				synchronized (playerMap) {
+					plr = playerMap.get(uuid);
+				}
+				if (plr == null || !plr.getUsername().equals(name)) {
+					connectPlayer(name);
 				} else {
+					System.out.println("[Player] " + plr.getUsername() + " reconnected!");
 					plr.setConnection(this);
 					client = plr;
 					close = PLAYER;
@@ -187,12 +191,6 @@ public class ConnectionManager {
 	};
 	private final ConnectionCloseOperation PLAYER = c -> {
 		Player p = (Player) c;
-		synchronized (playerMap) {
-			playerMap.remove(p.getInternalId());
-		}
-		synchronized (playerInternalMap) {
-			playerInternalMap.remove(p.getId());
-		}
 		AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS05PlayerDead(p.getId()));
 		p.disconnect();
 	};

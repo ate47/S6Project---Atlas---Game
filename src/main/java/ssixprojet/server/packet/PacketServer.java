@@ -9,11 +9,10 @@ import io.netty.buffer.ByteBuf;
 public abstract class PacketServer {
 
 	public static void writeUUID(ByteBuf buf, UUID uuid) {
-		buf.writeInt((int) (uuid.getMostSignificantBits() >> 32));
-		buf.writeInt((int) (uuid.getMostSignificantBits() & 0xFFFFFFFF));
-		buf.writeInt((int) (uuid.getLeastSignificantBits() >> 32));
-		buf.writeInt((int) (uuid.getLeastSignificantBits() & 0xFFFFFFFF));
+		buf.writeLong(uuid.getMostSignificantBits());
+		buf.writeLong(uuid.getLeastSignificantBits());
 	}
+
 	private int initialSize;
 
 	private final int id;
