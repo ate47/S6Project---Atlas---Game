@@ -214,7 +214,7 @@ public class World {
 	 * run map logic
 	 */
 	public void tick() {
-		if (!getEntities().stream().filter(e -> e instanceof Player).map(e -> (Player) e).filter(p -> p.getType() != PlayerType.INFECTED).findAny().isPresent()) {
+		if (AtlasGame.getAtlas().getPhase() == GamePhase.PLAYING && !getEntities().stream().filter(e -> e instanceof Player).map(e -> (Player) e).filter(p -> p.getType() != PlayerType.INFECTED).findAny().isPresent()) {
 			AtlasGame.getAtlas().setPhase(GamePhase.SCORE);
 		}
 	}
