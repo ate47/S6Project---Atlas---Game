@@ -164,6 +164,8 @@ public class Player extends Entity implements ConnectionClient {
 
 	@Override
 	public void sendPacket(PacketServer packet) {
+		if (connection == null || connection.getChannel() == null)
+			return;
 		ByteBuf buffer = Unpooled.buffer(packet.getInitialSize() + 4);
 		buffer.writeInt(packet.getPacketId());
 		packet.write(buffer);
