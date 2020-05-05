@@ -109,7 +109,7 @@ public class AtlasGame {
 						(location.getHeight() - size) * mapFactorX, location.isOutside());
 			else
 				System.err.println("Can't add the spawn location : " + location);
-		
+
 		setPhase(GamePhase.WAITING);
 	}
 
@@ -178,7 +178,7 @@ public class AtlasGame {
 
 		if (players.length == 0)
 			return;
-		
+
 		int toInfect = Math.max(1, percentage * players.length / 100);
 
 		Player p;
@@ -190,6 +190,16 @@ public class AtlasGame {
 			players[i] = p;
 
 			p.infect();
+		}
+	}
+
+	public void restart() {
+		Map<Integer, Player> map = getWebServer().getConnectionManager().getPlayerInternalMap();
+
+		setPhase(GamePhase.WAITING);
+
+		synchronized (map) {
+			map.values().stream().filter(Player::isConnected).forEach(p -> p.kick("restarting..."));
 		}
 	}
 
@@ -217,6 +227,7 @@ public class AtlasGame {
 		sendToAllMaster(packetSupplier);
 		sendToAllPlayer(packetSupplier);
 	}
+
 	public void sendToAllMaster(Supplier<PacketServer> packetSupplier) {
 		Map<Integer, Master> masters = getWebServer().getConnectionManager().getMasters();
 
@@ -238,7 +249,7 @@ public class AtlasGame {
 			screens.forEach((id, screen) -> screen.sendPacket(packetSupplier.get()));
 		}
 	}
-	
+
 	public void setPhase(GamePhase phase) {
 		this.phase = phase;
 		phase.onInit();

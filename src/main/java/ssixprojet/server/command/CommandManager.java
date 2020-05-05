@@ -29,7 +29,7 @@ public class CommandManager {
 					"Joueurs (" + c.getSource().getWebServer().getConnectionManager().getPlayerMap().size() + ")");
 			c.getSource().getWebServer().getConnectionManager().getPlayerInternalMap().entrySet().stream()
 					.map(e -> "- id: " + e.getKey() + ", nom: " + e.getValue().getUsername() + ", type: "
-							+ e.getValue().getType().name())
+							+ e.getValue().getType().name() + ", ip: " + e.getValue().getIp())
 					.forEach(System.out::println);
 			System.out.println("Ecran(s) (" + c.getSource().getScreens().size() + ")");
 			c.getSource().getScreens().entrySet().stream().map(e -> "- id: " + e.getKey()).forEach(System.out::println);
@@ -64,6 +64,12 @@ public class CommandManager {
 						System.out.println("- " + t.name());
 					return 0;
 				}));
+
+		registerCommand("restart", command -> command.executes(c -> {
+			System.out.println("Relancement...");
+			c.getSource().restart();
+			return 0;
+		}));
 	}
 
 	public static <T> RequiredArgumentBuilder<AtlasGame, T> argument(String name, ArgumentType<T> type) {

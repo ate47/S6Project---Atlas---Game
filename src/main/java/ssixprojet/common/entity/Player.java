@@ -137,6 +137,14 @@ public class Player extends Entity implements ConnectionClient {
 		return connected;
 	}
 
+	public String getIp() {
+		if (getConnection() == null)
+			return "err";
+		if (getConnection().getChannel() == null)
+			return "err";
+		return String.valueOf(getConnection().getChannel().remoteAddress());
+	}
+
 	@Override
 	public void kick(String msg) {
 		Channel channel = connection.getChannel();

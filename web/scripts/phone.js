@@ -7,8 +7,8 @@ let IMAGE_CONTROLER_RIGHT;
 let IMAGE_DEAD;
 let IMAGE_ROTATE;
 
-let left;
-let right;
+let left = false;
+let right = false;
 
 let handle = false;
 let playerData = {
@@ -37,8 +37,10 @@ log("Pseudo: " + username);
 const packetHandler = new PacketHandler('ws://' + window.location.host + '/game');
 
 packetHandler.openWebSocket(function() {
-	left.set00();
-	right.set00();
+	if (left !== false)
+		left.set00();
+	if (right !== false)
+		right.set00();
 	packetHandler.sendPacket(new PacketC00ConnectPlayer(username));
 });
 
