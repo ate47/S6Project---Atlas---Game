@@ -359,9 +359,52 @@ function draw() {
 
 		stroke(255);
 
-		line(windowWidth / 2, windowHeight / 20, windowWidth / 2, 18 * windowHeight / 20);
+		fill(255);
+		textSize(windowHeight / 15);
+		text("Tableau des scores", windowWidth / 2, windowHeight / 10);
 		
+		textSize(windowHeight / 30);
+		text("Survivants", windowWidth / 4, 2 * windowHeight / 10);
+		text("Infectés", 3 * windowWidth / 4, 2 * windowHeight / 10);
+		line(windowWidth / 2, 3 * windowHeight / 10, windowWidth / 2, 9 * windowHeight / 10);
+
+		stroke(16);
 		
+		textSize(windowHeight / 60);
+		text("#", windowWidth / 16, 7 * windowHeight / 20);
+		text("Nom", 3 * windowWidth / 16, 7 * windowHeight / 20);
+		text("Temps", 5 * windowWidth / 16, 7 * windowHeight / 20);
+		text("Eliminations", 6 * windowWidth / 16, 7 * windowHeight / 20);
+		text("Degats Donnés", 7 * windowWidth / 16, 7 * windowHeight / 20);
+		
+		text("#", 9 * windowWidth / 16, 7 * windowHeight / 20);
+		text("Nom", 11 * windowWidth / 16, 7 * windowHeight / 20);
+		text("Infections", 13 * windowWidth / 16, 7 * windowHeight / 20);
+		text("Morts", 14 * windowWidth / 16, 7 * windowHeight / 20);
+		text("Degats Pris", 15 * windowWidth / 16, 7 * windowHeight / 20);
+		
+		let y, number, p;
+		for (const i in scoresSurvivor) {
+			number = parseInt(i, 10);
+			y = (number + 8) * windowHeight / 20;
+			text((number + 1), windowWidth / 16, y);
+			p = playerMap[scoresSurvivor[i]];
+			text(p.name, 3 * windowWidth / 16, y);
+			text(Math.floor(p.score.timeAlive / 1000) + "s", 5 * windowWidth / 16, y);
+			text(p.score.kills, 6 * windowWidth / 16, y);
+			text(p.score.damageGiven, 7 * windowWidth / 16, y);
+		}
+		for (const i in scoresInfected) {
+			number = parseInt(i, 10);
+			y = (number + 8) * windowHeight / 20;
+			text((number + 1), 9 * windowWidth / 16, y);
+			p = playerMap[scoresInfected[i]];
+			text(p.name, 11 * windowWidth / 16, y);
+
+			text(p.score.infections, 13 * windowWidth / 16, y);
+			text(p.score.death, 14 * windowWidth / 16, y);
+			text(p.score.damageTaken, 15 * windowWidth / 16, y);
+		}
 	}
 }
 
