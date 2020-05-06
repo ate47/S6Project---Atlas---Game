@@ -129,6 +129,8 @@ public class ConnectionManager {
 				} else {
 					System.out.println("[Player] " + plr.getUsername() + " reconnected!");
 					plr.setConnection(this);
+					plr.connect(name);
+					AtlasGame.getAtlas().sendToAllScreens(plr::createPacketSpawn);
 					client = plr;
 					close = PLAYER;
 				}
