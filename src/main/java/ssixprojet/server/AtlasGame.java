@@ -252,6 +252,13 @@ public class AtlasGame {
 
 		synchronized (map) {
 			map.values().stream().filter(Player::isConnected).forEach(p -> p.kick("restarting..."));
+			map.clear();
+		}
+		
+		Map<UUID, Player> mapu = getWebServer().getConnectionManager().getPlayerMap();
+
+		synchronized (mapu) {
+			mapu.clear();
 		}
 	}
 
