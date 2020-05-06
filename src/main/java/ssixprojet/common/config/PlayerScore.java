@@ -13,7 +13,7 @@ public class PlayerScore {
 	public int compareToInfected(PlayerScore score) {
 		// compare infections
 		if (infections != score.infections)
-			return score.infections - infections;
+			return infections - score.infections;
 
 		// compare death
 		return score.death - death;
@@ -22,14 +22,14 @@ public class PlayerScore {
 	public int compareToSurvivor(PlayerScore score) {
 		// compare time alive
 		if (timeAlive != score.timeAlive)
-			return score.timeAlive - timeAlive;
+			return timeAlive - score.timeAlive;
 
 		// compare kills
 		if (kills != score.kills)
-			return score.kills - kills;
+			return kills - score.kills;
 
 		// compare damageGiven
-		return score.damageGiven - damageGiven;
+		return damageGiven - score.damageGiven;
 	}
 
 }
