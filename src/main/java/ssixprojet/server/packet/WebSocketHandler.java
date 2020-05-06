@@ -49,7 +49,6 @@ public class WebSocketHandler extends ChannelInboundHandlerAdapter implements Ch
 				packet.handle(client);
 			} catch (Exception e) {
 				e.printStackTrace();
-				client.kick("Error while handling the packet");
 			}
 		});
 	}
