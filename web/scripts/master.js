@@ -3,6 +3,7 @@ let canvas;
 let handle = false;
 let confirmInfection = false;
 let IMAGE_DEAD;
+let IMAGE_RESTART;
 let IMAGE_BIOHAZARD;
 const packetHandler = new PacketHandler('ws://' + window.location.host + '/game');
 
@@ -55,6 +56,11 @@ class PacketS0DMasterLogged extends ServerPacket {
     	handle = true;
     }
 }
+class PacketC0ARestart extends ClientPacket {
+    constructor() {
+        super(0x0A, 0);
+    }
+}
 
 function inRect(mouseX, mouseY, x, y, w, h) {
 	return mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h;
@@ -75,6 +81,7 @@ function setup() {
 
 	IMAGE_DEAD = loadImage("images/dead.png");
 	IMAGE_BIOHAZARD = loadImage("images/logo_biohazard.png");
+	IMAGE_RESTART = loadImage("images/restart.png");
 	
 	textAlign(CENTER, CENTER);
 	
@@ -152,7 +159,18 @@ function draw() {
 		}
 
 	} else if (phase == GAME_PHASE_SCORE) {
+		let diameter = Math.min(windowHeight, windowWidth) * 2 / 3;
 
+		translate(windowWidth / 2, windowHeight / 2);
+		fill(color(200, 0, 0));
+		circle(0, 0, diameter);
+		
+		image(IMAGE_RESTART, - diameter  / 2, - diameter / 2, diameter, diameter);
+
+		textSize(diameter / 12);
+		
+		fill(0);
+		text('Relancer le jeu', 0, diameter / 2 + diameter / 12);
 		
 	}
 	
@@ -219,6 +237,12 @@ function mousePressed() {
 
 	} else if (phase == GAME_PHASE_SCORE) {
 
+		let dx = mouseX - windowWidth / 2;
+		let dy = mouseY - windowHeight / 2;
+		let d2 = Math.min(windowHeight, windowWidth) / 3;
+		
+		if ((dx * dx + dy * dy) <= d2 * d2)
+			packetHandler.sendPacket(new PacketC0ARestart());
 		
 	}
 	return false;
