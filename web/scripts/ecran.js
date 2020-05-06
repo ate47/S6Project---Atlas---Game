@@ -368,7 +368,7 @@ function draw() {
 
 	} else if (phase == GAME_PHASE_SCORE) {
 
-		fill(color(0xaa, 0x80, 0));
+		fill(color(0, 0, 0x44));
 		rect(0, 0, windowWidth, windowHeight);
 
 		stroke(255);
@@ -400,6 +400,14 @@ function draw() {
 		let y, number, p;
 		for (const i in scoresSurvivor) {
 			number = parseInt(i, 10);
+			if (number == 0) {
+				fill(color(255,255,0));
+			} else if (number == 1)
+				fill(color(255,255,255));
+			else if (number == 2)
+				fill(color(0xff, 0x77, 0x55));
+			else
+				fill(color(155,155,155));
 			y = (number + 8) * windowHeight / 20;
 			text((number + 1), windowWidth / 16, y);
 			p = playerMap[scoresSurvivor[i]];
@@ -410,6 +418,14 @@ function draw() {
 		}
 		for (const i in scoresInfected) {
 			number = parseInt(i, 10);
+			if (number == 0) {
+				fill(color(255,255,0));
+			} else if (number == 1)
+				fill(color(255,255,255));
+			else if (number == 2)
+				fill(color(0xff, 0x77, 0x55));
+			else
+				fill(color(155,155,155));
 			y = (number + 8) * windowHeight / 20;
 			text((number + 1), 9 * windowWidth / 16, y);
 			p = playerMap[scoresInfected[i]];
