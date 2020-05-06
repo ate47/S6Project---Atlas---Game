@@ -2,6 +2,8 @@ let log = console.log;
 let canvas;
 let playerMap = [];
 let shoots = [];
+let scoresSurvivor = [];
+let scoresInfected = [];
 let playerSizeX = 0.005;
 let playerSizeY = 0.005;
 const fps = 24;
@@ -42,6 +44,18 @@ class PlayerData {
 		if (tsn != 0) {
 			let ts = Math.sqrt(tsn);
 			this.rotation = (Math.asin(lookX / ts) < 0 ? -1 : 1) * Math.acos(-lookY / ts);
+		}
+
+		this.score = {
+			id: 0,
+			survivorSortId: 0,
+			infectionSortId: 0,
+			damageGiven: 0,
+			damageTaken: 0,
+			death: 0,
+			infections: 0,
+			kills: 0,
+			timeAlive: 0
 		}
 	}
 }
@@ -149,15 +163,77 @@ class PacketS08Shot extends ServerPacket{
 		shoots.push(new Shoot(this.x1, this.y1, this.x2, this.y2));
 	}
 }
+
+class PacketS10ScoreScreen extends ServerPacket {
+	read(dataview){
+		if (dataview.byteLength < 4)
+			return false;
+		this.maxPlayer = dataview.getInt32(0);
+
+		if (dataview.byteLength < 4/* maxPlayer */ + 
+				this.maxPlayer * 4 * 8 /* id, sortid, scores(6) */)
+			return false;
+		
+		this.infected = [];
+		this.survivor = [];
+
+		let shift = 0;
+		
+		for (let i = 0; i < this.maxPlayer; i++) {
+			this.infected[i] = {
+				id: dataview.getInt32(shift += 4),
+				infectionSortId: dataview.getInt32(shift += 4),
+				damageGiven: dataview.getInt32(shift += 4),
+				damageTaken: dataview.getInt32(shift += 4),
+				death: dataview.getInt32(shift += 4),
+				infections: dataview.getInt32(shift += 4),
+				kills: dataview.getInt32(shift += 4),
+				timeAlive: dataview.getInt32(shift += 4)
+			};
+		}
+		for (let i = 0; i < this.maxPlayer; i++) {
+			this.survivor[i] = {
+				id: dataview.getInt32(shift += 4),
+				survivorSortId: dataview.getInt32(shift += 4),
+				damageGiven: dataview.getInt32(shift += 4),
+				damageTaken: dataview.getInt32(shift += 4),
+				death: dataview.getInt32(shift += 4),
+				infections: dataview.getInt32(shift += 4),
+				kills: dataview.getInt32(shift += 4),
+				timeAlive: dataview.getInt32(shift += 4)
+			};
+		}
+		
+	}
+
+    handle() {
+		scoresSurvivor = [];
+		scoresInfected = [];
+		
+    	let inf, sur;
+		for (let i = 0; i < this.maxPlayer; i++) {
+			inf = this.infected[i];
+			sur = this.survivor[i];
+			playerMap[inf.id].score = inf;
+			playerMap[sur.id].score = sur;
+			scoresSurvivor[i] = inf.id;
+			scoresInfected[i] = sur.id;
+		}
+    }
+}
+
 packetHandler.registerPacketBuilder(0x03, () => new PacketS03PlayerSpawn());
 packetHandler.registerPacketBuilder(0x04, () => new PacketS04PlayerMove());
 packetHandler.registerPacketBuilder(0x05, () => new PacketS05PlayerDead());
 packetHandler.registerPacketBuilder(0x06, () => new PacketS06PlayerType());
 packetHandler.registerPacketBuilder(0x07, () => new PacketS07PlayerSize());
-packetHandler.registerPacketBuilder(0x08, () => new PacketS08Shot ());
+packetHandler.registerPacketBuilder(0x08, () => new PacketS08Shot());
+packetHandler.registerPacketBuilder(0x10, () => new PacketS10ScoreScreen());
 
 packetHandler.openWebSocket(function() {
 	playerMap = [];
+	scoresSurvivor = [];
+	scoresInfected = [];
 	if (isSetup)
 		IMAGE_MAP = loadImage("images/map.png");
 	packetHandler.sendPacket(new PacketC02ConnectScreen());

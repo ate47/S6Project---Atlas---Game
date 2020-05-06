@@ -1,8 +1,12 @@
 package ssixprojet.common;
 
+import java.util.Collection;
+
 import ssixprojet.common.entity.Player;
 import ssixprojet.server.AtlasGame;
 import ssixprojet.server.packet.server.PacketS0ETimeToWaitPing;
+import ssixprojet.server.packet.server.PacketS0FScorePlayer;
+import ssixprojet.server.packet.server.PacketS10ScoreScreen;
 
 public enum GamePhase {
 	WAITING(0) {
@@ -45,7 +49,33 @@ public enum GamePhase {
 	},
 	SCORE(2) {
 		@Override
-		public void onInit() {}
+		public void onInit() {
+			Collection<Player> plr = atlas.getWebServer().getConnectionManager().getPlayerInternalMap().values();
+
+			// set end for every player
+			plr.stream().forEach(p -> p.setEnd());
+
+			// sort the player into their score
+
+			Player[] survivorScore = plr.stream().filter(Player::isConnected).sorted(Player.SCORE_PLAYER_COMPARATOR)
+					.toArray(Player[]::new);
+			Player[] infectedScore = plr.stream().filter(Player::isConnected).sorted(Player.SCORE_INFECTED_COMPARATOR)
+					.toArray(Player[]::new);
+
+			// set sort id for each players
+
+			for (int i = 0; i < infectedScore.length; i++)
+				infectedScore[i].score.infectionSortId = i;
+
+			for (int i = 0; i < survivorScore.length; i++)
+				survivorScore[i].score.survivorSortId = i;
+
+			// send the score for each players
+			plr.stream().filter(Player::isConnected).forEach(p -> p.sendPacket(new PacketS0FScorePlayer(p.score)));
+
+			int maxPlayer = Math.min(Math.min(10, survivorScore.length), survivorScore.length);
+			atlas.sendToAllScreens(() -> new PacketS10ScoreScreen(maxPlayer, infectedScore, survivorScore));
+		}
 
 		@Override
 		public void tick() {}

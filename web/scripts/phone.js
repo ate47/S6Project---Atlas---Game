@@ -15,7 +15,15 @@ let handle = false;
 let playerData = {
 	health: 100,
 	ammos: 0,
-	type: PLAYER_TYPE_SURVIVOR
+	type: PLAYER_TYPE_SURVIVOR,
+	survivorSortId : 0,
+	infectionSortId : 0,
+	damageGiven : 0,
+	damageTaken : 0,
+	death : 0,
+	infections : 0,
+	kills : 0,
+	timeAlive : 0
 };
 
 function checkSize(w,h) {
@@ -223,11 +231,38 @@ class PacketS0AChangeAmmos extends ServerPacket {
     	playerData.ammos = this.ammos;
     }
 }
+class PacketS0FScorePlayer extends ServerPacket {
+	read(dataview){
+		if (dataview.byteLength < 8 * 4)
+			return false;
+		this.survivorSortId = dataview.getInt32(0);
+		this.infectionSortId = dataview.getInt32(4);
+		this.damageGiven = dataview.getInt32(8);
+		this.damageTaken = dataview.getInt32(12);
+		this.death = dataview.getInt32(16);
+		this.infections = dataview.getInt32(20);
+		this.kills = dataview.getInt32(24);
+		this.timeAlive = dataview.getInt32(28);
+		
+	}
+
+    handle() {
+    	playerData.survivorSortId = this.survivorSortId;
+    	playerData.infectionSortId = this.infectionSortId;
+    	playerData.damageGiven = this.damageGiven;
+    	playerData.damageTaken = this.damageTaken;
+    	playerData.death = this.death;
+    	playerData.infections = this.infections;
+    	playerData.kills = this.kills;
+    	playerData.timeAlive = this.timeAlive;
+    }
+}
 
 packetHandler.registerPacketBuilder(0x02, () => new PacketS02PlayerRegister());
 packetHandler.registerPacketBuilder(0x06, () => new PacketS06PlayerType());
 packetHandler.registerPacketBuilder(0x09, () => new PacketS09ChangeHealth());
 packetHandler.registerPacketBuilder(0x0A, () => new PacketS0AChangeAmmos());
+packetHandler.registerPacketBuilder(0x0F, () => new PacketS0FScorePlayer());
 
 function setup() {
 	log("Create canvas("+windowWidth+", "+windowHeight+")");

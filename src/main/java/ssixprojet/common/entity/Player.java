@@ -1,5 +1,6 @@
 package ssixprojet.common.entity;
 
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,6 +26,18 @@ import ssixprojet.server.packet.server.PacketS0AChangeAmmos;
 import ssixprojet.utils.Vector;
 
 public class Player extends Entity implements ConnectionClient {
+	public static final Comparator<Player> SCORE_INFECTED_COMPARATOR = new Comparator<Player>() {
+		@Override
+		public int compare(Player p1, Player p2) {
+			return p1.score.compareToInfected(p2.score);
+		}
+	};
+	public static final Comparator<Player> SCORE_PLAYER_COMPARATOR = new Comparator<Player>() {
+		@Override
+		public int compare(Player p1, Player p2) {
+			return p1.score.compareToSurvivor(p2.score);
+		}
+	};
 	public static final int START_AMMOS = AtlasGame.getConfig().getStartAmmo();
 	public static final long TIME_BEFORE_RESHOOT = AtlasGame.getConfig().getMillisBeforeReshooting();
 	public static final int AMMO_POWER = AtlasGame.getConfig().getAmmoPower();
@@ -38,7 +51,7 @@ public class Player extends Entity implements ConnectionClient {
 	private Connection connection;
 	private int keepAliveCount = MAX_KEEP_ALIVE;
 	private double lookX = 1, lookY;
-	private int health = 100, ammos;
+	private int health = 100, ammos = START_AMMOS;
 	private long lastTimeShooted = 0L;
 	public final PlayerScore score = new PlayerScore();
 
@@ -62,9 +75,9 @@ public class Player extends Entity implements ConnectionClient {
 	public void connect(String name) {
 		connected = true;
 		this.username = name;
-		setHealth(100);
-		setAmmos(START_AMMOS);
-		setType(PlayerType.SURVIVOR);
+		setHealth(health);
+		setAmmos(ammos);
+		setType(type);
 	}
 
 	public PacketS03PlayerSpawn createPacketSpawn() {
@@ -196,6 +209,8 @@ public class Player extends Entity implements ConnectionClient {
 	}
 
 	public void setType(PlayerType type) {
+		if (this.type != type && type == PlayerType.INFECTED)
+			score.timeAlive = (int) (System.currentTimeMillis() - AtlasGame.getAtlas().getGameStartTime());
 		this.type = type;
 		// update phone type
 		sendPacket(new PacketS06PlayerType(type.getId(), 0));
@@ -225,7 +240,7 @@ public class Player extends Entity implements ConnectionClient {
 		Entity cible = null;
 
 		for (Entity e : this.getWorld().getEntities()) {
-			if (e == this || (e instanceof Player && ((Player) e).type == type))
+			if (e == this || (e instanceof Player && ((Player) e).type == type || !((Player) e).isConnected()))
 				continue;
 
 			// opti : 2 bord a calcule
@@ -341,7 +356,8 @@ public class Player extends Entity implements ConnectionClient {
 
 			if (w != null) {
 				int touches = w.getEntities().stream().filter(e -> e instanceof Player).map(e -> (Player) e)
-						.filter(p -> p.type == PlayerType.SURVIVOR && p.collide(this)).mapToInt(p -> {
+						.filter(p -> p.isConnected() && p.type == PlayerType.SURVIVOR && p.collide(this))
+						.mapToInt(p -> {
 							p.infect();
 							return 1;
 						}).sum();
@@ -354,5 +370,10 @@ public class Player extends Entity implements ConnectionClient {
 		}
 
 		AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS04PlayerMove(id, getX(), getY(), lookX, lookY));
+	}
+
+	public void setEnd() {
+		if (this.type == PlayerType.SURVIVOR)
+			score.timeAlive = (int) (AtlasGame.getAtlas().getGameEndTime() - AtlasGame.getAtlas().getGameStartTime());
 	}
 }

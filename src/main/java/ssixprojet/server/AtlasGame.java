@@ -64,6 +64,8 @@ public class AtlasGame {
 	private double height;
 
 	private GamePhase phase;
+	
+	private long gameStartTime, gameEndTime;
 
 	public AtlasGame() {
 		atlas = this;
@@ -123,12 +125,20 @@ public class AtlasGame {
 		return commandManager;
 	}
 
+	public long getGameEndTime() {
+		return gameEndTime;
+	}
+
 	public GameMap getGameMap() {
 		return gameMap;
 	}
 
 	public GameServer getGameServer() {
 		return gameServer;
+	}
+
+	public long getGameStartTime() {
+		return gameStartTime;
 	}
 
 	public double getHeight() {
@@ -170,7 +180,7 @@ public class AtlasGame {
 	public WebServer getWebServer() {
 		return webServer;
 	}
-
+	
 	/**
 	 * infect a certain percentage of players, this method guaranty at least 1
 	 * infected
@@ -212,12 +222,12 @@ public class AtlasGame {
 
 		Map<UUID, Player> map = getWebServer().getConnectionManager().getPlayerMap();
 		synchronized (map) {
-			map.values().stream().map(Player::createPacketSpawn).forEach(screen::sendPacket);
+			map.values().stream().filter(Player::isConnected).map(Player::createPacketSpawn).forEach(screen::sendPacket);
 		}
 
 		screen.sendPacket(new PacketS07PlayerSize(playerSizeX, playerSizeY));
 	}
-	
+
 	public void restart() {
 		Map<Integer, Player> map = getWebServer().getConnectionManager().getPlayerInternalMap();
 
@@ -251,18 +261,25 @@ public class AtlasGame {
 			players.values().stream().filter(Player::isConnected).forEach(p -> p.sendPacket(packetSupplier.get()));
 		}
 	}
-
+	
 	public void sendToAllScreens(Supplier<PacketServer> packetSupplier) {
 		synchronized (screens) {
 			screens.forEach((id, screen) -> screen.sendPacket(packetSupplier.get()));
 		}
 	}
-
+	
 	public void setPhase(GamePhase phase) {
-		this.phase = phase;
-		phase.onInit();
 		if (this.phase == phase)
+			return;
+		this.phase = phase;
+		if (this.phase == GamePhase.SCORE)
+			gameEndTime = System.currentTimeMillis();
+		phase.onInit();
+		if (this.phase == phase) {
+			if (this.phase == GamePhase.PLAYING)
+				gameStartTime = System.currentTimeMillis();
 			sendToAll(() -> new PacketS0BSetGamePhase(phase));
+		}
 	}
 
 	/**
