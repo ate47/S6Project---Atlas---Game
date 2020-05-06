@@ -25,6 +25,7 @@ import ssixprojet.server.packet.server.PacketS0AChangeAmmos;
 import ssixprojet.utils.Vector;
 
 public class Player extends Entity implements ConnectionClient {
+	public static final int START_AMMOS = AtlasGame.getConfig().getStartAmmo();
 	public static final long TIME_BEFORE_RESHOOT = AtlasGame.getConfig().getMillisBeforeReshooting();
 	public static final int AMMO_POWER = AtlasGame.getConfig().getAmmoPower();
 	public static final int MAX_KEEP_ALIVE = 20;
@@ -62,7 +63,7 @@ public class Player extends Entity implements ConnectionClient {
 		connected = true;
 		this.username = name;
 		setHealth(100);
-		setAmmos(AtlasGame.getConfig().getStartAmmo());
+		setAmmos(START_AMMOS);
 		setType(PlayerType.SURVIVOR);
 	}
 
@@ -280,22 +281,26 @@ public class Player extends Entity implements ConnectionClient {
 		if (cible != null) {
 			final double xf = xi;
 			final double yf = yi;
-			cible.shot(this);
+			if (cible.shot(this)) {
+				setAmmos(Math.min(getAmmos() + (100 / AMMO_POWER) + 3, START_AMMOS));
+			}
 			AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS08Shot(ox, oy, xf, yf));
 		}
 
 	}
 
 	@Override
-	public void shot(Player p) {
+	public boolean shot(Player p) {
 		score.damageTaken += AMMO_POWER;
 		p.score.damageGiven += AMMO_POWER;
 		if (getHealth() - AMMO_POWER <= 0) {
 			score.death++;
 			p.score.kills++;
 			infect();
+			return true;
 		} else
 			setHealth(getHealth() - AMMO_POWER);
+		return false;
 	}
 
 	@Override

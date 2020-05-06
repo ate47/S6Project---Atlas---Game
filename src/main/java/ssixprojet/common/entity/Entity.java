@@ -55,7 +55,7 @@ public class Entity {
 		getWorld().killEntity(this);
 		this.exist = false;
 	}
-	
+
 	/**
 	 * move the entity
 	 * 
@@ -82,12 +82,9 @@ public class Entity {
 	}
 
 	public boolean collide(Entity e) {
-		return x < e.getX() + e.width &&
-				x + width > e.getX() &&
-				   y < e.getY() + e.height &&
-				   y + height > e.getY();
+		return x < e.getX() + e.width && x + width > e.getX() && y < e.getY() + e.height && y + height > e.getY();
 	}
-	
+
 	/**
 	 * respawn this entity in the same world, does nothing if the entity isn't in a
 	 * world
@@ -132,9 +129,15 @@ public class Entity {
 		this.exist = true;
 	}
 
-	public void shot(Player p) {
+	/**
+	 * @param p
+	 *            the shooter
+	 * @return if the shot killed
+	 */
+	public boolean shot(Player p) {
+		return false;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Entity [exist=" + exist + ", x=" + x + ", y=" + y + ", width=" + width + ", height=" + height
