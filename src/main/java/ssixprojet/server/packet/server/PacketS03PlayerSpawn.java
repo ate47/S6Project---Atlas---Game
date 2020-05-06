@@ -9,7 +9,7 @@ public class PacketS03PlayerSpawn extends PacketServer {
 	private byte[] preparedName;
 
 	public PacketS03PlayerSpawn(int id, double x, double y, double lookX, double lookY, int type, String name) {
-		super(0x03, 8 * 4 + 4);
+		super(0x03, 8 * 4 + 4 * 2);
 
 		this.id = id;
 		this.x = x;
