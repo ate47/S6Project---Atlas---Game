@@ -335,11 +335,16 @@ public class Player extends Entity implements ConnectionClient {
 			World w = getWorld();
 
 			if (w != null) {
-				score.infections += w.getEntities().stream().filter(e -> e instanceof Player).map(e -> (Player) e)
+				int touches = w.getEntities().stream().filter(e -> e instanceof Player).map(e -> (Player) e)
 						.filter(p -> p.type == PlayerType.SURVIVOR && p.collide(this)).mapToInt(p -> {
 							p.infect();
 							return 1;
 						}).sum();
+				if (touches != 0) {
+					if (getHealth() < 75)
+						setHealth(75);
+					score.infections += touches;
+				}
 			}
 		}
 
