@@ -24,8 +24,10 @@ import ssixprojet.server.command.CommandManager;
 import ssixprojet.server.packet.PacketServer;
 import ssixprojet.server.packet.server.PacketS07PlayerSize;
 import ssixprojet.server.packet.server.PacketS0BSetGamePhase;
+import ssixprojet.server.packet.server.PacketS10ScoreScreen;
 
 public class AtlasGame {
+	private static final Player[] EMPTY_ARRAY = new Player[0];
 	private static final Random RANDOM = new Random();
 	private static ConfigManager configManager = new ConfigManager(new File(new File("config"), "server.json"));
 
@@ -43,8 +45,10 @@ public class AtlasGame {
 		return configManager;
 	}
 
+	private Player[] infectedScore = EMPTY_ARRAY, survivorScore = EMPTY_ARRAY;
+
 	private UUID serverUUID = UUID.randomUUID();
-	
+
 	private GameMap gameMap;
 
 	private WebServer webServer;
@@ -64,7 +68,7 @@ public class AtlasGame {
 	private double height;
 
 	private GamePhase phase;
-	
+
 	private long gameStartTime, gameEndTime;
 
 	public AtlasGame() {
@@ -115,6 +119,14 @@ public class AtlasGame {
 				System.err.println("Can't add the spawn location : " + location);
 
 		setPhase(GamePhase.WAITING);
+	}
+
+	public PacketS10ScoreScreen createScorePacket() {
+		return createScorePacket0(Math.min(Math.min(10, survivorScore.length), survivorScore.length));
+	}
+
+	private PacketS10ScoreScreen createScorePacket0(int maxPlayer) {
+		return new PacketS10ScoreScreen(maxPlayer, infectedScore, survivorScore);
 	}
 
 	public CommandHandler getCommandHandler() {
@@ -180,7 +192,7 @@ public class AtlasGame {
 	public WebServer getWebServer() {
 		return webServer;
 	}
-	
+
 	/**
 	 * infect a certain percentage of players, this method guaranty at least 1
 	 * infected
@@ -222,10 +234,12 @@ public class AtlasGame {
 
 		Map<UUID, Player> map = getWebServer().getConnectionManager().getPlayerMap();
 		synchronized (map) {
-			map.values().stream().filter(Player::isConnected).map(Player::createPacketSpawn).forEach(screen::sendPacket);
+			map.values().stream().filter(Player::isConnected).map(Player::createPacketSpawn)
+					.forEach(screen::sendPacket);
 		}
 
 		screen.sendPacket(new PacketS07PlayerSize(playerSizeX, playerSizeY));
+		screen.sendPacket(createScorePacket());
 	}
 
 	public void restart() {
@@ -233,11 +247,17 @@ public class AtlasGame {
 
 		setPhase(GamePhase.WAITING);
 
+		infectedScore = survivorScore = EMPTY_ARRAY;
 		serverUUID = UUID.randomUUID();
-		
+
 		synchronized (map) {
 			map.values().stream().filter(Player::isConnected).forEach(p -> p.kick("restarting..."));
 		}
+	}
+
+	public void sendScoreScreenPacket() {
+		int maxPlayer = Math.min(Math.min(10, survivorScore.length), survivorScore.length);
+		sendToAllScreens(() -> createScorePacket0(maxPlayer));
 	}
 
 	public void sendToAll(Supplier<PacketServer> packetSupplier) {
@@ -261,13 +281,13 @@ public class AtlasGame {
 			players.values().stream().filter(Player::isConnected).forEach(p -> p.sendPacket(packetSupplier.get()));
 		}
 	}
-	
+
 	public void sendToAllScreens(Supplier<PacketServer> packetSupplier) {
 		synchronized (screens) {
 			screens.forEach((id, screen) -> screen.sendPacket(packetSupplier.get()));
 		}
 	}
-	
+
 	public void setPhase(GamePhase phase) {
 		if (this.phase == phase)
 			return;
@@ -280,6 +300,11 @@ public class AtlasGame {
 				gameStartTime = System.currentTimeMillis();
 			sendToAll(() -> new PacketS0BSetGamePhase(phase));
 		}
+	}
+
+	public void setScore(Player[] infectedScore, Player[] survivorScore) {
+		this.infectedScore = infectedScore;
+		this.survivorScore = survivorScore;
 	}
 
 	/**

@@ -356,6 +356,10 @@ function draw() {
 
 		fill(color(0xaa, 0x80, 0));
 		rect(0, 0, windowWidth, windowHeight);
+
+		stroke(255);
+
+		line(windowWidth / 2, windowHeight / 20, windowWidth / 2, 18 * windowHeight / 20);
 		
 		
 	}

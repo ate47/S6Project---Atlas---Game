@@ -6,7 +6,6 @@ import ssixprojet.common.entity.Player;
 import ssixprojet.server.AtlasGame;
 import ssixprojet.server.packet.server.PacketS0ETimeToWaitPing;
 import ssixprojet.server.packet.server.PacketS0FScorePlayer;
-import ssixprojet.server.packet.server.PacketS10ScoreScreen;
 
 public enum GamePhase {
 	WAITING(0) {
@@ -73,8 +72,8 @@ public enum GamePhase {
 			// send the score for each players
 			plr.stream().filter(Player::isConnected).forEach(p -> p.sendPacket(new PacketS0FScorePlayer(p.score)));
 
-			int maxPlayer = Math.min(Math.min(10, survivorScore.length), survivorScore.length);
-			atlas.sendToAllScreens(() -> new PacketS10ScoreScreen(maxPlayer, infectedScore, survivorScore));
+			atlas.setScore(infectedScore, survivorScore);
+			atlas.sendScoreScreenPacket();
 		}
 
 		@Override

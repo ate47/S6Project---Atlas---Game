@@ -81,7 +81,7 @@ public class ConnectionManager {
 				Screen screen = new Screen(this);
 
 				AtlasGame.getAtlas().registerScreen(screen);
-
+				
 				client = screen;
 				close = SCREEN;
 				sendConnectionsPacket();
