@@ -266,6 +266,20 @@ function tick() {
 	});
 }
 
+function beautifulMillis(time) {
+	let s = Math.floor(time / 1000);
+	let min = Math.floor(s / 60);
+	if (min != 0) {
+		let h = Math.floor(min / 60);
+		if (min != 0)
+			return h + "h " + (min % 60) + "min " + (s % 60) + "s";
+		
+		return min + "min " + (s % 60) + "s";
+	}
+	
+	return s + "s";
+}
+
 function draw() {
 	if (!packetHandler.open) {
 		background(200);
@@ -390,7 +404,7 @@ function draw() {
 			text((number + 1), windowWidth / 16, y);
 			p = playerMap[scoresSurvivor[i]];
 			text(p.name, 3 * windowWidth / 16, y);
-			text(Math.floor(p.score.timeAlive / 1000) + "s", 5 * windowWidth / 16, y);
+			text(beautifulMillis(p.score.timeAlive), 5 * windowWidth / 16, y);
 			text(p.score.kills, 6 * windowWidth / 16, y);
 			text(p.score.damageGiven, 7 * windowWidth / 16, y);
 		}
