@@ -25,7 +25,8 @@ function checkSize(w,h) {
 const username = function() {
     let search = window.location.search;
 	if (search.startsWith("?username=")) {
-		return search.substr("?username=".length);
+		let name = decodeURIComponent(search.substr("?username=".length).replace(/\+/g, ' '));
+		return name.length > 15 ? false : name;
 	} else {
 		window.location.pathname="/index.html";
 		return false;

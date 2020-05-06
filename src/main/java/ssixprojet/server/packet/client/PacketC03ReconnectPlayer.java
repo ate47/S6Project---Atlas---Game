@@ -13,7 +13,7 @@ public class PacketC03ReconnectPlayer extends PacketClient {
 		if (uuid == null)
 			return null;
 		String name = PacketManager.readUTF8String(buf);
-		return name == null ? null : new PacketC03ReconnectPlayer(uuid, name);
+		return name == null || name.length() > 15 ? null : new PacketC03ReconnectPlayer(uuid, name);
 	}
 
 	private UUID uuid;

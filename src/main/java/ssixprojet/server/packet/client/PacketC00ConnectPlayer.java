@@ -8,7 +8,7 @@ import ssixprojet.server.packet.PacketManager;
 public class PacketC00ConnectPlayer extends PacketClient {
 	public static PacketC00ConnectPlayer create(ByteBuf buf) {
 		String name = PacketManager.readUTF8String(buf);
-		return name == null ? null : new PacketC00ConnectPlayer(name);
+		return name == null || name.length() > 15 ? null : new PacketC00ConnectPlayer(name);
 	}
 
 	private String name;
