@@ -6,6 +6,7 @@ let IMAGE_CONTROLER_LEFT;
 let IMAGE_CONTROLER_RIGHT;
 let IMAGE_DEAD;
 let IMAGE_ROTATE;
+let IMAGE_TUTO;
 let playerUUID = false;
 
 let left = false;
@@ -271,6 +272,7 @@ function setup() {
 	IMAGE_CONTROLER_RIGHT = loadImage("images/controler_weapon.png");
 	IMAGE_DEAD = loadImage("images/dead.png");
 	IMAGE_ROTATE = loadImage("images/rotate.png");
+	IMAGE_TUTO = loadImage("images/tuto.png");
 
 	left = new PressPoint(windowWidth / 6, windowHeight * 3 / 5, -1, windowWidth / 8, IMAGE_CONTROLER_LEFT);
 	right = new PressPoint(windowWidth * 5 / 6, windowHeight * 3 / 5, -1, windowWidth / 6, IMAGE_CONTROLER_RIGHT);
@@ -329,6 +331,8 @@ function draw() {
 	}
 
 	if (phase == GAME_PHASE_WAITING) {
+		image(IMAGE_TUTO, 0,0, windowWidth, windowHeight);
+		/*
 		fill(color(0x3A, 0x46, 0));
 		rect(0, 0, windowWidth, windowHeight);
 
@@ -336,6 +340,7 @@ function draw() {
 		translate(windowWidth / 2, windowHeight / 2);
 		textSize(windowHeight / 12);
 		text('En attente du lancement...', 0, 0);
+		*/
 	} else if (phase == GAME_PHASE_PLAYING) {
 		textSize(windowHeight / 10);
 		noStroke();

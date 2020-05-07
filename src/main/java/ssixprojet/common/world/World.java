@@ -192,6 +192,7 @@ public class World {
 		if (e.getWorld() == this && !e.isExist())
 			entities.add(e);
 		// TODO set entity on chunks
+		// bcp de todo
 		// TODO send spawn packet to screen
 	}
 
