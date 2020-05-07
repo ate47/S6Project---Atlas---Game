@@ -1,7 +1,7 @@
 const textDecoder = new TextDecoder();
 const textEncoder = new TextEncoder();
 
-const DEBUG = true;
+const DEBUG = false;
 
 const PLAYER_TYPE_INFECTED = 0;
 const PLAYER_TYPE_SURVIVOR = 1;

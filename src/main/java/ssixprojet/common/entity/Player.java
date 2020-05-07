@@ -242,7 +242,7 @@ public class Player extends Entity implements ConnectionClient {
 		Entity cible = null;
 
 		for (Entity e : this.getWorld().getEntities()) {
-			if (e == this || (e instanceof Player && ((Player) e).type == type || !((Player) e).isConnected()))
+			if (e == this || (e instanceof Player && (((Player) e).type == type || !((Player) e).isConnected())))
 				continue;
 
 			// opti : 2 bord a calcule

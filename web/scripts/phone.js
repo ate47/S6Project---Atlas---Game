@@ -344,8 +344,8 @@ function draw() {
 		fill(255);
 		translate(windowWidth / 2, windowHeight / 2);
 		textSize(windowHeight / 12);
-		text('En attente du lancement...', 0, 0);
-		*/
+		text('En attente du lancement...', 0, 0);*/
+		
 	} else if (phase == GAME_PHASE_PLAYING) {
 		textSize(windowHeight / 10);
 		noStroke();
