@@ -351,7 +351,7 @@ function draw() {
 		let sizeX = playerSizeX * windowWidth;
 		let sizeY = playerSizeY * windowHeight;
 		
-		playerMap.forEach(function (player) {
+		playerMap.forEach(function (player, id) {
 			let realX = player.x * windowWidth;
 			let realY = player.y * windowHeight;
 	
@@ -361,8 +361,13 @@ function draw() {
 			
 			rotate(player.rotation);
 			image(img, - sizeX / 2, - sizeY / 2, sizeX, sizeY);
+			
 			rotate(-player.rotation);
 	
+			textSize(sizeX / 2);
+			fill(0);
+			text(id, 0, - sizeY / 2 - sizeX / 4);
+			
 			translate(-realX - sizeX / 2, -realY - sizeY / 2);
 		});
 
