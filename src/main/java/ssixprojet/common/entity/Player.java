@@ -148,7 +148,7 @@ public class Player extends Entity implements ConnectionClient {
 	}
 
 	public boolean isConnected() {
-		return connected;
+		return connected && connection != null;
 	}
 
 	public String getIp() {
@@ -166,6 +166,8 @@ public class Player extends Entity implements ConnectionClient {
 		CloseWebSocketFrame frame = new CloseWebSocketFrame(1000, msg);
 		channel.writeAndFlush(frame);
 		channel.close();
+		connection = null;
+		connected = false;
 	}
 
 	@Override
