@@ -70,7 +70,7 @@ public class ConnectionManager {
 				close = PLAYER;
 				sendConnectionsPacket();
 				// send the uuid for reconnection
-				plr.sendPacket(new PacketS02PlayerRegister(plr.getInternalId()));
+				plr.sendPacket(new PacketS02PlayerRegister(plr.getInternalId(), plr.getId()));
 				System.out.println("[Player] " + name + " connected!");
 			}
 		}

@@ -24,7 +24,8 @@ let playerData = {
 	death : 0,
 	infections : 0,
 	kills : 0,
-	timeAlive : 0
+	timeAlive : 0,
+	id: 0
 };
 
 function checkSize(w,h) {
@@ -191,10 +192,14 @@ class PacketS02PlayerRegister extends ServerPacket {
 		this.uuid = this.getUUID(dataview, 0);
 		if (this.uuid === false)
 			return false;
+		if (dataview.byteLength < 20)
+			return false;
+		this.id = dataview.getInt32(16);
 	}
 
     handle() {
     	playerUUID = this.uuid;
+    	playerData.id = this.id;
     	log(this.uuid);
     }
 }
@@ -395,6 +400,8 @@ function draw() {
 	
 		left.draw();
 		right.draw();
+		textSize(windowWidth / 5);
+		text(playerData.id, windowWidth / 2, windowHeight * 3 / 5);
 
 	} else if (phase == GAME_PHASE_SCORE) {
 
@@ -413,6 +420,7 @@ function draw() {
 		
 	}
 }
+
 
 function touchStarted(ev) {
 	if (phase != GAME_PHASE_PLAYING)
