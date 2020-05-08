@@ -23,9 +23,11 @@ public class World {
 		double unit, x = 0, y = 0;
 		unit = 1. / split;
 		int i, j;
-		for (i = 0; i < split; i++, y += unit)
+		for (i = 0; i < split; i++, y += unit) {
+			x = 0;
 			for (j = 0; j < split; j++, x += unit)
 				setChunk(i, j, new Chunk(unit, x, y));
+		}
 
 		Chunk c;
 		for (i = 0; i < split - 1; i++)
@@ -82,6 +84,12 @@ public class World {
 					sBottom = y + height;
 				
 				Spawn newSpawn = new Spawn(sLeft, sTop, sRight - sLeft, sBottom - sTop, outside);
+				 
+				if (newSpawn.getWidth() > 1 || newSpawn.getHeight() > 1) {
+					System.out.println(newSpawn);
+					throw new Error();
+				}
+					
 				
 				c.getSpawns().add(newSpawn);
 				spawns.add(newSpawn);
