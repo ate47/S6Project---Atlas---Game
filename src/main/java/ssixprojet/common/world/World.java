@@ -192,7 +192,6 @@ public class World {
 		if (e.getWorld() == this && !e.isExist())
 			entities.add(e);
 		// TODO set entity on chunks
-		// bcp de todo
 		// TODO send spawn packet to screen
 	}
 
@@ -205,10 +204,17 @@ public class World {
 	 */
 	public void spawnEntityAtRandomLocation(Entity e) {
 		// get a random spawn on the chunk with the minimum player count
+		
 		Spawn s = Arrays.stream(chunks).filter(c -> !c.getSpawns().isEmpty())
 				.collect(Collectors.minBy((c1, c2) -> c1.getPlayerCount() - c2.getPlayerCount())).get()
 				.getRandomSpawn();
-		e.spawn(this, s.getRandomX(), s.getRandomY());
+		
+		double x = s.getRandomX(), 
+				y = s.getRandomY();
+		
+		if(x > 1 || y > 1)
+			System.out.println(s);
+		e.spawn(this, x, y);
 	}
 
 	/**
