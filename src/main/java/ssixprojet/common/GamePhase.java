@@ -19,6 +19,7 @@ public enum GamePhase {
 		long infection;
 		long ping;
 		boolean infected;
+		long fin;
 
 		@Override
 		public void onInit() {
@@ -38,11 +39,17 @@ public enum GamePhase {
 					infected = true;
 					atlas.randomInfection(AtlasGame.getConfig().getInitialInfectionPercentage());
 					atlas.sendToAll(() -> new PacketS0ETimeToWaitPing(0));
+					fin = System.currentTimeMillis() + AtlasGame.getConfig().getTimeInTickBeforeEnd() * 1000 / 20;
 				} else if (ping < t) {
 					int ttw = (int) ((infection - ping) / 1000);
 					atlas.sendToAll(() -> new PacketS0ETimeToWaitPing(ttw));
 					ping = t + 800L; // to avoid to wait more than 1s
 				}
+			}
+			if(infected) {
+				long t = System.currentTimeMillis();
+				if(fin < t)
+					atlas.setPhase(SCORE);
 			}
 		}
 	},
