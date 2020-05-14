@@ -46,6 +46,7 @@ public enum GamePhase {
 					ping = t + 800L; // to avoid to wait more than 1s
 				}
 			}
+			
 			if(infected) {
 				long t = System.currentTimeMillis();
 				if(fin < t)
