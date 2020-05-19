@@ -51,6 +51,11 @@ public enum GamePhase {
 				long t = System.currentTimeMillis();
 				if(fin < t)
 					atlas.setPhase(SCORE);
+				else if(ping < t){
+					int ttw = (int) ((fin - ping) / 1000);
+					atlas.sendToAllScreens(() -> new PacketS0ETimeToWaitPing(-ttw));
+					ping = t + 800L;
+				}
 			}
 		}
 	},
