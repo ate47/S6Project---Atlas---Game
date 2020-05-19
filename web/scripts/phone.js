@@ -310,6 +310,20 @@ function tick() {
 	}
 }
 
+function beautifulMillis(time) {
+	let s = Math.floor(time / 1000);
+	let min = Math.floor(s / 60);
+	if (min != 0) {
+		let h = Math.floor(min / 60);
+		if (min != 0)
+			return h + "h " + (min % 60) + "min " + (s % 60) + "s";
+		
+		return min + "min " + (s % 60) + "s";
+	}
+	
+	return s + "s";
+}
+
 function draw() {
 	if (!packetHandler.open) {
 		background(200);
@@ -418,6 +432,17 @@ function draw() {
 		rect(0, 0, windowWidth, windowHeight);
 		
 		
+		p = playerData;
+		
+		text("SCORE", 11 * windowWidth / 16, y);
+		line(windowWidth / 2, 3 * windowHeight / 10, windowWidth / 2, 9 * windowHeight / 10);
+		text(beautifulMillis(p.timeAlive), 5 * windowWidth / 16, y);
+		text(p.kills, 6 * windowWidth / 16, y);
+		text(p.damageGiven, 7 * windowWidth / 16, y);
+		
+		text(p.infections, 13 * windowWidth / 16, y);
+		text(p.death, 14 * windowWidth / 16, y);
+		text(p.damageTaken, 15 * windowWidth / 16, y);
 	}
 }
 
