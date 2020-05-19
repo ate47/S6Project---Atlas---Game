@@ -430,19 +430,27 @@ function draw() {
 			break;
 		}
 		rect(0, 0, windowWidth, windowHeight);
+		fill(255);
 		
+		textSize(windowWidth / 40);
+		text("SCORE", windowWidth / 2, 2 * windowHeight / 10);
+		line(windowWidth / 2, 3.5 * windowHeight / 10, windowWidth / 2, 9 * windowHeight / 10);
 		
-		p = playerData;
+		text("Temps", 1.2 * windowWidth / 16, 7 * windowHeight / 20);
+		text("Elimination", 3 * windowWidth / 16, 7 * windowHeight / 20);
+		text("Degats Donnés", 6 * windowWidth / 16, 7 * windowHeight / 20);
 		
-		text("SCORE", 11 * windowWidth / 16, y);
-		line(windowWidth / 2, 3 * windowHeight / 10, windowWidth / 2, 9 * windowHeight / 10);
-		text(beautifulMillis(p.timeAlive), 5 * windowWidth / 16, y);
-		text(p.kills, 6 * windowWidth / 16, y);
-		text(p.damageGiven, 7 * windowWidth / 16, y);
+		text("Infections", 9 * windowWidth / 16, 7 * windowHeight / 20);
+		text("Morts", 11 * windowWidth / 16, 7 * windowHeight / 20);
+		text("Degats Pris", 13 * windowWidth / 16, 7 * windowHeight / 20);
 		
-		text(p.infections, 13 * windowWidth / 16, y);
-		text(p.death, 14 * windowWidth / 16, y);
-		text(p.damageTaken, 15 * windowWidth / 16, y);
+		text(beautifulMillis(playerData.timeAlive),  1.2 * windowWidth / 16, windowHeight * 3 / 5);
+		text(playerData.kills, 3 * windowWidth / 16,  windowHeight * 3 / 5);
+		text(playerData.damageGiven, 6 * windowWidth / 16,  windowHeight * 3 / 5);
+		
+		text(playerData.infections, 9 * windowWidth / 16, windowHeight * 3 / 5);
+		text(playerData.death, 11 * windowWidth / 16, windowHeight * 3 / 5);
+		text(playerData.damageTaken, 13 * windowWidth / 16, windowHeight * 3 / 5);
 	}
 }
 
