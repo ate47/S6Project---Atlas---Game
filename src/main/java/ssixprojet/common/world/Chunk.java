@@ -92,9 +92,12 @@ public class Chunk {
 		return y;
 	}
 
+	public boolean isIn(double ex, double ey, double w, double h) {
+		return x < ex + w && x + unit > ex && y < ey + h && y + unit > ey;
+	}
+
 	public boolean isIn(Entity e) {
-		return x < e.getX() + e.getWidth() && x + unit > e.getX() && y < e.getY() + e.getHeight()
-				&& y + unit > e.getY();
+		return isIn(e.getX(), e.getY(), e.getWidth(), e.getHeight());
 	}
 
 	public void removeEntity(Entity e) {
