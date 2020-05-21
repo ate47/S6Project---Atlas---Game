@@ -26,6 +26,10 @@ public class Entity {
 		return x < e.getX() + e.width && x + width > e.getX() && y < e.getY() + e.height && y + height > e.getY();
 	}
 
+	public Chunk[][] getArea() {
+		return area;
+	}
+
 	public int getEntityId() {
 		return id;
 	}
@@ -54,6 +58,11 @@ public class Entity {
 		return y;
 	}
 
+	private int higherValue(double d) {
+		int id = (int) d;
+		return id < d ? id + 1 : id;
+	}
+
 	public boolean isExist() {
 		return exist;
 	}
@@ -69,7 +78,7 @@ public class Entity {
 		getWorld().killEntity(this);
 		this.exist = false;
 	}
-
+	
 	/**
 	 * move the entity
 	 * 
@@ -148,11 +157,6 @@ public class Entity {
 	 */
 	public boolean shot(Player p) {
 		return false;
-	}
-
-	private int higherValue(double d) {
-		int id = (int) d;
-		return id < d ? id + 1 : id;
 	}
 
 	/**

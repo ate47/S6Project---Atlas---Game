@@ -11,6 +11,7 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import ssixprojet.common.config.PlayerScore;
+import ssixprojet.common.world.Chunk;
 import ssixprojet.common.world.World;
 import ssixprojet.server.AtlasGame;
 import ssixprojet.server.connection.Connection;
@@ -233,13 +234,13 @@ public class Player extends Entity implements ConnectionClient {
 
 		Vector tir = new Vector(this.lookX, this.lookY).normalized();
 
-		double x, y; // tireur
+		double x, y; // shooter
 		double xt, yt, xi = 0, yi = 0; // impact
 		double d = 2.0, dt; // distance
 		double k;
 		final double ox = getX() + getWidth() / 2;
 		final double oy = getY() + getHeight() / 2;
-		Entity cible = null;
+		Entity target = null;
 
 		for (Entity e : this.getWorld().getEntities()) {
 			if (e == this || (e instanceof Player && (((Player) e).type == type || !((Player) e).isConnected())))
@@ -266,7 +267,7 @@ public class Player extends Entity implements ConnectionClient {
 
 						if (dt < d) {
 							d = dt;
-							cible = e;
+							target = e;
 							xi = xt;
 							yi = y;
 							continue;
@@ -284,7 +285,7 @@ public class Player extends Entity implements ConnectionClient {
 
 						if (dt < d) {
 							d = dt;
-							cible = e;
+							target = e;
 							xi = x;
 							yi = yt;
 							continue;
@@ -295,10 +296,10 @@ public class Player extends Entity implements ConnectionClient {
 
 		}
 
-		if (cible != null) {
+		if (target != null) {
 			final double xf = xi;
 			final double yf = yi;
-			if (cible.shot(this)) {
+			if (target.shot(this)) {
 				setAmmos(Math.min(getAmmos() + (100 / AMMO_POWER) + 3, START_AMMOS));
 			}
 			AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS08Shot(ox, oy, xf, yf));
@@ -354,20 +355,24 @@ public class Player extends Entity implements ConnectionClient {
 		move(preDeltaX, preDeltaY);
 
 		if (type == PlayerType.INFECTED) {
-			World w = getWorld();
+			Chunk[][] area = getArea();
 
-			if (w != null) {
-				int touches = w.getEntities().stream().filter(e -> e instanceof Player).map(e -> (Player) e)
-						.filter(p -> p.isConnected() && p.type == PlayerType.SURVIVOR && p.collide(this))
-						.mapToInt(p -> {
-							p.infect();
-							return 1;
-						}).sum();
-				if (touches != 0) {
-					if (getHealth() < 75)
-						setHealth(75);
-					score.infections += touches;
-				}
+			int touches = 0;
+
+			for (int i = 0; i < area.length; i++)
+				for (int j = 0; j < area[i].length; j++)
+					touches += area[i][j].getEntities().values().stream().filter(e -> e instanceof Player)
+							.map(e -> (Player) e)
+							.filter(p -> p.isConnected() && p.type == PlayerType.SURVIVOR && p.collide(this))
+							.mapToInt(p -> {
+								p.infect();
+								return 1;
+							}).sum();
+			
+			if (touches != 0) {
+				if (getHealth() < 75)
+					setHealth(75);
+				score.infections += touches;
 			}
 		}
 
