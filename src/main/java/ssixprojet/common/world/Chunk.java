@@ -105,11 +105,6 @@ public class Chunk {
 		entities.remove(e.getEntityId());
 	}
 
-	public Entity searchEntity(double originX, double originY, Chunk c, Predicate<Entity> filter) {
-
-		return null;
-	}
-
 	/**
 	 * search an entity in the chunk
 	 * 
