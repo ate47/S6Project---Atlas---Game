@@ -204,8 +204,6 @@ public class World {
 	public void spawnEntity(Entity e) {
 		if (e.getWorld() == this && !e.isExist())
 			entities.add(e);
-		// TODO set entity on chunks
-		// TODO send spawn packet to screen
 	}
 
 	/**
