@@ -1,19 +1,30 @@
 package ssixprojet.common.entity;
 
 import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import ssixprojet.common.world.World;
 
 public class Entity {
+	private static final AtomicInteger INCREMENT = new AtomicInteger(0);
 	private boolean exist = false;
 	private double x, y;
 	private double width, height;
-
+	private int id;
 	private World world;
 
 	public Entity(double w, double h) {
 		this.width = w;
 		this.height = h;
+		id = INCREMENT.getAndIncrement();
+	}
+
+	public boolean collide(Entity e) {
+		return x < e.getX() + e.width && x + width > e.getX() && y < e.getY() + e.height && y + height > e.getY();
+	}
+
+	public int getEntityId() {
+		return id;
 	}
 
 	public double getHeight() {
@@ -81,10 +92,6 @@ public class Entity {
 		}
 	}
 
-	public boolean collide(Entity e) {
-		return x < e.getX() + e.width && x + width > e.getX() && y < e.getY() + e.height && y + height > e.getY();
-	}
-
 	/**
 	 * respawn this entity in the same world, does nothing if the entity isn't in a
 	 * world
@@ -112,6 +119,15 @@ public class Entity {
 	}
 
 	/**
+	 * @param p
+	 *            the shooter
+	 * @return if the shot killed
+	 */
+	public boolean shot(Player p) {
+		return false;
+	}
+
+	/**
 	 * spawn an entity in a world
 	 * 
 	 * @param w
@@ -127,15 +143,6 @@ public class Entity {
 		this.x = x;
 		this.y = y;
 		this.exist = true;
-	}
-
-	/**
-	 * @param p
-	 *            the shooter
-	 * @return if the shot killed
-	 */
-	public boolean shot(Player p) {
-		return false;
 	}
 
 	@Override
