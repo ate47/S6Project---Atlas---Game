@@ -35,9 +35,27 @@ public class Chunk {
 		return left;
 	}
 
-	public int getPlayerCount() {
+	private int getRealPlayerCount() {
 		return (int) entityList.stream()
 				.filter(e -> e instanceof Player && ((Player) e).getType() == PlayerType.SURVIVOR).count();
+	}
+
+	public int getPlayerCount() {
+		int count = getRealPlayerCount();
+
+		if (top != null)
+			count += top.getRealPlayerCount();
+
+		if (bottom != null)
+			count += bottom.getRealPlayerCount();
+
+		if (right != null)
+			count += right.getRealPlayerCount();
+
+		if (left != null)
+			count += left.getRealPlayerCount();
+
+		return count;
 	}
 
 	public Spawn getRandomSpawn() {
@@ -51,6 +69,7 @@ public class Chunk {
 	public List<Spawn> getSpawns() {
 		return spawns;
 	}
+
 	public Chunk getTop() {
 		return top;
 	}
