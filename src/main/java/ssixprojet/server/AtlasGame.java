@@ -114,7 +114,7 @@ public class AtlasGame {
 			if (location.getWidth() > size && location.getHeight() > size)
 				mainWorld.addSpawnLocation((location.getX() + dsize) * mapFactorX,
 						(location.getY() + dsize) * mapFactorY, (location.getWidth() - size) * mapFactorX,
-						(location.getHeight() - size) * mapFactorX, location.isOutside());
+						(location.getHeight() - size) * mapFactorY, location.isOutside());
 			else
 				System.err.println("Can't add the spawn location : " + location);
 

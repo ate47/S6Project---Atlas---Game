@@ -310,6 +310,20 @@ function tick() {
 	}
 }
 
+function beautifulMillis(time) {
+	let s = Math.floor(time / 1000);
+	let min = Math.floor(s / 60);
+	if (min != 0) {
+		let h = Math.floor(min / 60);
+		if (min != 0)
+			return h + "h " + (min % 60) + "min " + (s % 60) + "s";
+		
+		return min + "min " + (s % 60) + "s";
+	}
+	
+	return s + "s";
+}
+
 function draw() {
 	if (!packetHandler.open) {
 		background(200);
@@ -416,8 +430,27 @@ function draw() {
 			break;
 		}
 		rect(0, 0, windowWidth, windowHeight);
+		fill(255);
 		
+		textSize(windowWidth / 40);
+		text("SCORE", windowWidth / 2, 2 * windowHeight / 10);
+		line(windowWidth / 2, 3.5 * windowHeight / 10, windowWidth / 2, 9 * windowHeight / 10);
 		
+		text("Temps", 1.2 * windowWidth / 16, 7 * windowHeight / 20);
+		text("Elimination", 3 * windowWidth / 16, 7 * windowHeight / 20);
+		text("Degats Donnés", 6 * windowWidth / 16, 7 * windowHeight / 20);
+		
+		text("Infections", 9 * windowWidth / 16, 7 * windowHeight / 20);
+		text("Morts", 11 * windowWidth / 16, 7 * windowHeight / 20);
+		text("Degats Pris", 13 * windowWidth / 16, 7 * windowHeight / 20);
+		
+		text(beautifulMillis(playerData.timeAlive),  1.2 * windowWidth / 16, windowHeight * 3 / 5);
+		text(playerData.kills, 3 * windowWidth / 16,  windowHeight * 3 / 5);
+		text(playerData.damageGiven, 6 * windowWidth / 16,  windowHeight * 3 / 5);
+		
+		text(playerData.infections, 9 * windowWidth / 16, windowHeight * 3 / 5);
+		text(playerData.death, 11 * windowWidth / 16, windowHeight * 3 / 5);
+		text(playerData.damageTaken, 13 * windowWidth / 16, windowHeight * 3 / 5);
 	}
 }
 

@@ -343,6 +343,18 @@ function draw() {
 			fill(255);
 			text(txt, windowWidth / 2, windowHeight / 40);
 		}
+		else{
+			if(time < 0){
+				textSize(windowHeight / 20);
+				let timeN = - time;
+				let txt = "Temps restant avant la fin " + timeN + "s";
+				let tw = textWidth(txt) * 1.25;
+				fill(0);
+				rect(windowWidth / 2 - tw / 2, 0, tw, windowHeight / 20);
+				fill(255);
+				text(txt, windowWidth / 2, windowHeight / 40);
+			}
+		}
 		
 		stroke(40);
 		
