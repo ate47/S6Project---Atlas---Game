@@ -1,7 +1,9 @@
 package ssixprojet.common.world;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import ssixprojet.common.entity.Entity;
@@ -13,7 +15,7 @@ public class Chunk {
 	private double unit, x, y;
 	Chunk top, bottom, left, right;
 
-	private List<Entity> entityList = new ArrayList<>();
+	private Map<Integer, Entity> entities = new HashMap<>();
 
 	private List<Spawn> spawns = new ArrayList<>();
 
@@ -23,21 +25,20 @@ public class Chunk {
 		this.y = y;
 	}
 
+	public void addEntity(Entity e) {
+		entities.put(e.getEntityId(), e);
+	}
+
 	public Chunk getBottom() {
 		return bottom;
 	}
 
-	public List<Entity> getEntityList() {
-		return entityList;
+	public Map<Integer, Entity> getEntities() {
+		return entities;
 	}
 
 	public Chunk getLeft() {
 		return left;
-	}
-
-	private int getRealPlayerCount() {
-		return (int) entityList.stream()
-				.filter(e -> e instanceof Player && ((Player) e).getType() == PlayerType.SURVIVOR).count();
 	}
 
 	public int getPlayerCount() {
@@ -62,6 +63,11 @@ public class Chunk {
 		return spawns.get(RANDOM.nextInt(spawns.size()));
 	}
 
+	private int getRealPlayerCount() {
+		return (int) entities.values().stream()
+				.filter(e -> e instanceof Player && ((Player) e).getType() == PlayerType.SURVIVOR).count();
+	}
+
 	public Chunk getRight() {
 		return right;
 	}
@@ -84,5 +90,14 @@ public class Chunk {
 
 	public double getY() {
 		return y;
+	}
+
+	public boolean isIn(Entity e) {
+		return x < e.getX() + e.getWidth() && x + unit > e.getX() && y < e.getY() + e.getHeight()
+				&& y + unit > e.getY();
+	}
+
+	public void removeEntity(Entity e) {
+		entities.remove(e.getEntityId());
 	}
 }
