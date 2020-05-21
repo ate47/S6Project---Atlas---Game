@@ -12,6 +12,7 @@ import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import ssixprojet.common.config.PlayerScore;
 import ssixprojet.common.world.Chunk;
+import ssixprojet.common.world.TraceAnswer;
 import ssixprojet.common.world.World;
 import ssixprojet.server.AtlasGame;
 import ssixprojet.server.connection.Connection;
@@ -24,7 +25,6 @@ import ssixprojet.server.packet.server.PacketS06PlayerType;
 import ssixprojet.server.packet.server.PacketS08Shot;
 import ssixprojet.server.packet.server.PacketS09ChangeHealth;
 import ssixprojet.server.packet.server.PacketS0AChangeAmmos;
-import ssixprojet.utils.Vector;
 
 public class Player extends Entity implements ConnectionClient {
 	public static final Comparator<Player> SCORE_INFECTED_COMPARATOR = new Comparator<Player>() {
@@ -55,6 +55,7 @@ public class Player extends Entity implements ConnectionClient {
 	private int health = 100, ammos = START_AMMOS;
 	private long lastTimeShooted = 0L;
 	public final PlayerScore score = new PlayerScore();
+	private final TraceAnswer trace = new TraceAnswer(); // put that here to avoid reallocation
 
 	public Player(Connection connection) {
 		this(connection, AtlasGame.getAtlas());
@@ -232,74 +233,19 @@ public class Player extends Entity implements ConnectionClient {
 		lastTimeShooted = currentTime;
 		setAmmos(getAmmos() - 1);
 
-		Vector tir = new Vector(this.lookX, this.lookY).normalized();
-
-		double x, y; // shooter
-		double xt, yt, xi = 0, yi = 0; // impact
-		double d = 2.0, dt; // distance
-		double k;
 		final double ox = getX() + getWidth() / 2;
 		final double oy = getY() + getHeight() / 2;
-		Entity target = null;
 
-		for (Entity e : this.getWorld().getEntities()) {
-			if (e == this || (e instanceof Player && (((Player) e).type == type || !((Player) e).isConnected())))
-				continue;
+		getWorld()
+				.traceLineAndGetEntity(ox, oy, lookX, lookY,
+						e -> !(e == this
+								|| (e instanceof Player && (((Player) e).type == type || !((Player) e).isConnected()))),
+						trace);
 
-			// opti : 2 bord a calcule
-			if (lookX < 0) {
-				x = e.getX() + e.getWidth();
-			} else {
-				x = e.getX();
-			}
-			if (lookY < 0) {
-				y = e.getY() + e.getHeight();
-			} else {
-				y = e.getY();
-			}
-
-			if (tir.getY() != 0) {
-				k = ((y - oy) / tir.getY());
-				if (k > 0) {
-					xt = k * tir.getX() + ox;
-					if (xt >= e.getX() && xt <= e.getX() + e.getWidth()) {
-						dt = (xt - ox) * (xt - ox) + (y - oy) * (y - oy);
-
-						if (dt < d) {
-							d = dt;
-							target = e;
-							xi = xt;
-							yi = y;
-							continue;
-						}
-					}
-				}
-			}
-
-			if (tir.getX() != 0) {
-				k = ((x - ox) / tir.getX());
-				if (k > 0) {
-					yt = k * tir.getY() + oy;
-					if (yt >= e.getY() && yt <= e.getY() + e.getHeight()) {
-						dt = (x - ox) * (x - ox) + (yt - oy) * (yt - oy);
-
-						if (dt < d) {
-							d = dt;
-							target = e;
-							xi = x;
-							yi = yt;
-							continue;
-						}
-					}
-				}
-			}
-
-		}
-
-		if (target != null) {
-			final double xf = xi;
-			final double yf = yi;
-			if (target.shot(this)) {
+		if (trace.isFound()) {
+			final double xf = trace.getX();
+			final double yf = trace.getY();
+			if (trace.getTarget().shot(this)) {
 				setAmmos(Math.min(getAmmos() + (100 / AMMO_POWER) + 3, START_AMMOS));
 			}
 			AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS08Shot(ox, oy, xf, yf));
@@ -368,7 +314,7 @@ public class Player extends Entity implements ConnectionClient {
 								p.infect();
 								return 1;
 							}).sum();
-			
+
 			if (touches != 0) {
 				if (getHealth() < 75)
 					setHealth(75);

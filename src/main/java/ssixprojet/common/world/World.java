@@ -223,36 +223,36 @@ public class World {
 	}
 
 	/**
-	 * walk across every chunk to find the first entity respecting the filter, the
-	 * (0,0) direction vector will return the entity at this location or null
+	 * walk across chunks to find an entity
 	 * 
 	 * @param originX
-	 *            the origin location x
+	 *            the line origin X
 	 * @param originY
-	 *            the origin location y
+	 *            the line origin Y
 	 * @param directionX
-	 *            the direction vector x
+	 *            the direction vector X
 	 * @param directionY
-	 *            the direction vector y
+	 *            the direction vector Y
 	 * @param filter
 	 *            the entity filter
-	 * @return the first entity respecting the predicate, null otherwise
+	 * @param answer
+	 *            the answer to fill
+	 * @return true if an entity has been found, false otherwise
 	 */
-	public Entity traceLineAndGetEntity(double originX, double originY, double directionX, double directionY,
-			Predicate<Entity> filter) {
+	public boolean traceLineAndGetEntity(double originX, double originY, double directionX, double directionY,
+			Predicate<Entity> filter, TraceAnswer answer) {
+		answer.clear();
+
 		// check numbers validity
 		if (!(Double.isFinite(originX) && Double.isFinite(originY) && Double.isFinite(directionX)
 				&& Double.isFinite(directionY)))
-			return null;
+			return false;
 
 		// (0, 0) vector, get the first matching entity
 		if (directionX == 0 && directionY == 0) {
 			Chunk c = getChunk(getChunk(originX), getChunk(originY));
-			if (c == null)
-				return null;
+			return (c == null) ? false : c.searchEntity(originX, originY, directionX, directionY, filter, answer);
 
-			return c.getEntities().values().stream().filter(e -> e.isIn(originX, originY) && filter.test(e)).findAny()
-					.orElse(null);
 		}
 
 		// u <- normalized direction vector
@@ -260,10 +260,37 @@ public class World {
 		double ux = directionX / directionLength;
 		double uy = directionY / directionLength;
 
-		
-		
-		
-		return null;
+		if (ux < 0) { // left
+			if (uy > 0) { // bottom
+				if (-ux < -uy) { // 6
+
+				} else { // 5
+
+				}
+			} else { // top
+				if (-ux < uy) { // 3
+
+				} else { // 4
+
+				}
+			}
+		} else {
+			if (uy > 0) { // bottom
+				if (ux < -uy) { // 7
+
+				} else { // 8
+
+				}
+			} else { // top
+				if (ux < uy) { // 2
+
+				} else { // 1
+
+				}
+			}
+		}
+
+		return false;
 	}
 
 	/**

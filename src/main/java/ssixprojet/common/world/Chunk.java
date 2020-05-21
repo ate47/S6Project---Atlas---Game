@@ -124,6 +124,7 @@ public class Chunk {
 	 */
 	public boolean searchEntity(double originX, double originY, double directionX, double directionY,
 			Predicate<Entity> filter, TraceAnswer answer) {
+		answer.clear();
 		// check numbers validity
 		if (!(Double.isFinite(originX) && Double.isFinite(originY) && Double.isFinite(directionX)
 				&& Double.isFinite(directionY)))
