@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import ssixprojet.common.GamePhase;
@@ -226,6 +227,50 @@ public class World {
 		if (x > 1 || y > 1)
 			System.out.println(s);
 		e.spawn(this, x, y);
+	}
+
+	/**
+	 * walk across every chunk to find the first entity respecting the filter, the
+	 * (0,0) direction vector will return the entity at this location or null
+	 * 
+	 * @param originX
+	 *            the origin location x
+	 * @param originY
+	 *            the origin location y
+	 * @param directionX
+	 *            the direction vector x
+	 * @param directionY
+	 *            the direction vector y
+	 * @param filter
+	 *            the entity filter
+	 * @return the first entity respecting the predicate, null otherwise
+	 */
+	public Entity traceLineAndGetEntity(double originX, double originY, double directionX, double directionY,
+			Predicate<Entity> filter) {
+		// check numbers validity
+		if (!(Double.isFinite(originX) && Double.isFinite(originY) && Double.isFinite(directionX)
+				&& Double.isFinite(directionY)))
+			return null;
+
+		// (0, 0) vector, get the first matching entity
+		if (directionX == 0 && directionY == 0) {
+			Chunk c = getChunk(getChunk(originX), getChunk(originY));
+			if (c == null)
+				return null;
+
+			return c.getEntities().values().stream().filter(e -> e.isIn(originX, originY) && filter.test(e)).findAny()
+					.orElse(null);
+		}
+
+		// u <- normalized direction vector
+		double directionLength = Math.sqrt(directionX * directionX + directionY * directionY);
+		double ux = directionX / directionLength;
+		double uy = directionY / directionLength;
+
+		
+		
+		
+		return null;
 	}
 
 	/**

@@ -67,6 +67,10 @@ public class Entity {
 		return exist;
 	}
 
+	public boolean isIn(double ex, double ey) {
+		return x <= ex && y <= ey && x + width >= ex && y + height >= ey;
+	}
+
 	public boolean isSolid() {
 		return false;
 	}
@@ -78,7 +82,7 @@ public class Entity {
 		getWorld().killEntity(this);
 		this.exist = false;
 	}
-	
+
 	/**
 	 * move the entity
 	 * 
