@@ -279,7 +279,7 @@ public class World {
 	public void tick() {
 		if (AtlasGame.getAtlas().getPhase() == GamePhase.PLAYING
 				&& !getEntities().stream().filter(e -> e instanceof Player).map(e -> (Player) e)
-						.filter(p -> p.getType() != PlayerType.INFECTED).findAny().isPresent()) {
+						.filter(p -> p.isConnected() && p.getType() != PlayerType.INFECTED).findAny().isPresent()) {
 			AtlasGame.getAtlas().setPhase(GamePhase.SCORE);
 		}
 	}
