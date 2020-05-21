@@ -3,15 +3,18 @@ package ssixprojet.common.entity;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import ssixprojet.common.world.Chunk;
 import ssixprojet.common.world.World;
 
 public class Entity {
+	private static final Chunk[][] EMPTY_AREA = new Chunk[0][0];
 	private static final AtomicInteger INCREMENT = new AtomicInteger(0);
 	private boolean exist = false;
 	private double x, y;
 	private double width, height;
 	private int id;
 	private World world;
+	private Chunk[][] area = EMPTY_AREA;
 
 	public Entity(double w, double h) {
 		this.width = w;
@@ -90,6 +93,7 @@ public class Entity {
 				return; // TODO: better algorithm
 			}
 		}
+		setLocation(x, y);
 	}
 
 	/**
@@ -106,16 +110,35 @@ public class Entity {
 			world.spawnEntity(this);
 			this.exist = true;
 		}
-		this.x = x;
-		this.y = y;
+		setLocation(x, y);
 	}
 
-	public void setX(double x) {
-		this.x = x;
-	}
+	public void setLocation(double newx, double newy) {
+		if (world == null) {
+			area = EMPTY_AREA;
+			return;
+		}
+		double oldX = this.x;
+		double oldY = this.y;
+		this.x = newx;
+		this.y = newy;
 
-	public void setY(double y) {
-		this.y = y;
+		int x = world.getChunk(this.x), y_ = world.getChunk(this.y);
+		for (int i = 0; i < area.length; i++, x++) {
+			int y = y_;
+			for (int j = 0; j < area[i].length; j++, y++) {
+				Chunk oldc = area[i][j];
+				// remove if this new location isn't in this chunk
+				if (oldc != null && !oldc.isIn(this))
+					oldc.removeEntity(this);
+
+				Chunk newc = area[i][j] = world.getChunk(x, y);
+				// add if this new chunk wasn't colliding with the old location
+				if (newc != null && !newc.isIn(oldX, oldY, width, height)) {
+					newc.addEntity(this);
+				}
+			}
+		}
 	}
 
 	/**
@@ -125,6 +148,11 @@ public class Entity {
 	 */
 	public boolean shot(Player p) {
 		return false;
+	}
+
+	private int higherValue(double d) {
+		int id = (int) d;
+		return id < d ? id + 1 : id;
 	}
 
 	/**
@@ -140,9 +168,11 @@ public class Entity {
 	public void spawn(World w, double x, double y) {
 		this.world = w;
 		world.spawnEntity(this);
-		this.x = x;
-		this.y = y;
 		this.exist = true;
+		int n = higherValue(getWidth() / w.getUnit());
+		int m = higherValue(getWidth() / w.getUnit());
+		area = new Chunk[n][m];
+		setLocation(x, y);
 	}
 
 	@Override

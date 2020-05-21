@@ -18,9 +18,10 @@ public class World {
 	private final List<Spawn> spawns = new ArrayList<>();
 	private final int split = AtlasGame.getConfig().getChunkSplit();
 	private final Chunk[] chunks = new Chunk[split * split];
+	private double unit;
 
 	public World() {
-		double unit, x = 0, y = 0;
+		double x = 0, y = 0;
 		unit = 1. / split;
 		int i, j;
 		for (i = 0; i < split; i++, y += unit) {
@@ -82,15 +83,14 @@ public class World {
 					sBottom = c.getY() + c.getUnit();
 				else
 					sBottom = y + height;
-				
+
 				Spawn newSpawn = new Spawn(sLeft, sTop, sRight - sLeft, sBottom - sTop, outside);
-				 
+
 				if (newSpawn.getWidth() > 1 || newSpawn.getHeight() > 1) {
 					System.out.println(newSpawn);
 					throw new Error();
 				}
-					
-				
+
 				c.getSpawns().add(newSpawn);
 				spawns.add(newSpawn);
 			}
@@ -134,7 +134,7 @@ public class World {
 	}
 
 	public Chunk getChunk(int x, int y) {
-		return chunks[x * split + y];
+		return x < 0 || y < 0 || x >= split || y >= split ? null : chunks[x * split + y];
 	}
 
 	public Chunk[] getChunks() {
@@ -158,6 +158,10 @@ public class World {
 
 	public int getSplit() {
 		return split;
+	}
+
+	public double getUnit() {
+		return unit;
 	}
 
 	@Override
@@ -212,15 +216,14 @@ public class World {
 	 */
 	public void spawnEntityAtRandomLocation(Entity e) {
 		// get a random spawn on the chunk with the minimum player count
-		
+
 		Spawn s = Arrays.stream(chunks).filter(c -> !c.getSpawns().isEmpty())
 				.collect(Collectors.minBy((c1, c2) -> c1.getPlayerCount() - c2.getPlayerCount())).get()
 				.getRandomSpawn();
-		
-		double x = s.getRandomX(), 
-				y = s.getRandomY();
-		
-		if(x > 1 || y > 1)
+
+		double x = s.getRandomX(), y = s.getRandomY();
+
+		if (x > 1 || y > 1)
 			System.out.println(s);
 		e.spawn(this, x, y);
 	}
@@ -229,7 +232,9 @@ public class World {
 	 * run map logic
 	 */
 	public void tick() {
-		if (AtlasGame.getAtlas().getPhase() == GamePhase.PLAYING && !getEntities().stream().filter(e -> e instanceof Player).map(e -> (Player) e).filter(p -> p.getType() != PlayerType.INFECTED).findAny().isPresent()) {
+		if (AtlasGame.getAtlas().getPhase() == GamePhase.PLAYING
+				&& !getEntities().stream().filter(e -> e instanceof Player).map(e -> (Player) e)
+						.filter(p -> p.getType() != PlayerType.INFECTED).findAny().isPresent()) {
 			AtlasGame.getAtlas().setPhase(GamePhase.SCORE);
 		}
 	}
