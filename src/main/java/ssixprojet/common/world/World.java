@@ -184,11 +184,6 @@ public class World {
 	 */
 	public void killEntity(Entity e) {
 		entities.remove(e);
-		// TODO send spawn packet to screen
-	}
-
-	public void moveEntityChunk(Entity e) {
-		// TODO send chunk to screen
 	}
 
 	private void setChunk(int x, int y, Chunk chunk) {
