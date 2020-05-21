@@ -102,6 +102,8 @@ public class Entity {
 				return; // TODO: better algorithm
 			}
 		}
+		x = oldX;
+		y = oldY;
 		setLocation(x, y);
 	}
 
