@@ -311,13 +311,14 @@ public class World {
 	private boolean traceLineAndGetEntityOctant1(Chunk start, double originX, double originY, double ux, double uy,
 			Predicate<Entity> filter, TraceAnswer answer) {
 		double error;
-		final double diff = uy * unit / ux;
+		final double diff;
 
 		if (uy == 0 || ux == 0) {
 			error = 0;
+			diff = 0;
 		} else {
-			double ya = (start.getX() - originX) / ux * uy + originY;
-			error = ya - (start.getY() + start.getUnit());
+			diff = -uy * unit / ux;
+			error = (originX - start.getX()) / unit * diff;
 		}
 		for (Chunk c = start; c != null; c = c.right) {
 			if (c.searchEntityNormalized(originX, originY, ux, uy, filter, answer))
@@ -340,13 +341,14 @@ public class World {
 	private boolean traceLineAndGetEntityOctant2(Chunk start, double originX, double originY, double ux, double uy,
 			Predicate<Entity> filter, TraceAnswer answer) {
 		double error;
-		final double diff = ux * unit / uy;
+		final double diff;
 
 		if (uy == 0 || ux == 0) {
 			error = 0;
+			diff = 0;
 		} else {
-			double xa = (start.getY() - originY) / uy * ux + originX;
-			error = xa - (start.getX() + start.getUnit());
+			diff = ux * unit / -uy;
+			error = -(originY - start.getY()) / unit * diff;
 		}
 		
 		for (Chunk c = start; c != null; c = c.top) {
@@ -366,21 +368,20 @@ public class World {
 
 		}
 
-		throw new Error();
-		
-//		return false;
+		return false;
 	}
 
 	private boolean traceLineAndGetEntityOctant3(Chunk start, double originX, double originY, double ux, double uy,
 			Predicate<Entity> filter, TraceAnswer answer) {
 		double error;
-		final double diff = -ux * unit / uy;
+		final double diff;
 
 		if (uy == 0 || ux == 0) {
 			error = 0;
+			diff = 0;
 		} else {
-			double xa = (start.getY() - originY) / uy * -ux + originX;
-			error = xa - (start.getX() + start.getUnit());
+			diff = -ux * unit / -uy;
+			error = -(originY - start.getY()) / unit * diff;
 		}
 
 		for (Chunk c = start; c != null; c = c.top) {
@@ -406,13 +407,14 @@ public class World {
 	private boolean traceLineAndGetEntityOctant4(Chunk start, double originX, double originY, double ux, double uy,
 			Predicate<Entity> filter, TraceAnswer answer) {
 		double error;
-		final double diff = uy * unit / -ux;
+		final double diff;
 
 		if (uy == 0 || ux == 0) {
 			error = 0;
+			diff = 0;
 		} else {
-			double ya = (start.getX() - originX) / -ux * uy + originY;
-			error = ya - (start.getY() + start.getUnit());
+			diff = -uy * unit / -ux;
+			error = -(originX - start.getX()) / unit * diff;
 		}
 
 		for (Chunk c = start; c != null; c = c.left) {
@@ -438,13 +440,14 @@ public class World {
 	private boolean traceLineAndGetEntityOctant5(Chunk start, double originX, double originY, double ux, double uy,
 			Predicate<Entity> filter, TraceAnswer answer) {
 		double error;
-		final double diff = -uy * unit / -ux;
+		final double diff;
 
 		if (uy == 0 || ux == 0) {
 			error = 0;
+			diff = 0;
 		} else {
-			double ya = (start.getX() - originX) / -ux * -uy + originY;
-			error = ya - (start.getY() + start.getUnit());
+			diff = uy * unit / -ux;
+			error = -(originX - start.getX()) / unit * diff;
 		}
 
 		for (Chunk c = start; c != null; c = c.left) {
@@ -470,13 +473,14 @@ public class World {
 	private boolean traceLineAndGetEntityOctant6(Chunk start, double originX, double originY, double ux, double uy,
 			Predicate<Entity> filter, TraceAnswer answer) {
 		double error;
-		final double diff = -ux * unit / -uy;
+		final double diff;
 
 		if (uy == 0 || ux == 0) {
 			error = 0;
+			diff = 0;
 		} else {
-			double xa = (start.getY() - originY) / -uy * -ux + originX;
-			error = xa - (start.getX() + start.getUnit());
+			diff = -ux * unit / uy;
+			error = (originY - start.getY()) / unit * diff;
 		}
 
 		for (Chunk c = start; c != null; c = c.bottom) {
@@ -502,13 +506,14 @@ public class World {
 	private boolean traceLineAndGetEntityOctant7(Chunk start, double originX, double originY, double ux, double uy,
 			Predicate<Entity> filter, TraceAnswer answer) {
 		double error;
-		final double diff = ux * unit / -uy;
+		final double diff;
 
 		if (uy == 0 || ux == 0) {
 			error = 0;
+			diff = 0;
 		} else {
-			double xa = (start.getY() - originY) / -uy * ux + originX;
-			error = xa - (start.getX() + start.getUnit());
+			diff = ux * unit / uy;
+			error = (originY - start.getY()) / unit * diff;
 		}
 
 		for (Chunk c = start; c != null; c = c.bottom) {
@@ -534,13 +539,14 @@ public class World {
 	private boolean traceLineAndGetEntityOctant8(Chunk start, double originX, double originY, double ux, double uy,
 			Predicate<Entity> filter, TraceAnswer answer) {
 		double error;
-		final double diff = -uy * unit / ux;
+		final double diff;
 
 		if (uy == 0 || ux == 0) {
 			error = 0;
+			diff = 0;
 		} else {
-			double ya = (start.getX() - originX) / ux * -uy + originY;
-			error = ya - (start.getY() + start.getUnit());
+			diff = uy * unit / ux;
+			error = (originX - start.getX()) / unit * diff;
 		}
 
 		for (Chunk c = start; c != null; c = c.right) {
