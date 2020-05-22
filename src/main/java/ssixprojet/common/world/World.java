@@ -318,7 +318,8 @@ public class World {
 			diff = 0;
 		} else {
 			diff = -uy * unit / ux;
-			error = (originX - start.getX()) / unit * diff;
+			double h = (originX - start.getX()) * -uy / ux;
+			error = start.getY() + unit - (originY + h);
 		}
 		for (Chunk c = start; c != null; c = c.right) {
 			if (c.searchEntityNormalized(originX, originY, ux, uy, filter, answer))
