@@ -236,13 +236,10 @@ public class Player extends Entity implements ConnectionClient {
 		final double ox = getX() + getWidth() / 2;
 		final double oy = getY() + getHeight() / 2;
 
-		getWorld()
-				.traceLineAndGetEntity(ox, oy, lookX, lookY,
-						e -> !(e == this
-								|| (e instanceof Player && (((Player) e).type == type || !((Player) e).isConnected()))),
-						trace);
-
-		if (trace.isFound()) {
+		if (getWorld().traceLineAndGetEntity(ox, oy, lookX, lookY,
+				e -> !(e == this
+						|| (e instanceof Player && (((Player) e).type == type || !((Player) e).isConnected()))),
+				trace)) {
 			final double xf = trace.getX();
 			final double yf = trace.getY();
 			if (trace.getTarget().shot(this)) {
