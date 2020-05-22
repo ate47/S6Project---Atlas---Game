@@ -231,7 +231,8 @@ public class Player extends Entity implements ConnectionClient {
 			return;
 
 		lastTimeShooted = currentTime;
-		setAmmos(getAmmos() - 1);
+		if (AtlasGame.getAtlas().getPhase().isPvpEnabled())
+			setAmmos(getAmmos() - 1);
 
 		final double ox = getX() + getWidth() / 2;
 		final double oy = getY() + getHeight() / 2;

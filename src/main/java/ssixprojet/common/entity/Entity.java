@@ -94,8 +94,8 @@ public class Entity {
 	public void move(double dx, double dy) {
 		double oldX = x;
 		double oldY = y;
-		x = x + dx * width * getSpeed();
-		y = y + dy * height * getSpeed();
+		double nx = x = x + dx * width * getSpeed();
+		double ny = y = y + dy * height * getSpeed();
 
 		for (Iterator<Entity> it = world.getEntities().stream().filter(Entity::isSolid).iterator(); it.hasNext();) {
 			Entity wall = it.next();
@@ -108,7 +108,7 @@ public class Entity {
 		}
 		x = oldX;
 		y = oldY;
-		setLocation(x, y);
+		setLocation(nx, ny);
 	}
 
 	/**

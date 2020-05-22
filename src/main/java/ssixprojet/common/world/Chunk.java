@@ -10,6 +10,8 @@ import java.util.function.Predicate;
 import ssixprojet.common.entity.Entity;
 import ssixprojet.common.entity.Player;
 import ssixprojet.common.entity.PlayerType;
+import ssixprojet.server.AtlasGame;
+import ssixprojet.server.packet.server.PacketS08Shot;
 
 public class Chunk {
 	private static final Random RANDOM = new Random();
@@ -168,10 +170,12 @@ public class Chunk {
 	 */
 	boolean searchEntityNormalized(double originX, double originY, double ux, double uy, Predicate<Entity> filter,
 			TraceAnswer answer) {
-		double distance = Double.MAX_VALUE; // a large number consider as Inf
+		double distance = 20; // a large number consider as Inf
 		Entity target = null;
 		double xi = 0, yi = 0;
 
+		show();
+		
 		for (Entity e : getEntities().values()) {
 			if (!filter.test(e))
 				continue;
@@ -232,4 +236,17 @@ public class Chunk {
 		}
 		return false;
 	}
+
+	public void show() {
+		final double x2 = x + unit;
+		final double y2 = y + unit;
+		AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS08Shot(x, y, x2, y2));
+		AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS08Shot(x2, y, x, y2));
+	}
+
+	@Override
+	public String toString() {
+		return "Chunk [x=" + x + ", y=" + y + "]";
+	}
+	
 }

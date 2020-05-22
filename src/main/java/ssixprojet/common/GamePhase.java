@@ -22,6 +22,11 @@ public enum GamePhase {
 		long fin;
 
 		@Override
+		public boolean isPvpEnabled() {
+			return infected;
+		}
+
+		@Override
 		public void onInit() {
 			infected = false;
 			infection = System.currentTimeMillis() + AtlasGame.getConfig().getTimeInTickBeforeInfection() * 1000 / 20;
@@ -30,6 +35,7 @@ public enum GamePhase {
 					.filter(Player::isConnected).findFirst().isPresent())
 				atlas.setPhase(WAITING);
 		}
+		
 
 		@Override
 		public void tick() {
@@ -105,7 +111,11 @@ public enum GamePhase {
 		return id;
 	}
 
-	public void onInit() {}
+	public boolean isPvpEnabled() {
+		return false;
+	}
 
+	public void onInit() {}
+	
 	public void tick() {}
 }

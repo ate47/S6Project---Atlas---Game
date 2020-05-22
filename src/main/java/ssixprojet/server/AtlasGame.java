@@ -92,8 +92,8 @@ public class AtlasGame {
 		// add world edges
 		new Wall(mapFactorX, 1).spawn(mainWorld, 0, 0);
 		new Wall(1, mapFactorY).spawn(mainWorld, 0, 0);
-		new Wall(mapFactorX, 1).spawn(mainWorld, 1, 0);
-		new Wall(1, mapFactorY).spawn(mainWorld, 0, 1);
+		new Wall(mapFactorX, 1).spawn(mainWorld, 1 - mapFactorX, 0);
+		new Wall(1, mapFactorY).spawn(mainWorld, 0, 1 - mapFactorY);
 
 		// add world walls
 		for (MapEdge edge : gameMap.getEdges()) {

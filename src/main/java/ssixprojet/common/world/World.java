@@ -22,28 +22,27 @@ public class World {
 	private double unit;
 
 	public World() {
-		double x = 0, y = 0;
+		double cx = 0, cy = 0;
 		unit = 1. / split;
-		int i, j;
-		for (i = 0; i < split; i++, y += unit) {
-			x = 0;
-			for (j = 0; j < split; j++, x += unit)
-				setChunk(i, j, new Chunk(unit, x, y));
+		for (int i = 0; i < split; i++, cy += unit) {
+			cx = 0;
+			for (int j = 0; j < split; j++, cx += unit)
+				setChunk(j, i, new Chunk(unit, cx, cy));
 		}
 
 		Chunk c;
-		for (i = 0; i < split - 1; i++)
-			for (j = 0; j < split - 1; j++) {
-				c = getChunk(i, j);
-				c.bottom = getChunk(i, j + 1);
-				c.right = getChunk(i + 1, j);
+		for (int x = 0; x < split - 1; x++)
+			for (int y = 0; y < split - 1; y++) {
+				c = getChunk(x, y);
+				c.bottom = getChunk(x, y + 1);
+				c.right = getChunk(x + 1, y);
 			}
 
-		for (i = 1; i < split; i++)
-			for (j = 1; j < split; j++) {
-				c = getChunk(i, j);
-				c.top = getChunk(i, j - 1);
-				c.left = getChunk(i - 1, j);
+		for (int x = 1; x < split; x++)
+			for (int y = 1; y < split; y++) {
+				c = getChunk(x, y);
+				c.top = getChunk(x, y - 1);
+				c.left = getChunk(x - 1, y);
 			}
 	}
 
@@ -223,6 +222,22 @@ public class World {
 	}
 
 	/**
+	 * run map logic
+	 */
+	public void tick() {
+		if (AtlasGame.getAtlas().getPhase() == GamePhase.PLAYING
+				&& !getEntities().stream().filter(e -> e instanceof Player).map(e -> (Player) e)
+						.filter(p -> p.isConnected() && p.getType() != PlayerType.INFECTED).findAny().isPresent()) {
+			AtlasGame.getAtlas().setPhase(GamePhase.SCORE);
+		}
+	}
+
+	@Override
+	public String toString() {
+		return "World [entities=" + entities + ", spawns=" + spawns + ", split=" + split + "]";
+	}
+
+	/**
 	 * walk across chunks to find an entity
 	 * 
 	 * @param originX
@@ -248,10 +263,12 @@ public class World {
 				&& Double.isFinite(directionY)))
 			return false;
 
+		Chunk start = getChunk(getChunk(originX), getChunk(originY));
+
 		// (0, 0) vector, get the first matching entity
 		if (directionX == 0 && directionY == 0) {
-			Chunk c = getChunk(getChunk(originX), getChunk(originY));
-			return (c == null) ? false : c.searchEntity(originX, originY, directionX, directionY, filter, answer);
+			return (start == null) ? false
+					: start.searchEntity(originX, originY, directionX, directionY, filter, answer);
 
 		}
 
@@ -262,50 +279,287 @@ public class World {
 
 		if (ux < 0) { // left
 			if (uy > 0) { // bottom
-				if (-ux < -uy) { // 6
-
+				if (-ux < uy) { // 6
+					return traceLineAndGetEntityOctant6(start, originX, originY, ux, uy, filter, answer);
 				} else { // 5
-
+					return traceLineAndGetEntityOctant5(start, originX, originY, ux, uy, filter, answer);
 				}
 			} else { // top
-				if (-ux < uy) { // 3
-
+				if (-ux < -uy) { // 3
+					return traceLineAndGetEntityOctant3(start, originX, originY, ux, uy, filter, answer);
 				} else { // 4
-
+					return traceLineAndGetEntityOctant4(start, originX, originY, ux, uy, filter, answer);
 				}
 			}
 		} else {
 			if (uy > 0) { // bottom
-				if (ux < -uy) { // 7
-
+				if (ux < uy) { // 7
+					return traceLineAndGetEntityOctant7(start, originX, originY, ux, uy, filter, answer);
 				} else { // 8
-
+					return traceLineAndGetEntityOctant8(start, originX, originY, ux, uy, filter, answer);
 				}
 			} else { // top
-				if (ux < uy) { // 2
-
+				if (ux < -uy) { // 2
+					return traceLineAndGetEntityOctant2(start, originX, originY, ux, uy, filter, answer);
 				} else { // 1
-
+					return traceLineAndGetEntityOctant1(start, originX, originY, ux, uy, filter, answer);
 				}
+			}
+		}
+	}
+
+	private boolean traceLineAndGetEntityOctant1(Chunk start, double originX, double originY, double ux, double uy,
+			Predicate<Entity> filter, TraceAnswer answer) {
+		double error;
+		final double diff = uy * unit / ux;
+
+		if (uy == 0 || ux == 0) {
+			error = 0;
+		} else {
+			double ya = (start.getX() - originX) / ux * uy + originY;
+			error = ya - (start.getY() + start.getUnit());
+		}
+		for (Chunk c = start; c != null; c = c.right) {
+			if (c.searchEntityNormalized(originX, originY, ux, uy, filter, answer))
+				return true;
+
+			error += diff;
+			if (error > unit) {
+				error -= unit;
+				c = c.top;
+				if (c == null)
+					return false;
+				else if (c.searchEntityNormalized(originX, originY, ux, uy, filter, answer))
+					return true;
 			}
 		}
 
 		return false;
 	}
 
-	/**
-	 * run map logic
-	 */
-	public void tick() {
-		if (AtlasGame.getAtlas().getPhase() == GamePhase.PLAYING
-				&& !getEntities().stream().filter(e -> e instanceof Player).map(e -> (Player) e)
-						.filter(p -> p.isConnected() && p.getType() != PlayerType.INFECTED).findAny().isPresent()) {
-			AtlasGame.getAtlas().setPhase(GamePhase.SCORE);
+	private boolean traceLineAndGetEntityOctant2(Chunk start, double originX, double originY, double ux, double uy,
+			Predicate<Entity> filter, TraceAnswer answer) {
+		double error;
+		final double diff = ux * unit / uy;
+
+		if (uy == 0 || ux == 0) {
+			error = 0;
+		} else {
+			double xa = (start.getY() - originY) / uy * ux + originX;
+			error = xa - (start.getX() + start.getUnit());
 		}
+		
+		for (Chunk c = start; c != null; c = c.top) {
+			if (c.searchEntityNormalized(originX, originY, ux, uy, filter, answer))
+				return true;
+
+			error += diff;
+
+			if (error > unit) {
+				error -= unit;
+				c = c.right;
+				if (c == null)
+					return false;
+				else if (c.searchEntityNormalized(originX, originY, ux, uy, filter, answer))
+					return true;
+			}
+
+		}
+
+		throw new Error();
+		
+//		return false;
 	}
 
-	@Override
-	public String toString() {
-		return "World [entities=" + entities + ", spawns=" + spawns + ", split=" + split + "]";
+	private boolean traceLineAndGetEntityOctant3(Chunk start, double originX, double originY, double ux, double uy,
+			Predicate<Entity> filter, TraceAnswer answer) {
+		double error;
+		final double diff = -ux * unit / uy;
+
+		if (uy == 0 || ux == 0) {
+			error = 0;
+		} else {
+			double xa = (start.getY() - originY) / uy * -ux + originX;
+			error = xa - (start.getX() + start.getUnit());
+		}
+
+		for (Chunk c = start; c != null; c = c.top) {
+			if (c.searchEntityNormalized(originX, originY, ux, uy, filter, answer))
+				return true;
+
+			error += diff;
+
+			if (error > unit) {
+				error -= unit;
+				c = c.left;
+				if (c == null)
+					return false;
+				else if (c.searchEntityNormalized(originX, originY, ux, uy, filter, answer))
+					return true;
+			}
+
+		}
+
+		return false;
+	}
+
+	private boolean traceLineAndGetEntityOctant4(Chunk start, double originX, double originY, double ux, double uy,
+			Predicate<Entity> filter, TraceAnswer answer) {
+		double error;
+		final double diff = uy * unit / -ux;
+
+		if (uy == 0 || ux == 0) {
+			error = 0;
+		} else {
+			double ya = (start.getX() - originX) / -ux * uy + originY;
+			error = ya - (start.getY() + start.getUnit());
+		}
+
+		for (Chunk c = start; c != null; c = c.left) {
+			if (c.searchEntityNormalized(originX, originY, ux, uy, filter, answer))
+				return true;
+
+			error += diff;
+
+			if (error > unit) {
+				error -= unit;
+				c = c.top;
+				if (c == null)
+					return false;
+				else if (c.searchEntityNormalized(originX, originY, ux, uy, filter, answer))
+					return true;
+			}
+
+		}
+
+		return false;
+	}
+
+	private boolean traceLineAndGetEntityOctant5(Chunk start, double originX, double originY, double ux, double uy,
+			Predicate<Entity> filter, TraceAnswer answer) {
+		double error;
+		final double diff = -uy * unit / -ux;
+
+		if (uy == 0 || ux == 0) {
+			error = 0;
+		} else {
+			double ya = (start.getX() - originX) / -ux * -uy + originY;
+			error = ya - (start.getY() + start.getUnit());
+		}
+
+		for (Chunk c = start; c != null; c = c.left) {
+			if (c.searchEntityNormalized(originX, originY, ux, uy, filter, answer))
+				return true;
+
+			error += diff;
+
+			if (error > unit) {
+				error -= unit;
+				c = c.bottom;
+				if (c == null)
+					return false;
+				else if (c.searchEntityNormalized(originX, originY, ux, uy, filter, answer))
+					return true;
+			}
+
+		}
+
+		return false;
+	}
+
+	private boolean traceLineAndGetEntityOctant6(Chunk start, double originX, double originY, double ux, double uy,
+			Predicate<Entity> filter, TraceAnswer answer) {
+		double error;
+		final double diff = -ux * unit / -uy;
+
+		if (uy == 0 || ux == 0) {
+			error = 0;
+		} else {
+			double xa = (start.getY() - originY) / -uy * -ux + originX;
+			error = xa - (start.getX() + start.getUnit());
+		}
+
+		for (Chunk c = start; c != null; c = c.bottom) {
+			if (c.searchEntityNormalized(originX, originY, ux, uy, filter, answer))
+				return true;
+
+			error += diff;
+
+			if (error > unit) {
+				error -= unit;
+				c = c.left;
+				if (c == null)
+					return false;
+				else if (c.searchEntityNormalized(originX, originY, ux, uy, filter, answer))
+					return true;
+			}
+
+		}
+
+		return false;
+	}
+
+	private boolean traceLineAndGetEntityOctant7(Chunk start, double originX, double originY, double ux, double uy,
+			Predicate<Entity> filter, TraceAnswer answer) {
+		double error;
+		final double diff = ux * unit / -uy;
+
+		if (uy == 0 || ux == 0) {
+			error = 0;
+		} else {
+			double xa = (start.getY() - originY) / -uy * ux + originX;
+			error = xa - (start.getX() + start.getUnit());
+		}
+
+		for (Chunk c = start; c != null; c = c.bottom) {
+			if (c.searchEntityNormalized(originX, originY, ux, uy, filter, answer))
+				return true;
+
+			error += diff;
+
+			if (error > unit) {
+				error -= unit;
+				c = c.right;
+				if (c == null)
+					return false;
+				else if (c.searchEntityNormalized(originX, originY, ux, uy, filter, answer))
+					return true;
+			}
+
+		}
+
+		return false;
+	}
+
+	private boolean traceLineAndGetEntityOctant8(Chunk start, double originX, double originY, double ux, double uy,
+			Predicate<Entity> filter, TraceAnswer answer) {
+		double error;
+		final double diff = -uy * unit / ux;
+
+		if (uy == 0 || ux == 0) {
+			error = 0;
+		} else {
+			double ya = (start.getX() - originX) / ux * -uy + originY;
+			error = ya - (start.getY() + start.getUnit());
+		}
+
+		for (Chunk c = start; c != null; c = c.right) {
+			if (c.searchEntityNormalized(originX, originY, ux, uy, filter, answer))
+				return true;
+
+			error += diff;
+
+			if (error > unit) {
+				error -= unit;
+				c = c.bottom;
+				if (c == null)
+					return false;
+				else if (c.searchEntityNormalized(originX, originY, ux, uy, filter, answer))
+					return true;
+			}
+
+		}
+
+		return false;
 	}
 }
