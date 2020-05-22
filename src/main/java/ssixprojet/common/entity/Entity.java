@@ -180,7 +180,7 @@ public class Entity {
 		world.spawnEntity(this);
 		this.exist = true;
 		int n = higherValue(getWidth() / w.getUnit());
-		int m = higherValue(getWidth() / w.getUnit());
+		int m = higherValue(getHeight() / w.getUnit());
 		area = new Chunk[n][m];
 		setLocation(x, y);
 	}
