@@ -547,7 +547,8 @@ public class World {
 			diff = 0;
 		} else {
 			diff = uy * unit / ux;
-			error = (originX - start.getX()) / unit * diff;
+			double h = (originX - start.getX()) * uy / ux;
+			error = (originY - h) - start.getY();
 		}
 
 		for (Chunk c = start; c != null; c = c.right) {
