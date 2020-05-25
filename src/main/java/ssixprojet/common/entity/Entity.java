@@ -10,7 +10,7 @@ public class Entity {
 	private static final Chunk[][] EMPTY_AREA = new Chunk[0][0];
 	private static final AtomicInteger INCREMENT = new AtomicInteger(0);
 	private boolean exist = false;
-	private double x, y;
+	private double x = -1, y = -1;
 	private double width, height;
 	private int id;
 	private World world;
@@ -58,11 +58,6 @@ public class Entity {
 		return y;
 	}
 
-	private int higherValue(double d) {
-		int id = (int) d;
-		return id < d ? id + 1 : id;
-	}
-
 	public boolean isExist() {
 		return exist;
 	}
@@ -81,6 +76,11 @@ public class Entity {
 	public void kill() {
 		getWorld().killEntity(this);
 		this.exist = false;
+		for (Chunk[] cs : area)
+			for (Chunk c : cs)
+				c.removeEntity(this);
+		x = -1;
+		y = -1;
 	}
 
 	/**
@@ -131,10 +131,10 @@ public class Entity {
 	public void setLocation(double newx, double newy) {
 		if (world == null) {
 			area = EMPTY_AREA;
+			this.x = -1;
+			this.y = -1;
 			return;
 		}
-		double oldX = this.x;
-		double oldY = this.y;
 		this.x = newx;
 		this.y = newy;
 
@@ -149,7 +149,7 @@ public class Entity {
 
 				Chunk newc = area[i][j] = world.getChunk(x, y);
 				// add if this new chunk wasn't colliding with the old location
-				if (newc != null && !newc.isIn(oldX, oldY, width, height)) {
+				if (newc != null) {
 					newc.addEntity(this);
 				}
 			}
@@ -179,8 +179,8 @@ public class Entity {
 		this.world = w;
 		world.spawnEntity(this);
 		this.exist = true;
-		int n = higherValue(getWidth() / w.getUnit());
-		int m = higherValue(getHeight() / w.getUnit());
+		int n = (int) (getWidth() / w.getUnit() + 1);
+		int m = (int) (getHeight() / w.getUnit() + 1);
 		area = new Chunk[n][m];
 		setLocation(x, y);
 	}

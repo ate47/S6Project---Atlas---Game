@@ -99,6 +99,10 @@ public class Chunk {
 		return x < ex + w && x + unit > ex && y < ey + h && y + unit > ey;
 	}
 
+	public boolean isIn(double x, double y) {
+		return x >= this.x && x <= this.x + unit && y >= this.y && y <= this.y + unit;
+	}
+
 	public boolean isIn(Entity e) {
 		return isIn(e.getX(), e.getY(), e.getWidth(), e.getHeight());
 	}
@@ -175,7 +179,7 @@ public class Chunk {
 		double xi = 0, yi = 0;
 
 		show();
-		
+
 		for (Entity e : getEntities().values()) {
 			if (!filter.test(e))
 				continue;
@@ -187,7 +191,7 @@ public class Chunk {
 			} else {
 				x = e.getX();
 			}
-			if (uy < 0) {
+			if (uy > 0) {
 				y = e.getY() + e.getHeight();
 			} else {
 				y = e.getY();
@@ -248,5 +252,5 @@ public class Chunk {
 	public String toString() {
 		return "Chunk [x=" + x + ", y=" + y + "]";
 	}
-	
+
 }
