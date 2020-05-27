@@ -178,7 +178,7 @@ public class Chunk {
 		Entity target = null;
 		double xi = 0, yi = 0;
 
-		show();
+//		show();
 
 		for (Entity e : getEntities().values()) {
 			if (!filter.test(e))

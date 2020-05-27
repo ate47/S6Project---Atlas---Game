@@ -10,7 +10,7 @@ public class Entity {
 	private static final Chunk[][] EMPTY_AREA = new Chunk[0][0];
 	private static final AtomicInteger INCREMENT = new AtomicInteger(0);
 	private boolean exist = false;
-	private double x = -1, y = -1;
+	private double x, y;
 	private double width, height;
 	private int id;
 	private World world;
@@ -19,6 +19,9 @@ public class Entity {
 	public Entity(double w, double h) {
 		this.width = w;
 		this.height = h;
+		// avoid conflict
+		x = -1 - w;
+		y = -1 - h;
 		id = INCREMENT.getAndIncrement();
 	}
 
@@ -79,8 +82,9 @@ public class Entity {
 		for (Chunk[] cs : area)
 			for (Chunk c : cs)
 				c.removeEntity(this);
-		x = -1;
-		y = -1;
+		// avoid conflict
+		x = -1 - width;
+		y = -1 - height;
 	}
 
 	/**
@@ -135,6 +139,9 @@ public class Entity {
 			this.y = -1;
 			return;
 		}
+		double oldX = this.x;
+		double oldY = this.y;
+
 		this.x = newx;
 		this.y = newy;
 
@@ -149,7 +156,7 @@ public class Entity {
 
 				Chunk newc = area[i][j] = world.getChunk(x, y);
 				// add if this new chunk wasn't colliding with the old location
-				if (newc != null) {
+				if (newc != null && !newc.isIn(oldX, oldY, width, height) && newc.isIn(this)) {
 					newc.addEntity(this);
 				}
 			}
@@ -179,8 +186,8 @@ public class Entity {
 		this.world = w;
 		world.spawnEntity(this);
 		this.exist = true;
-		int n = (int) (getWidth() / w.getUnit() + 1);
-		int m = (int) (getHeight() / w.getUnit() + 1);
+		int n = (int) (getWidth() / w.getUnit() + 2);
+		int m = (int) (getHeight() / w.getUnit() + 2);
 		area = new Chunk[n][m];
 		setLocation(x, y);
 	}
