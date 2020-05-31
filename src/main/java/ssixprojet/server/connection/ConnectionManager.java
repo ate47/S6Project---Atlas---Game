@@ -81,7 +81,7 @@ public class ConnectionManager {
 				Screen screen = new Screen(this);
 
 				AtlasGame.getAtlas().registerScreen(screen);
-				
+
 				client = screen;
 				close = SCREEN;
 				sendConnectionsPacket();
@@ -130,7 +130,7 @@ public class ConnectionManager {
 					System.out.println("[Player] " + plr.getUsername() + " reconnected!");
 					plr.setConnection(this);
 					plr.connect(name);
-					AtlasGame.getAtlas().sendToAllScreens(plr::createPacketSpawn);
+					AtlasGame.getAtlas().sendToAllScreens(plr.createPacketSpawn());
 					client = plr;
 					close = PLAYER;
 				}
@@ -193,7 +193,7 @@ public class ConnectionManager {
 	};
 	private final ConnectionCloseOperation PLAYER = c -> {
 		Player p = (Player) c;
-		AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS05PlayerDead(p.getId()));
+		AtlasGame.getAtlas().sendToAllScreens(new PacketS05PlayerDead(p.getId()));
 		p.disconnect();
 	};
 	private final ConnectionCloseOperation SCREEN = c -> {

@@ -2,6 +2,7 @@ let log = console.log;
 let canvas;
 let playerMap = [];
 let shoots = [];
+let crates = [];
 let scoresSurvivor = [];
 let scoresInfected = [];
 let playerSizeX = 0.005;
@@ -14,6 +15,7 @@ let IMAGE_MAP;
 let IMAGE_PLAYER_S;
 let IMAGE_PLAYER_I;
 let IMAGE_DEAD;
+let IMAGE_CRATE;
 
 const packetHandler = new PacketHandler('ws://' + window.location.host + '/game');
 
@@ -57,6 +59,13 @@ class PlayerData {
 			kills: 0,
 			timeAlive: 0
 		}
+	}
+}
+
+class Crate {
+	constructor(x, y) {
+		this.x = x;
+		this.y = y;
 	}
 }
 
@@ -222,6 +231,33 @@ class PacketS10ScoreScreen extends ServerPacket {
     }
 }
 
+class PacketS11CrateSpawn extends ServerPacket {
+	read(dataview){
+		if (dataview.byteLength < 4 + 8 * 2)
+			return false;
+		this.id = dataview.getInt32(0);
+		this.x = dataview.getFloat64(4);
+		this.y = dataview.getFloat64(12);
+	}
+    handle() {
+    	let crate = new Crate(this.x, this.y);
+    	crates[this.id] = crate;
+    }
+}
+
+class PacketS12CrateRemove extends ServerPacket {
+	read(dataview){
+		if (dataview.byteLength < 4)
+			return false;
+		this.id = dataview.getInt32(0);
+	}
+
+    handle() {
+    	// we remove the player from the map
+    	delete crates[this.id];
+    }
+}
+
 packetHandler.registerPacketBuilder(0x03, () => new PacketS03PlayerSpawn());
 packetHandler.registerPacketBuilder(0x04, () => new PacketS04PlayerMove());
 packetHandler.registerPacketBuilder(0x05, () => new PacketS05PlayerDead());
@@ -229,11 +265,14 @@ packetHandler.registerPacketBuilder(0x06, () => new PacketS06PlayerType());
 packetHandler.registerPacketBuilder(0x07, () => new PacketS07PlayerSize());
 packetHandler.registerPacketBuilder(0x08, () => new PacketS08Shot());
 packetHandler.registerPacketBuilder(0x10, () => new PacketS10ScoreScreen());
+packetHandler.registerPacketBuilder(0x11, () => new PacketS11CrateSpawn());
+packetHandler.registerPacketBuilder(0x12, () => new PacketS12CrateRemove());
 
 packetHandler.openWebSocket(function() {
 	playerMap = [];
 	scoresSurvivor = [];
 	scoresInfected = [];
+	crates = [];
 	if (isSetup)
 		IMAGE_MAP = loadImage("images/map.png");
 	packetHandler.sendPacket(new PacketC02ConnectScreen());
@@ -249,6 +288,7 @@ function setup() {
 	IMAGE_PLAYER_I = loadImage("images/plr_zombie.png");
 	IMAGE_DEAD = loadImage("images/dead.png");
 	IMAGE_MAP = loadImage("images/map.png");
+	IMAGE_CRATE = loadImage("images/bonus_ammos.png");
 	
 	isSetup = true;
 
@@ -362,6 +402,9 @@ function draw() {
 		
 		let sizeX = playerSizeX * windowWidth;
 		let sizeY = playerSizeY * windowHeight;
+
+		textSize(sizeX / 2);
+		fill(0);
 		
 		playerMap.forEach(function (player, id) {
 			let realX = player.x * windowWidth;
@@ -376,10 +419,18 @@ function draw() {
 			
 			rotate(-player.rotation);
 	
-			textSize(sizeX / 2);
-			fill(0);
 			text(id, 0, - sizeY / 2 - sizeX / 4);
 			
+			translate(-realX - sizeX / 2, -realY - sizeY / 2);
+		});
+		crates.forEach(function (crate) {
+			let realX = crate.x * windowWidth;
+			let realY = crate.y * windowHeight;
+	
+			translate(realX + sizeX / 2, realY + sizeY / 2);
+	
+			image(IMAGE_CRATE, - sizeX / 2, - sizeY / 2, sizeX, sizeY);
+	
 			translate(-realX - sizeX / 2, -realY - sizeY / 2);
 		});
 

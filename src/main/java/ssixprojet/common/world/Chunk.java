@@ -21,6 +21,7 @@ public class Chunk {
 	private Map<Integer, Entity> entities = new HashMap<>();
 
 	private List<Spawn> spawns = new ArrayList<>();
+	private List<Spawn> outsideSpawns = new ArrayList<>();
 
 	public Chunk(double unit, double x, double y) {
 		this.unit = unit;
@@ -29,6 +30,8 @@ public class Chunk {
 	}
 
 	public void addEntity(Entity e) {
+		if (e == null)
+			throw new Error();
 		entities.put(e.getEntityId(), e);
 	}
 
@@ -66,6 +69,10 @@ public class Chunk {
 		return spawns.get(RANDOM.nextInt(spawns.size()));
 	}
 
+	public Spawn getRandomOutsideSpawn() {
+		return outsideSpawns.get(RANDOM.nextInt(outsideSpawns.size()));
+	}
+
 	private int getRealPlayerCount() {
 		return (int) entities.values().stream()
 				.filter(e -> e instanceof Player && ((Player) e).getType() == PlayerType.SURVIVOR).count();
@@ -77,6 +84,10 @@ public class Chunk {
 
 	public List<Spawn> getSpawns() {
 		return spawns;
+	}
+
+	public List<Spawn> getOutsideSpawns() {
+		return outsideSpawns;
 	}
 
 	public Chunk getTop() {
@@ -178,7 +189,7 @@ public class Chunk {
 		Entity target = null;
 		double xi = 0, yi = 0;
 
-//		show();
+		// show();
 
 		for (Entity e : getEntities().values()) {
 			if (!filter.test(e))
@@ -244,8 +255,8 @@ public class Chunk {
 	public void show() {
 		final double x2 = x + unit;
 		final double y2 = y + unit;
-		AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS08Shot(x, y, x2, y2));
-		AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS08Shot(x2, y, x, y2));
+		AtlasGame.getAtlas().sendToAllScreens(new PacketS08Shot(x, y, x2, y2));
+		AtlasGame.getAtlas().sendToAllScreens(new PacketS08Shot(x2, y, x, y2));
 	}
 
 	@Override

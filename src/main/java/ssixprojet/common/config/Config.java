@@ -26,7 +26,7 @@ public class Config {
 	/**
 	 * luck of the spawn of a crate
 	 */
-	private double spawnCrateLuck = 1.0 / (5 * tickRate); // every 5 second
+	private int spawnCrateTime = tickRate * 10; // every 5 second
 	/**
 	 * speed added to the infected
 	 */
@@ -53,12 +53,17 @@ public class Config {
 	 * time before a player can reshoot
 	 */
 	private long millisBeforeReshooting = 100;
-	
+
 	/**
 	 * power of ammunition
 	 */
 	private int ammoPower = 21;
-	
+
+	/**
+	 * ammos per crate
+	 */
+	private int crateAmmos = 30;
+
 	public Config() {}
 
 	public int getAmmoPower() {
@@ -67,6 +72,10 @@ public class Config {
 
 	public int getChunkSplit() {
 		return chunkSplit;
+	}
+
+	public int getCrateAmmos() {
+		return crateAmmos;
 	}
 
 	public int getInitialInfectionPercentage() {
@@ -85,8 +94,8 @@ public class Config {
 		return port;
 	}
 
-	public double getSpawnCrateLuck() {
-		return spawnCrateLuck;
+	public int getSpawnCrateTime() {
+		return spawnCrateTime;
 	}
 
 	public int getSpeedAccelerationPercentage() {
@@ -125,6 +134,10 @@ public class Config {
 		this.chunkSplit = chunkSplit;
 	}
 
+	public void setCrateAmmos(int crateAmmos) {
+		this.crateAmmos = crateAmmos;
+	}
+
 	public void setInitialInfectionPercentage(int initialInfectionPercentage) {
 		this.initialInfectionPercentage = initialInfectionPercentage;
 	}
@@ -141,8 +154,8 @@ public class Config {
 		this.port = port;
 	}
 
-	public void setSpawnCrateLuck(double spawnCrateLuck) {
-		this.spawnCrateLuck = spawnCrateLuck;
+	public void setSpawnCrateTime(int spawnCrateTime) {
+		this.spawnCrateTime = spawnCrateTime;
 	}
 
 	public void setSpeedAccelerationPercentage(int speedAccelerationPercentage) {

@@ -12,7 +12,7 @@ public class Entity {
 	private boolean exist = false;
 	private double x, y;
 	private double width, height;
-	private int id;
+	private final int id;
 	private World world;
 	private Chunk[][] area = EMPTY_AREA;
 
@@ -81,7 +81,8 @@ public class Entity {
 		this.exist = false;
 		for (Chunk[] cs : area)
 			for (Chunk c : cs)
-				c.removeEntity(this);
+				if (c != null)
+					c.removeEntity(this);
 		// avoid conflict
 		x = -1 - width;
 		y = -1 - height;

@@ -2,10 +2,11 @@ package ssixprojet.server;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 import ssixprojet.common.GameMap;
 import ssixprojet.common.GamePhase;
@@ -16,6 +17,7 @@ import ssixprojet.common.Screen;
 import ssixprojet.common.SpawnLocation;
 import ssixprojet.common.config.Config;
 import ssixprojet.common.config.ConfigManager;
+import ssixprojet.common.entity.AmmoCrate;
 import ssixprojet.common.entity.Player;
 import ssixprojet.common.entity.PlayerType;
 import ssixprojet.common.entity.Wall;
@@ -45,6 +47,7 @@ public class AtlasGame {
 		return configManager;
 	}
 
+	private Map<Integer, AmmoCrate> crates = new HashMap<>();
 	private Player[] infectedScore = EMPTY_ARRAY, survivorScore = EMPTY_ARRAY;
 
 	private UUID serverUUID = UUID.randomUUID();
@@ -135,6 +138,10 @@ public class AtlasGame {
 
 	public CommandManager getCommandManager() {
 		return commandManager;
+	}
+
+	public Map<Integer, AmmoCrate> getCrates() {
+		return crates;
 	}
 
 	public long getGameEndTime() {
@@ -254,44 +261,65 @@ public class AtlasGame {
 			map.values().stream().filter(Player::isConnected).forEach(p -> p.kick("restarting..."));
 			map.clear();
 		}
-		
+
 		Map<UUID, Player> mapu = getWebServer().getConnectionManager().getPlayerMap();
 
 		synchronized (mapu) {
 			mapu.clear();
 		}
+
+		synchronized (crates) {
+			Iterator<Entry<Integer, AmmoCrate>> it = crates.entrySet().iterator();
+			while (it.hasNext()) {
+				it.next().getValue().kill(false);
+				it.remove();
+			}
+		}
+	}
+
+	public void spawnRandomCrate() {
+		AmmoCrate crate = new AmmoCrate(getConfig().getCrateAmmos());
+		crates.put(crate.getEntityId(), crate);
+		getMainWorld().spawnEntityOutsideAtRandomLocationWithoutMin(crate);
+		System.out.println("New crate spawning: (" + crate.getX() + ", " + crate.getY() + ")");
+	}
+
+	public void spawnCrate(int ammos, double x, double y) {
+		AmmoCrate crate = new AmmoCrate(ammos);
+		crates.put(crate.getEntityId(), crate);
+		crate.spawn(getMainWorld(), x, y);
 	}
 
 	public void sendScoreScreenPacket() {
 		int maxPlayer = Math.min(Math.min(10, survivorScore.length), survivorScore.length);
-		sendToAllScreens(() -> createScorePacket0(maxPlayer));
+		sendToAllScreens(createScorePacket0(maxPlayer));
 	}
 
-	public void sendToAll(Supplier<PacketServer> packetSupplier) {
+	public void sendToAll(PacketServer packetSupplier) {
 		sendToAllScreens(packetSupplier);
 		sendToAllMaster(packetSupplier);
 		sendToAllPlayer(packetSupplier);
 	}
 
-	public void sendToAllMaster(Supplier<PacketServer> packetSupplier) {
+	public void sendToAllMaster(PacketServer packet) {
 		Map<Integer, Master> masters = getWebServer().getConnectionManager().getMasters();
 
 		synchronized (masters) {
-			masters.values().stream().forEach(p -> p.sendPacket(packetSupplier.get()));
+			masters.values().stream().forEach(p -> p.sendPacket(packet));
 		}
 	}
 
-	public void sendToAllPlayer(Supplier<PacketServer> packetSupplier) {
+	public void sendToAllPlayer(PacketServer packet) {
 		Map<UUID, Player> players = getWebServer().getConnectionManager().getPlayerMap();
 
 		synchronized (players) {
-			players.values().stream().filter(Player::isConnected).forEach(p -> p.sendPacket(packetSupplier.get()));
+			players.values().stream().filter(Player::isConnected).forEach(p -> p.sendPacket(packet));
 		}
 	}
 
-	public void sendToAllScreens(Supplier<PacketServer> packetSupplier) {
+	public void sendToAllScreens(PacketServer packet) {
 		synchronized (screens) {
-			screens.forEach((id, screen) -> screen.sendPacket(packetSupplier.get()));
+			screens.forEach((id, screen) -> screen.sendPacket(packet));
 		}
 	}
 
@@ -305,7 +333,7 @@ public class AtlasGame {
 		if (this.phase == phase) {
 			if (this.phase == GamePhase.PLAYING)
 				gameStartTime = System.currentTimeMillis();
-			sendToAll(() -> new PacketS0BSetGamePhase(phase));
+			sendToAll(new PacketS0BSetGamePhase(phase));
 		}
 	}
 

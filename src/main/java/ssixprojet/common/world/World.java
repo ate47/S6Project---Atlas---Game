@@ -92,6 +92,8 @@ public class World {
 				}
 
 				c.getSpawns().add(newSpawn);
+				if (newSpawn.isOutside())
+					c.getOutsideSpawns().add(newSpawn);
 				spawns.add(newSpawn);
 			}
 	}
@@ -208,16 +210,54 @@ public class World {
 	 *            the entity
 	 */
 	public void spawnEntityAtRandomLocation(Entity e) {
+		spawnEntityAtRandomLocation(e, false);
+	}
+
+	/**
+	 * spawn an entity where there is a minimum survivor, this method call the
+	 * {@link Entity#spawn(World, double, double)} method.
+	 * 
+	 * @param e
+	 *            the entity
+	 * @param forceOutside
+	 *            if the entity must be outside
+	 */
+	public void spawnEntityAtRandomLocation(Entity e, boolean forceOutside) {
 		// get a random spawn on the chunk with the minimum player count
 
-		Spawn s = Arrays.stream(chunks).filter(c -> !c.getSpawns().isEmpty())
-				.collect(Collectors.minBy((c1, c2) -> c1.getPlayerCount() - c2.getPlayerCount())).get()
-				.getRandomSpawn();
+		Spawn s;
+
+		if (forceOutside) {
+			s = Arrays.stream(chunks).filter(c -> !c.getOutsideSpawns().isEmpty())
+					.collect(Collectors.minBy((c1, c2) -> c1.getPlayerCount() - c2.getPlayerCount())).get()
+					.getRandomOutsideSpawn();
+		} else {
+			s = Arrays.stream(chunks).filter(c -> !c.getSpawns().isEmpty())
+					.collect(Collectors.minBy((c1, c2) -> c1.getPlayerCount() - c2.getPlayerCount())).get()
+					.getRandomSpawn();
+		}
 
 		double x = s.getRandomX(), y = s.getRandomY();
 
-		if (x > 1 || y > 1)
-			System.out.println(s);
+		e.spawn(this, x, y);
+	}
+
+	/**
+	 * spawn an entity where there is a minimum survivor, this method call the
+	 * {@link Entity#spawn(World, double, double)} method.
+	 * 
+	 * @param e
+	 *            the entity
+	 * @param forceOutside
+	 *            if the entity must be outside
+	 */
+	public void spawnEntityOutsideAtRandomLocationWithoutMin(Entity e) {
+		Chunk[] cs = Arrays.stream(chunks).filter(c -> !c.getOutsideSpawns().isEmpty()).toArray(Chunk[]::new);
+
+		Spawn s = cs[RANDOM.nextInt(cs.length)].getRandomOutsideSpawn();
+
+		double x = s.getRandomX(), y = s.getRandomY();
+
 		e.spawn(this, x, y);
 	}
 

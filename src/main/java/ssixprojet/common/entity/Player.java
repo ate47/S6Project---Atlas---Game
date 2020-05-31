@@ -1,6 +1,8 @@
 package ssixprojet.common.entity;
 
 import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -185,7 +187,7 @@ public class Player extends Entity implements ConnectionClient {
 	@Override
 	public void respawn(double x, double y) {
 		super.respawn(x, y);
-		AtlasGame.getAtlas().sendToAllScreens(this::createPacketSpawn);
+		AtlasGame.getAtlas().sendToAllScreens(createPacketSpawn());
 	}
 
 	@Override
@@ -219,7 +221,7 @@ public class Player extends Entity implements ConnectionClient {
 		// update phone type
 		sendPacket(new PacketS06PlayerType(type.getId(), 0));
 		// update type on every screens
-		AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS06PlayerType(type.getId(), id));
+		AtlasGame.getAtlas().sendToAllScreens(new PacketS06PlayerType(type.getId(), id));
 	}
 
 	public void shooting() {
@@ -246,7 +248,7 @@ public class Player extends Entity implements ConnectionClient {
 			if (trace.getTarget().shot(this)) {
 				setAmmos(Math.min(getAmmos() + (100 / AMMO_POWER) + 3, START_AMMOS));
 			}
-			AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS08Shot(ox, oy, xf, yf));
+			AtlasGame.getAtlas().sendToAllScreens(new PacketS08Shot(ox, oy, xf, yf));
 		}
 
 	}
@@ -268,7 +270,7 @@ public class Player extends Entity implements ConnectionClient {
 	@Override
 	public void spawn(World w, double x, double y) {
 		super.spawn(w, x, y);
-		AtlasGame.getAtlas().sendToAllScreens(this::createPacketSpawn);
+		AtlasGame.getAtlas().sendToAllScreens(createPacketSpawn());
 	}
 
 	/**
@@ -298,29 +300,52 @@ public class Player extends Entity implements ConnectionClient {
 		}
 		move(preDeltaX, preDeltaY);
 
+		Chunk[][] area = getArea();
+
 		if (type == PlayerType.INFECTED) {
-			Chunk[][] area = getArea();
 
 			int touches = 0;
 
 			for (int i = 0; i < area.length; i++)
 				for (int j = 0; j < area[i].length; j++)
-					touches += area[i][j].getEntities().values().stream().filter(e -> e instanceof Player)
-							.map(e -> (Player) e)
-							.filter(p -> p.isConnected() && p.type == PlayerType.SURVIVOR && p.collide(this))
-							.mapToInt(p -> {
-								p.infect();
-								return 1;
-							}).sum();
+					if (area[i][j] != null)
+						touches += area[i][j].getEntities().values().stream().filter(e -> e instanceof Player)
+								.map(e -> (Player) e)
+								.filter(p -> p.isConnected() && p.type == PlayerType.SURVIVOR && p.collide(this))
+								.mapToInt(p -> {
+									p.infect();
+									return 1;
+								}).sum();
 
 			if (touches != 0) {
 				if (getHealth() < 75)
 					setHealth(75);
 				score.infections += touches;
 			}
+		} else { // survivor
+
+			int ammos = 0;
+
+			for (int i = 0; i < area.length; i++)
+				for (int j = 0; j < area[i].length; j++)
+					if (area[i][j] != null) {
+						for (Iterator<Entry<Integer, Entity>> it = area[i][j].getEntities().entrySet().iterator(); it
+								.hasNext();) {
+							Entity e = it.next().getValue();
+							if (e instanceof AmmoCrate && e.collide(this)) {
+								AmmoCrate ac = (AmmoCrate) e;
+								ammos += ac.getAmmos();
+								ac.kill(true, false);
+								it.remove();
+							}
+						}
+					}
+
+			if (ammos != 0)
+				setAmmos(Math.min(getAmmos() + ammos, START_AMMOS));
 		}
 
-		AtlasGame.getAtlas().sendToAllScreens(() -> new PacketS04PlayerMove(id, getX(), getY(), lookX, lookY));
+		AtlasGame.getAtlas().sendToAllScreens(new PacketS04PlayerMove(id, getX(), getY(), lookX, lookY));
 	}
 
 	public void setEnd() {
