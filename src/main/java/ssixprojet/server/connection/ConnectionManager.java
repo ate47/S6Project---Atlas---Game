@@ -38,8 +38,8 @@ public class ConnectionManager {
 			this.client = this;
 		}
 
-		private void sendConnectionsPacket() {
-			client.sendPacket(new PacketS0BSetGamePhase(AtlasGame.getAtlas().getPhase()));
+		private PacketServer getConnectionsPacket() {
+			return new PacketS0BSetGamePhase(AtlasGame.getAtlas().getPhase());
 		}
 
 		private boolean checkConnected() {
@@ -69,9 +69,10 @@ public class ConnectionManager {
 				}
 				client = plr;
 				close = PLAYER;
-				sendConnectionsPacket();
+				PacketServer co = getConnectionsPacket();
 				// send the uuid for reconnection
-				plr.sendPacket(new PacketS02PlayerRegister(plr.getInternalId(), plr.getId()));
+				co.setNext(new PacketS02PlayerRegister(plr.getInternalId(), plr.getId()));
+				plr.sendPacket(co);
 				System.out.println("[Player] " + name + " connected!");
 			}
 		}
@@ -85,7 +86,7 @@ public class ConnectionManager {
 
 				client = screen;
 				close = SCREEN;
-				sendConnectionsPacket();
+				sendPacket(getConnectionsPacket());
 				System.out.println("[Screen#" + screen.getInternalId() + "] new screen connected!");
 			}
 		}
@@ -167,9 +168,11 @@ public class ConnectionManager {
 
 			client = master;
 			close = MASTER;
-			sendConnectionsPacket();
+			PacketServer co = getConnectionsPacket();
+			// send the uuid for reconnection
+			co.setNext(new PacketS0DMasterLogged());
+			master.sendPacket(co);
 			System.out.println("[Master] new master connected!");
-			master.sendPacket(new PacketS0DMasterLogged());
 		}
 
 		private final PacketServerSizeResult result = new PacketServerSizeResult();
