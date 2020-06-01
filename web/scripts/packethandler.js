@@ -282,21 +282,28 @@ class PacketHandler {
     }
     webSocketMessage(ev) {
     	const viewint = new DataView(event.data);
+    	let packetId, builder, size;
     	
-    	const packetId = viewint.getInt32(0);
-    	const builder = this.packetBuilder[packetId];
+    	const count = viewint.getInt32(0);
+    	let delta = 4; // data shift
     	
-    	if (builder != undefined) {
-    		const view = new DataView(event.data, 4);
-    		const packet = builder();
-    		
-    		if (packet.read(view) === false)
-    			return;
-            if (DEBUG)
-            	console.log(packet);
-    		packet.handle();
-    	} else {
-    		console.log("Weird packet id: " + packetId);
+    	for (let i = 0; i < count; i++) {
+    		packetId = viewint.getInt32(delta);
+    		size = viewint.getInt32(delta + 4);
+    		builder = this.packetBuilder[packetId];
+        	if (builder != undefined) {
+        		const view = new DataView(event.data, delta + 8, size);
+        		const packet = builder();
+        		
+        		if (packet.read(view) === false)
+        			return;
+                if (DEBUG)
+                	console.log(packet);
+        		packet.handle();
+        	} else {
+        		console.log("Weird packet id: " + packetId);
+        	}
+        	delta += 8 + size;
     	}
     }
     webSocketClose(ev) {

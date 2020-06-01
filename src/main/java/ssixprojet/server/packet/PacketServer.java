@@ -8,13 +8,18 @@ import io.netty.buffer.ByteBuf;
 
 public abstract class PacketServer {
 
+	public static class PacketServerSizeResult {
+		public int size;
+		public int count;
+	}
+
 	public static void writeUUID(ByteBuf buf, UUID uuid) {
 		buf.writeLong(uuid.getMostSignificantBits());
 		buf.writeLong(uuid.getLeastSignificantBits());
 	}
 
 	private int initialSize;
-
+	private PacketServer next;
 	private final int id;
 
 	public PacketServer(int id, int initialSize) {
@@ -24,6 +29,26 @@ public abstract class PacketServer {
 		if (initialSize < 0)
 			throw new IllegalArgumentException("an initial size can't be negative");
 		this.initialSize = initialSize;
+	}
+
+	public void setNext(PacketServer next) {
+		this.next = next;
+	}
+
+	public PacketServer getNext() {
+		return next;
+	}
+
+	public void getFullSize(PacketServerSizeResult result) {
+		result.count = result.size = 0;
+		getFullSize0(result);
+	}
+
+	private void getFullSize0(PacketServerSizeResult result) {
+		result.count++;
+		result.size += getInitialSize();
+		if (next != null)
+			next.getFullSize0(result);
 	}
 
 	/**

@@ -7,10 +7,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
-import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import ssixprojet.common.config.PlayerScore;
 import ssixprojet.common.world.Chunk;
@@ -19,7 +16,6 @@ import ssixprojet.common.world.World;
 import ssixprojet.server.AtlasGame;
 import ssixprojet.server.connection.Connection;
 import ssixprojet.server.connection.ConnectionClient;
-import ssixprojet.server.packet.PacketServer;
 import ssixprojet.server.packet.client.PacketC04Move;
 import ssixprojet.server.packet.server.PacketS03PlayerSpawn;
 import ssixprojet.server.packet.server.PacketS04PlayerMove;
@@ -188,17 +184,6 @@ public class Player extends Entity implements ConnectionClient {
 	public void respawn(double x, double y) {
 		super.respawn(x, y);
 		AtlasGame.getAtlas().sendToAllScreens(createPacketSpawn());
-	}
-
-	@Override
-	public void sendPacket(PacketServer packet) {
-		if (connection == null || connection.getChannel() == null)
-			return;
-		ByteBuf buffer = Unpooled.buffer(packet.getInitialSize() + 4);
-		buffer.writeInt(packet.getPacketId());
-		packet.write(buffer);
-		BinaryWebSocketFrame frame = new BinaryWebSocketFrame(buffer);
-		connection.getChannel().writeAndFlush(frame);
 	}
 
 	public void setAmmos(int ammos) {

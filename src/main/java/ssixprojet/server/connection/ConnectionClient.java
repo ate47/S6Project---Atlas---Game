@@ -17,7 +17,11 @@ public interface ConnectionClient {
 	 * @param packet
 	 *            the packet to send
 	 */
-	void sendPacket(PacketServer packet);
+	default void sendPacket(PacketServer packet) {
+		Connection c = getConnection();
+		if (c != null)
+			c.sendPacket(packet);
+	}
 	
 	Connection getConnection();
 	

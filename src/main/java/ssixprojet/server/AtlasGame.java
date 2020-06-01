@@ -57,6 +57,8 @@ public class AtlasGame {
 	private WebServer webServer;
 
 	private GameServer gameServer;
+	private final Object SCREEN_PACKET_LOCKER = new Object() {};
+	private PacketServer screenPacket = null;
 
 	private CommandManager commandManager;
 
@@ -318,8 +320,19 @@ public class AtlasGame {
 	}
 
 	public void sendToAllScreens(PacketServer packet) {
-		synchronized (screens) {
-			screens.forEach((id, screen) -> screen.sendPacket(packet));
+		synchronized (SCREEN_PACKET_LOCKER) {
+			packet.setNext(screenPacket);
+			screenPacket = packet;
+		}
+	}
+
+	public void sendAllScreenPackets() {
+		synchronized (SCREEN_PACKET_LOCKER) {
+			if (screenPacket != null)
+				synchronized (screens) {
+					screens.forEach((id, screen) -> screen.sendPacket(screenPacket));
+				}
+			screenPacket = null;
 		}
 	}
 

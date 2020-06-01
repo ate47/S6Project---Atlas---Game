@@ -21,6 +21,7 @@ public class GameServer extends Server {
 			long start = System.currentTimeMillis();
 			
 			executeActions();
+			atlas.sendAllScreenPackets();
 			atlas.tick();
 			
 			long deltaTime = start + rate - System.currentTimeMillis();

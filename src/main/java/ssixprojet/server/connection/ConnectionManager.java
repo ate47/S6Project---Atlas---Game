@@ -15,6 +15,7 @@ import ssixprojet.common.Screen;
 import ssixprojet.common.entity.Player;
 import ssixprojet.server.AtlasGame;
 import ssixprojet.server.packet.PacketServer;
+import ssixprojet.server.packet.PacketServer.PacketServerSizeResult;
 import ssixprojet.server.packet.server.PacketS02PlayerRegister;
 import ssixprojet.server.packet.server.PacketS05PlayerDead;
 import ssixprojet.server.packet.server.PacketS0BSetGamePhase;
@@ -138,15 +139,6 @@ public class ConnectionManager {
 		}
 
 		@Override
-		public void sendPacket(PacketServer packet) {
-			ByteBuf buffer = Unpooled.buffer(packet.getInitialSize() + 4);
-			buffer.writeInt(packet.getPacketId());
-			packet.write(buffer);
-			BinaryWebSocketFrame frame = new BinaryWebSocketFrame(buffer);
-			channel.writeAndFlush(frame);
-		}
-
-		@Override
 		public void setAttachedClient(ConnectionClient client) {
 			this.client = client;
 		}
@@ -178,6 +170,24 @@ public class ConnectionManager {
 			sendConnectionsPacket();
 			System.out.println("[Master] new master connected!");
 			master.sendPacket(new PacketS0DMasterLogged());
+		}
+
+		private final PacketServerSizeResult result = new PacketServerSizeResult();
+
+		@Override
+		public void sendPacket(PacketServer packet) {
+			if (channel == null)
+				return;
+			packet.getFullSize(result);
+			ByteBuf buffer = Unpooled.buffer(result.count * 8 + result.size + 4);
+			buffer.writeInt(result.count);
+			for (PacketServer c = packet; c != null; c = c.getNext()) {
+				buffer.writeInt(c.getPacketId());
+				buffer.writeInt(c.getInitialSize());
+				c.write(buffer);
+			}
+			BinaryWebSocketFrame frame = new BinaryWebSocketFrame(buffer);
+			channel.writeAndFlush(frame);
 		}
 
 	}
