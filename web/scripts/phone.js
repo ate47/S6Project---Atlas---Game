@@ -213,6 +213,7 @@ class PacketS06PlayerType extends ServerPacket {
 
     handle() {
     	playerData.type = this.type;
+    	log("new type: " + playerData.type);
     }
 }
 class PacketS09ChangeHealth extends ServerPacket {

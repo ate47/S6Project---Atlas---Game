@@ -10,7 +10,7 @@ public class PacketS10ScoreScreen extends PacketServer {
 	private Player[] infectedScore, survivorScore;
 
 	public PacketS10ScoreScreen(int maxPlayer, Player[] infectedScore, Player[] survivorScore) {
-		super(0x10, 4/* maxPlayer */ + maxPlayer * 4 * 8 /* id, sortid, scores(6) */);
+		super(0x10, 4/* maxPlayer */ + maxPlayer * 4 * 8 * 2 /* id, sortid, scores(6) */);
 
 		if (maxPlayer > infectedScore.length || maxPlayer > survivorScore.length)
 			throw new IllegalArgumentException(

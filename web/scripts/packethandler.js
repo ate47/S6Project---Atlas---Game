@@ -1,7 +1,7 @@
 const textDecoder = new TextDecoder();
 const textEncoder = new TextEncoder();
 
-const DEBUG = false;
+const DEBUG = true;
 
 const PLAYER_TYPE_INFECTED = 0;
 const PLAYER_TYPE_SURVIVOR = 1;
@@ -290,6 +290,9 @@ class PacketHandler {
     	for (let i = 0; i < count; i++) {
     		packetId = viewint.getInt32(delta);
     		size = viewint.getInt32(delta + 4);
+            if (DEBUG) {
+            	log("Packet(packetId: "+packetId+", size: "+size+")")
+            }
     		builder = this.packetBuilder[packetId];
         	if (builder != undefined) {
         		const view = new DataView(event.data, delta + 8, size);

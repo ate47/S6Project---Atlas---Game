@@ -298,9 +298,9 @@ public class AtlasGame {
 	}
 
 	public void sendToAll(PacketServer packetSupplier) {
-		sendToAllScreens(packetSupplier);
 		sendToAllMaster(packetSupplier);
 		sendToAllPlayer(packetSupplier);
+		sendToAllScreens(packetSupplier);
 	}
 
 	public void sendToAllMaster(PacketServer packet) {

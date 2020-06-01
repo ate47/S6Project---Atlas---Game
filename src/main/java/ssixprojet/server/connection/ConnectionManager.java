@@ -182,12 +182,20 @@ public class ConnectionManager {
 			if (channel == null)
 				return;
 			packet.getFullSize(result);
-			ByteBuf buffer = Unpooled.buffer(result.count * 8 + result.size + 4);
+			int size = result.count * 8 + result.size + 4;
+			ByteBuf buffer = Unpooled.buffer(size, size);
 			buffer.writeInt(result.count);
 			for (PacketServer c = packet; c != null; c = c.getNext()) {
+				if (c.getPacketId() == 3 && client instanceof Player) {
+					new Error().printStackTrace();
+					System.exit(0);
+				}
 				buffer.writeInt(c.getPacketId());
 				buffer.writeInt(c.getInitialSize());
+				int futureOffset = buffer.writerIndex() + c.getInitialSize();
 				c.write(buffer);
+				if (buffer.writerIndex() != futureOffset)
+					throw new Error("buffer.writerIndex() = " + buffer.writerIndex() + " != futureOffset = " + futureOffset + ", packet = " + c);
 			}
 			BinaryWebSocketFrame frame = new BinaryWebSocketFrame(buffer);
 			channel.writeAndFlush(frame);

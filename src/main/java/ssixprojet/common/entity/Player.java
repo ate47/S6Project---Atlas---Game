@@ -204,7 +204,7 @@ public class Player extends Entity implements ConnectionClient {
 			score.timeAlive = (int) (System.currentTimeMillis() - AtlasGame.getAtlas().getGameStartTime());
 		this.type = type;
 		// update phone type
-		sendPacket(new PacketS06PlayerType(type.getId(), 0));
+		sendPacket(new PacketS06PlayerType(type.getId(), -1));
 		// update type on every screens
 		AtlasGame.getAtlas().sendToAllScreens(new PacketS06PlayerType(type.getId(), id));
 	}
