@@ -32,7 +32,7 @@ public abstract class PacketServer {
 	}
 
 	public void setNext(PacketServer next) {
-		if (next == null)
+		if (this.next == null)
 			this.next = next;
 		else
 			this.next.setNext(next);
