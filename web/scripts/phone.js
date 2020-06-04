@@ -11,7 +11,7 @@ let playerUUID = false;
 
 let left = false;
 let right = false;
-
+let go=0;
 let handle = false;
 let playerData = {
 	health: 100,
@@ -351,7 +351,85 @@ function draw() {
 	}
 
 	if (phase == GAME_PHASE_WAITING) {
-		image(IMAGE_TUTO, 0,0, windowWidth, windowHeight);
+		
+		
+		if(millis()%5000<2500){
+		
+		
+		//image(IMAGE_TUTO, 0,0, windowWidth, windowHeight);
+		textSize(windowHeight / 10);
+		noStroke();
+		
+		
+		
+		
+		fill(color(0, 0, 80));
+		rect(0, 0, windowWidth, windowHeight);
+		
+		translate(windowWidth / 2, windowHeight / 5);
+		fill(255);
+		text("Munitions: " + playerData.ammos, 0, 0);
+		
+		
+		translate(-windowWidth / 2, -windowHeight / 5);
+		left.draw();
+		right.draw();
+		textSize(windowWidth / 5);
+		text(playerData.id, windowWidth / 2, windowHeight * 3 / 5);
+		textSize(windowWidth / 40);
+		fill(color(200, 0, 0));
+		text("votre numéro", windowWidth / 2, windowHeight * 3 / 3.7);
+		translate(-windowWidth / 2, -windowHeight / 5);
+		textSize(windowWidth / 40);
+		text("curseur de déplacement", windowWidth*0.65, windowHeight*1.1  );
+		text("curseur de tir/rotation", windowWidth*1.35, windowHeight*1.15  );
+		text("nombre de munition",  windowWidth,windowHeight*0.5  );
+		
+		textSize(windowHeight / 9);
+		text("SURVIVANT",  windowWidth,windowHeight*0.27);
+		textSize(windowHeight / 10);
+		}
+		else{
+			fill(color(0, 80, 0));
+			rect(0, 0, windowWidth, windowHeight);
+	
+			translate(windowWidth / 2, windowHeight / 5);
+			fill(127);
+			rect(-windowWidth/4, -windowHeight / 20, windowWidth/2, windowHeight / 10);
+			
+			if (playerData.health < 25)
+				fill(color(255, 0, 0));
+			else if(playerData.health < 50)
+				fill(color(255, 255, 0));
+			else
+				fill(color(0, 255, 0));
+	
+			rect(-windowWidth/4, -windowHeight / 20, playerData.health * windowWidth / 200, windowHeight / 10);
+			
+	
+			fill(0);
+			text("Vie: "+playerData.health, 0, 0);
+			
+			translate(-windowWidth / 2, -windowHeight / 5);
+			left.draw();
+			right.draw();
+			textSize(windowWidth / 5);
+			text(playerData.id, windowWidth / 2, windowHeight * 3 / 5);
+			textSize(windowWidth / 40);
+			fill(color(255, 255, 0));
+			text("votre numéro", windowWidth / 2, windowHeight * 3 / 3.7);
+			translate(-windowWidth / 2, -windowHeight / 5);
+			textSize(windowWidth / 40);
+			text("curseur de déplacement", windowWidth*0.65, windowHeight*1.1  );
+			text("curseur de tir/rotation", windowWidth*1.35, windowHeight*1.15  );
+			text("nombre de point de vie",  windowWidth,windowHeight*0.5  );
+			
+			textSize(windowHeight / 9);
+			text("ZOMBIE",  windowWidth,windowHeight*0.27);
+			textSize(windowHeight / 10);
+		
+		
+		}
 		/*
 		fill(color(0x3A, 0x46, 0));
 		rect(0, 0, windowWidth, windowHeight);
@@ -456,6 +534,8 @@ function draw() {
 }
 
 
+
+
 function touchStarted(ev) {
 	if (phase != GAME_PHASE_PLAYING)
 		return false;
@@ -473,6 +553,11 @@ function touchStarted(ev) {
 	}
 	return false;
 }
+
+
+
+
+
 function touchMoved(ev) {
 	if (phase != GAME_PHASE_PLAYING)
 		return false;
