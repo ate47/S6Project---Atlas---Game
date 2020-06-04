@@ -421,7 +421,7 @@ function draw() {
 			translate(-windowWidth / 2, -windowHeight / 5);
 			textSize(windowWidth / 40);
 			text("curseur de déplacement", windowWidth*0.65, windowHeight*1.1  );
-			text("curseur de tir/rotation", windowWidth*1.35, windowHeight*1.15  );
+			text("curseur de rotation", windowWidth*1.35, windowHeight*1.15  );
 			text("nombre de point de vie",  windowWidth,windowHeight*0.5  );
 			
 			textSize(windowHeight / 9);
