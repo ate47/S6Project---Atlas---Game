@@ -180,7 +180,7 @@ class PacketS10ScoreScreen extends ServerPacket {
 		this.maxPlayer = dataview.getInt32(0);
 
 		if (dataview.byteLength < 4/* maxPlayer */ + 
-				this.maxPlayer * 4 * 8 /* id, sortid, scores(6) */)
+				this.maxPlayer * 4 * 8 * 2 /* id, sortid, scores(6) */)
 			return false;
 		
 		this.infected = [];
@@ -219,14 +219,36 @@ class PacketS10ScoreScreen extends ServerPacket {
 		scoresSurvivor = [];
 		scoresInfected = [];
 		
-    	let inf, sur;
+    	let ninf, nsur, linf, lsur;
 		for (let i = 0; i < this.maxPlayer; i++) {
-			inf = this.infected[i];
-			sur = this.survivor[i];
-			playerMap[inf.id].score = inf;
-			playerMap[sur.id].score = sur;
-			scoresSurvivor[i] = inf.id;
-			scoresInfected[i] = sur.id;
+			ninf = this.infected[i];
+			nsur = this.survivor[i];
+			linf = playerMap[inf.id].score;
+			lsur = playerMap[sur.id].score;
+			
+			if (linf != undefined) {
+				linf.infectionSortId = ninf.infectionSortId;
+				linf.damageGiven = ninf.damageGiven;
+				linf.damageTaken = ninf.damageTaken;
+				linf.death = ninf.death;
+				linf.infections = ninf.infections;
+				linf.kills = ninf.kills;
+				linf.timeAlive = ninf.timeAlive;
+				scoresSurvivor[i] = inf.id;
+			} else
+				scoresInfected[i] = -1;
+			if (lsur != undefined) {
+				lsur.survivorSortId = nsur.survivorSortId;
+				lsur.damageGiven = nsur.damageGiven;
+				lsur.damageTaken = nsur.damageTaken;
+				lsur.death = nsur.death;
+				lsur.infections = nsur.infections;
+				lsur.kills = nsur.kills;
+				lsur.timeAlive = nsur.timeAlive;
+				scoresInfected[i] = sur.id;
+			} else
+				scoresInfected[i] = -1;
+			
 		}
     }
 }
@@ -468,6 +490,8 @@ function draw() {
 		let y, number, p;
 		for (const i in scoresSurvivor) {
 			number = parseInt(i, 10);
+			if (number == -1)
+				continue;
 			if (number == 0) {
 				fill(color(255,255,0));
 			} else if (number == 1)
@@ -486,6 +510,8 @@ function draw() {
 		}
 		for (const i in scoresInfected) {
 			number = parseInt(i, 10);
+			if (number == -1)
+				continue;
 			if (number == 0) {
 				fill(color(255,255,0));
 			} else if (number == 1)

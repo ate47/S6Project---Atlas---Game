@@ -8,7 +8,7 @@
   "speedAccelerationPercentage": 110,
   "startAmmo": 90,
   "timeInTickBeforeEnd": 4800,
-  "timeInTickBeforeInfection": 600,
+  "timeInTickBeforeInfection": 80,
   "chunkSplit": 20,
   "millisBeforeReshooting": 100,
   "ammoPower": 21,
