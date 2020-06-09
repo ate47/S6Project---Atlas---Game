@@ -223,8 +223,8 @@ class PacketS10ScoreScreen extends ServerPacket {
 		for (let i = 0; i < this.maxPlayer; i++) {
 			ninf = this.infected[i];
 			nsur = this.survivor[i];
-			linf = playerMap[inf.id].score;
-			lsur = playerMap[sur.id].score;
+			linf = playerMap[ninf.id].score;
+			lsur = playerMap[nsur.id].score;
 			
 			if (linf != undefined) {
 				linf.infectionSortId = ninf.infectionSortId;
@@ -234,7 +234,7 @@ class PacketS10ScoreScreen extends ServerPacket {
 				linf.infections = ninf.infections;
 				linf.kills = ninf.kills;
 				linf.timeAlive = ninf.timeAlive;
-				scoresSurvivor[i] = inf.id;
+				scoresSurvivor[i] = ninf.id;
 			} else
 				scoresInfected[i] = -1;
 			if (lsur != undefined) {
@@ -245,7 +245,7 @@ class PacketS10ScoreScreen extends ServerPacket {
 				lsur.infections = nsur.infections;
 				lsur.kills = nsur.kills;
 				lsur.timeAlive = nsur.timeAlive;
-				scoresInfected[i] = sur.id;
+				scoresInfected[i] = nsur.id;
 			} else
 				scoresInfected[i] = -1;
 			
